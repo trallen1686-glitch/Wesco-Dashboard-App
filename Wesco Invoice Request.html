@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wesco Invoice Request</title>
+  <style>
+    :root {
+      --navy: #173c58;
+      --blue: #2875bb;
+      --red: #7b1f31;
+      --ink: #17232d;
+      --muted: #5c6b78;
+      --line: #cbd5de;
+      --soft: #eef4f8;
+      --paper: #ffffff;
+      --page: #edf1f4;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 32px auto;
+      padding: 42px 48px 48px;
+      background: var(--paper);
+      border: 1px solid #dbe2e8;
+      box-shadow: 0 12px 34px rgba(23, 60, 88, 0.12);
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 22px;
+      border-bottom: 4px solid var(--navy);
+    }
+
+    .logo { width: 210px; height: auto; display: block; }
+    .title { text-align: right; }
+    h1 { margin: 5px 0 4px; color: var(--navy); font-size: 30px; line-height: 1.1; letter-spacing: 0; }
+    .subtitle { margin: 0; color: var(--blue); font-size: 17px; font-weight: 700; }
+
+    .notice {
+      margin: 24px 0;
+      padding: 14px 16px;
+      color: var(--navy);
+      background: var(--soft);
+      border-left: 4px solid var(--blue);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    fieldset { margin: 0; padding: 0; border: 0; }
+    legend { width: 100%; margin-bottom: 14px; color: var(--navy); font-size: 19px; font-weight: 700; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px 20px; }
+    .field { min-width: 0; }
+    .field.wide { grid-column: 1 / -1; }
+    label { display: block; margin-bottom: 7px; color: var(--navy); font-size: 14px; font-weight: 700; }
+    .required { color: var(--red); }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #aebdca;
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
+    input:focus, select:focus, textarea:focus { outline: 3px solid rgba(40, 117, 187, .2); border-color: var(--blue); }
+
+    .preview-wrap { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line); }
+    .preview-wrap h2 { margin: 0 0 14px; color: var(--blue); font-size: 19px; letter-spacing: 0; }
+    #emailPreview { padding: 18px; background: #f8fafb; border: 1px solid var(--line); line-height: 1.55; white-space: pre-wrap; }
+
+    .actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 24px; }
+    button {
+      min-height: 46px;
+      padding: 0 24px;
+      border: 0;
+      border-radius: 4px;
+      background: var(--navy);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: #0f3048; }
+    button:focus-visible { outline: 3px solid rgba(40, 117, 187, .35); outline-offset: 3px; }
+    #status { min-height: 22px; color: #246b3e; font-weight: 700; }
+
+    @media (max-width: 680px) {
+      main { width: 100%; margin: 0; padding: 24px 18px 30px; border: 0; box-shadow: none; }
+      header { align-items: center; }
+      .logo { width: 155px; }
+      h1 { font-size: 23px; }
+      .subtitle { font-size: 14px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.wide { grid-column: auto; }
+      .actions { align-items: stretch; flex-direction: column; }
+      button { width: 100%; }
+    }
+
+    @media print {
+      :root { background: #fff; }
+      main { width: 100%; margin: 0; padding: 24px; border: 0; box-shadow: none; }
+      .actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc.">
+      <div class="title">
+        <h1>Wesco, Inc.</h1>
+        <p class="subtitle">INVOICE REQUEST</p>
+      </div>
+    </header>
+
+    <p class="notice">IMPORTANT: Please do not delete any information from this template. Use N/A if needed.</p>
+
+    <form id="invoiceForm">
+      <fieldset>
+        <legend>Request Details</legend>
+        <div class="form-grid">
+          <div class="field">
+            <label for="propertyName">Property Name <span class="required">*</span></label>
+            <input id="propertyName" name="propertyName" required placeholder="Property name or N/A">
+          </div>
+          <div class="field">
+            <label for="inspectionDate">Final Inspection Date <span class="required">*</span></label>
+            <input id="inspectionDate" name="inspectionDate" required placeholder="Date or N/A">
+          </div>
+          <div class="field">
+            <label for="estimateNumber">Estimate Number <span class="required">*</span></label>
+            <input id="estimateNumber" name="estimateNumber" required placeholder="#XXXX or N/A">
+          </div>
+          <div class="field">
+            <label for="accountingEmail">Accounting Email <span class="required">*</span></label>
+            <input id="accountingEmail" name="accountingEmail" required placeholder="Email address or N/A">
+          </div>
+          <div class="field wide">
+            <label for="associate">Copy / Associate <span class="required">*</span></label>
+            <input id="associate" name="associate" required placeholder="Associate who requested work / executed contract or N/A">
+          </div>
+          <div class="field">
+            <label for="lienWaiver">Final Lien Waiver <span class="required">*</span></label>
+            <select id="lienWaiver" name="lienWaiver" required>
+              <option value="">Select an option</option>
+              <option>IS NEEDED</option>
+              <option>IS NOT NEEDED</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="estimateReference">Estimate Reference <span class="required">*</span></label>
+            <select id="estimateReference" name="estimateReference" required>
+              <option value="">Select an option</option>
+              <option>ATTACHED</option>
+              <option>COPIED BELOW</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="field wide">
+            <label for="referenceNotes">Estimate / Reference Notes</label>
+            <textarea id="referenceNotes" name="referenceNotes" placeholder="Paste estimate details here, note the attachment, or enter N/A"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <section class="preview-wrap" aria-labelledby="previewHeading">
+        <h2 id="previewHeading">EMAIL BODY</h2>
+        <div id="emailPreview" aria-live="polite"></div>
+      </section>
+
+      <div class="actions">
+        <span id="status" role="status" aria-live="polite"></span>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('invoiceForm');
+    const preview = document.getElementById('emailPreview');
+    const status = document.getElementById('status');
+    const value = (id, fallback) => document.getElementById(id).value.trim() || fallback;
+
+    function buildEmail() {
+      const property = value('propertyName', '[PROPERTY NAME OR N/A]');
+      const date = value('inspectionDate', '[DATE OR N/A]');
+      const estimate = value('estimateNumber', '[#XXXX OR N/A]');
+      const email = value('accountingEmail', '[ACCOUNTING EMAIL OR N/A]');
+      const associate = value('associate', '[ASSOCIATE WHO REQUESTED WORK / EXECUTED CONTRACT OR N/A]');
+      const waiver = value('lienWaiver', '[IS NEEDED / IS NOT NEEDED / N/A]');
+      const reference = value('estimateReference', '[ATTACHED / COPIED BELOW / N/A]');
+      const notes = value('referenceNotes', 'N/A');
+
+      return `Hi Rebecca,\n\nWork was completed and final inspected at ${property} on ${date}.\n\nI have reviewed the estimate (${estimate}), including scope and pricing, and confirm it is ready to be invoiced.\n\nI have also reviewed the job cost report and confirm the project is within budget and costs are accurate.\n\nThere are no additional charges or pending change orders at this time.\n\nPlease create and send the invoice to ${email} and copy ${associate}. A final lien waiver ${waiver}. PS - KMW requests lien waivers on all invoices.\n\nThe estimate is ${reference.toLowerCase()} for reference. ${notes}`;
+    }
+
+    function refreshPreview() {
+      preview.textContent = buildEmail();
+      status.textContent = '';
+    }
+
+    form.addEventListener('input', refreshPreview);
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const text = buildEmail();
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = 'Submitted. Email body copied to clipboard.';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(preview);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        status.textContent = 'Submitted. Email body selected for copying.';
+      }
+    });
+
+    refreshPreview();
+  </script>
+</body>
+</html>

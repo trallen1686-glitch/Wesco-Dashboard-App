@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wesco Subcontractor Labor Contract Request</title>
+  <style>
+    :root { --navy:#173c58; --blue:#2875bb; --red:#7b1f31; --ink:#17232d; --line:#cbd5de; --soft:#eef4f8; --page:#edf1f4; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:var(--page); }
+    * { box-sizing:border-box; }
+    body { margin:0; }
+    main { width:min(920px,calc(100% - 32px)); margin:32px auto; padding:42px 48px 48px; background:#fff; border:1px solid #dbe2e8; box-shadow:0 12px 34px rgba(23,60,88,.12); }
+    header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:4px solid var(--navy); }
+    .logo { width:210px; height:auto; display:block; }
+    .title { max-width:460px; text-align:right; }
+    h1 { margin:5px 0 4px; color:var(--navy); font-size:30px; line-height:1.1; letter-spacing:0; }
+    .subtitle { margin:0; color:var(--blue); font-size:17px; font-weight:700; }
+    .notice { margin:24px 0; padding:14px 16px; color:var(--navy); background:var(--soft); border-left:4px solid var(--blue); font-weight:700; line-height:1.4; }
+    fieldset { margin:0; padding:0; border:0; }
+    legend { width:100%; margin-bottom:14px; color:var(--navy); font-size:19px; font-weight:700; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:17px 20px; }
+    .field { min-width:0; }
+    .field.wide { grid-column:1 / -1; }
+    label { display:block; margin-bottom:7px; color:var(--navy); font-size:14px; font-weight:700; }
+    .hint { display:block; margin-top:4px; color:#5c6b78; font-size:12px; font-weight:400; line-height:1.35; }
+    .required { color:var(--red); }
+    input,textarea { width:100%; min-height:44px; padding:10px 12px; border:1px solid #aebdca; border-radius:4px; background:#fff; color:var(--ink); font:inherit; }
+    textarea { min-height:100px; resize:vertical; line-height:1.45; }
+    input:focus,textarea:focus { outline:3px solid rgba(40,117,187,.2); border-color:var(--blue); }
+    .preview-wrap { margin-top:30px; padding-top:26px; border-top:1px solid var(--line); }
+    .preview-wrap h2 { margin:0 0 14px; color:var(--blue); font-size:19px; letter-spacing:0; }
+    #emailPreview { padding:18px; background:#f8fafb; border:1px solid var(--line); line-height:1.55; white-space:pre-wrap; }
+    .actions { display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-top:24px; }
+    button { min-height:46px; padding:0 24px; border:0; border-radius:4px; background:var(--navy); color:#fff; font:inherit; font-weight:700; cursor:pointer; }
+    button:hover { background:#0f3048; }
+    button:focus-visible { outline:3px solid rgba(40,117,187,.35); outline-offset:3px; }
+    #status { min-height:22px; color:#246b3e; font-weight:700; }
+    @media (max-width:680px) {
+      main { width:100%; margin:0; padding:24px 18px 30px; border:0; box-shadow:none; }
+      header { align-items:center; }
+      .logo { width:145px; }
+      h1 { font-size:23px; }
+      .subtitle { font-size:13px; }
+      .form-grid { grid-template-columns:1fr; }
+      .field.wide { grid-column:auto; }
+      .actions { align-items:stretch; flex-direction:column; }
+      button { width:100%; }
+    }
+    @media print {
+      :root { background:#fff; }
+      main { width:100%; margin:0; padding:24px; border:0; box-shadow:none; }
+      .actions { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc.">
+      <div class="title">
+        <h1>Wesco, Inc.</h1>
+        <p class="subtitle">SUBCONTRACTOR "LABOR" CONTRACT REQUEST</p>
+      </div>
+    </header>
+
+    <p class="notice">Please allow at least 48 work hours to prepare the agreement. Enter N/A when information is not available.</p>
+
+    <form id="laborContractForm">
+      <fieldset>
+        <legend>Agreement Details</legend>
+        <div class="form-grid">
+          <div class="field">
+            <label for="jobName">Job Name <span class="required">*</span></label>
+            <input id="jobName" name="jobName" required placeholder="Job or project name">
+          </div>
+          <div class="field">
+            <label for="neededBy">Agreement Needed By <span class="required">*</span><span class="hint">Allow at least 48 work hours for preparation.</span></label>
+            <input id="neededBy" name="neededBy" type="date" required>
+          </div>
+          <div class="field">
+            <label for="contractDate">Contract Date <span class="required">*</span><span class="hint">Should be at least 14 days prior to the start date.</span></label>
+            <input id="contractDate" name="contractDate" type="date" required>
+          </div>
+          <div class="field">
+            <label for="contractorName">Contractor Name <span class="required">*</span></label>
+            <input id="contractorName" name="contractorName" required placeholder="Subcontractor name">
+          </div>
+          <div class="field wide">
+            <label for="scope">Scope of Work <span class="required">*</span><span class="hint">Paste or describe the entire purchase order scope.</span></label>
+            <textarea id="scope" name="scope" required placeholder="Screenshot entire PO here or enter the full scope of work"></textarea>
+          </div>
+          <div class="field wide">
+            <label for="equipment">Heavy Equipment Available On-site <span class="required">*</span></label>
+            <textarea id="equipment" name="equipment" required placeholder="List available heavy equipment or enter N/A"></textarea>
+          </div>
+          <div class="field">
+            <label for="price">Total Subcontract Price <span class="required">*</span></label>
+            <input id="price" name="price" required inputmode="decimal" placeholder="$ Amount of PO">
+          </div>
+          <div class="field">
+            <label for="completionDate">Anticipated Date of Substantial Completion <span class="required">*</span></label>
+            <input id="completionDate" name="completionDate" type="date" required>
+          </div>
+          <div class="field wide">
+            <label for="projectAddress">Project Address <span class="required">*</span></label>
+            <input id="projectAddress" name="projectAddress" required placeholder="Street, city, state, ZIP">
+          </div>
+        </div>
+      </fieldset>
+
+      <section class="preview-wrap" aria-labelledby="previewHeading">
+        <h2 id="previewHeading">EMAIL BODY</h2>
+        <div id="emailPreview" aria-live="polite"></div>
+      </section>
+
+      <div class="actions">
+        <span id="status" role="status" aria-live="polite"></span>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('laborContractForm');
+    const preview = document.getElementById('emailPreview');
+    const status = document.getElementById('status');
+    const rawValue = (id) => document.getElementById(id).value.trim();
+    const value = (id, fallback) => rawValue(id) || fallback;
+    const formattedDate = (id, fallback) => {
+      const raw = rawValue(id);
+      if (!raw) return fallback;
+      const [year, month, day] = raw.split('-');
+      return `${month}/${day}/${year}`;
+    };
+
+    function buildEmail() {
+      const job = value('jobName', '(JOB NAME)');
+      const needed = formattedDate('neededBy', '**/**/____');
+      const contractDate = formattedDate('contractDate', '[CONTRACT DATE]');
+      const contractor = value('contractorName', '[CONTRACTOR NAME]');
+      const scope = value('scope', '[SCREENSHOT ENTIRE PO HERE]');
+      const equipment = value('equipment', '[HEAVY EQUIPMENT OR N/A]');
+      const price = value('price', '$ [AMOUNT OF PO]');
+      const address = value('projectAddress', '[PROJECT ADDRESS]');
+      const completion = formattedDate('completionDate', '[ANTICIPATED COMPLETION DATE]');
+
+      return `Hi Rebecca,\n\nWe are preparing to start work at ${job}. Can you please generate a Subcontract Agreement and email it (or print) by ${needed}? (Please give at least 48 work hours to prepare.)\n\nContract Date: ${contractDate} (should be at least 14 days prior to start date)\n\nContractor Name: ${contractor}\n\nScope of Work: ${scope}\n\nHeavy Equipment Available On-site: ${equipment}\n\nTotal Subcontract Price: ${price}\n\nProject Address: ${address}\n\nAnticipated Date of Substantial Completion: ${completion}`;
+    }
+
+    function refreshPreview() {
+      preview.textContent = buildEmail();
+      status.textContent = '';
+    }
+
+    form.addEventListener('input', refreshPreview);
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const text = buildEmail();
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = 'Submitted. Email body copied to clipboard.';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(preview);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        status.textContent = 'Submitted. Email body selected for copying.';
+      }
+    });
+
+    refreshPreview();
+  </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Subcontract Agreement Template</title>
+    <style>
+        :root {
+            --primary-color: #2b2b2b;
+            --accent-color: #701c26; /* Dark wine/maroon tone matching logo vibe */
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --border-color: #cccccc;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0 0 100px 0; /* Clear space for the fixed bottom menu */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        /* Professional Header Layout */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-box img {
+            max-width: 280px;
+            height: auto;
+        }
+
+        .title-box {
+            text-align: right;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: var(--accent-color);
+            margin-top: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        /* Form Controls Formatting */
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
+            font-family: inherit;
+            font-size: 14px;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #fafafa;
+            color: #000000; /* No yellow backgrounds; completely readable */
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            background-color: #ffffff;
+        }
+
+        .inline-input {
+            width: auto;
+            display: inline-block;
+            margin: 2px 5px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        /* File Upload Styling Area */
+        .upload-container {
+            border: 2px dashed var(--border-color);
+            padding: 25px;
+            text-align: center;
+            background: #fafafa;
+            border-radius: 6px;
+            margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-container:hover {
+            border-color: var(--accent-color);
+        }
+
+        #po-preview {
+            max-width: 100%;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Footer Controls Styling */
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-save { background-color: #2e7d32; color: white; }
+        .btn-send { background-color: #1565c0; color: white; }
+        .btn-edit { background-color: #ed6c02; color: white; }
+        .btn-modify { background-color: #e91e63; color: white; }
+
+        /* Separate Section for Modification Tracking Logs */
+        .audit-section {
+            margin-top: 5px;
+            background: #fff3f5;
+            border: 1px solid #ffcdd2;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .audit-log-entry {
+            background: #ffffff;
+            border-left: 4px solid var(--accent-color);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .page-break {
+            margin: 50px 0;
+            border-top: 2px dashed #bbb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header Section featuring the requested logo template styling -->
+    <div class="header-section">
+        <div class="logo-box">
+            <!-- Provided Logo Asset placeholder -->
+            <img src="https://i.imgur.com/KdfQ6f6.png" alt="Wesco Exteriors, Inc. Logo">
+        </div>
+        <div class="title-box">
+            <h1>Subcontract Agreement</h1>
+        </div>
+    </div>
+
+    <form id="agreementForm">
+        <!-- Section: Intro Meta Fields -->
+        <p>
+            On this <input type="number" class="inline-input" style="width: 60px;" value="16"> day of 
+            <input type="text" class="inline-input" style="width: 110px;" value="June">, 2026, 
+            <strong>Wesco Exteriors, Inc.</strong>, a corporation organized under the law of the State of North Carolina and maintaining its business office address located at 201 Hillstone Drive, Jamestown, North Carolina 27282 (Contractor) and 
+            <input type="text" class="inline-input" style="width: 220px;" data-field-name="Subcontractor Name" value="Bruzz Construction LLC">, (Subcontractor), HEREBY ENTER into the following Subcontract for work to be performed on behalf of Contractor by Subcontractor at the Work Site identified in this Agreement.
+        </p>
+
+        <h2>SECTION 1. SUBCONTRACT WORK</h2>
+        <p>
+            1.1 Subcontractor shall be contracted as an independent contractor... necessary for the proper and complete performance and acceptance of the following portions of the Work:
+        </p>
+        
+        <!-- PO & Fillable Box requirements integrated here -->
+        <div style="background: #fdfdfd; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; margin: 15px 0;">
+            <strong>PO# 4103</strong> <span style="margin: 0 15px;">|</span>
+            <label for="poIssued"><strong>PO Number Issued:</strong></label>
+            <input type="text" id="poIssued" class="inline-input" data-field-name="PO Number Issued" style="width: 180px;" placeholder="Enter Issued PO">
+            <br><br>
+            <label for="scopeWork"><strong>Scope of Work Details:</strong></label>
+            <input type="text" id="scopeWork" data-field-name="Scope of Work" style="width: 100%;" value="Install replacement windows/included caulking inside and out.">
+        </div>
+
+        <!-- PO Interactive Upload Feature Box -->
+        <div class="form-group">
+            <label><strong>Picture of the PO Attachment:</strong></label>
+            <div class="upload-container" onclick="document.getElementById('poFile').click()">
+                <p style="margin:0; color: #666;">Click here to choose or paste a screenshot file of the PO Document</p>
+                <input type="file" id="poFile" accept="image/*" style="display: none;" onchange="previewPO(event)">
+                <img id="po-preview" alt="PO Preview Container">
+            </div>
+        </div>
+
+        <p>
+            1.3 Contractor will provide certain heavy equipment necessary for the completion of the work such as fork lifts and 
+            <input type="text" class="inline-input" data-field-name="Additional Machinery List" style="width: 180px;" placeholder="e.g. Boom / Scissor"> lifts.
+        </p>
+
+        <h2>SECTION 2. SUBCONTRACT PRICE</h2>
+        <p>
+            2.1 In consideration of Subcontractor's performance... Contractor shall pay to Subcontractor the total sum of 
+            $<input type="number" class="inline-input" data-field-name="Base Rate Per Unit" style="width: 80px;" value="100"> x number of windows installed up to 
+            <input type="number" class="inline-input" data-field-name="Window Maximum Limit" style="width: 70px;" value="88"> Siding price based on building Number PO Created.
+        </p>
+
+        <h2>SECTION 3. SPECIAL CONDITIONS</h2>
+        <div class="grid-inputs">
+            <div class="form-group">
+                <label>Project Site Address:</label>
+                <textarea id="projectAddress" data-field-name="Project Address" rows="3">Palmetto Apartments&#10;200 Palmetto Cir.&#10;Darlington, SC</textarea>
+            </div>
+            <div class="form-group">
+                <label>Anticipated Substantial Completion Date:</label>
+                <input type="text" data-field-name="Completion Date" value="7/30/26">
+                <label style="margin-top:10px;">Number of Days Limit:</label>
+                <input type="text" data-field-name="Number of Days Limit" value="N/A">
+            </div>
+        </div>
+
+        <h2>EXECUTION AND SIGNATURES</h2>
+        <div class="grid-inputs">
+            <div style="border: 1px dashed #ccc; padding: 15px; border-radius: 4px;">
+                <strong>Contractor Signature Block</strong><br><br>
+                <input type="text" data-field-name="Contractor Signature Name" placeholder="Authorized Signature"><br><br>
+                Wesco Exteriors, Inc.
+            </div>
+            <div style="border: 1px dashed #ccc; padding: 15px; border-radius: 4px;">
+                <strong>Subcontractor Signature Block</strong><br><br>
+                <input type="text" data-field-name="Subcontractor Signature Name" placeholder="Authorized Signature"><br><br>
+                Company Name: Bruzz Construction LLC
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Bottom Fixed Control Action Bar Matrix -->
+<div class="action-bar">
+    <button type="button" class="btn btn-save" onclick="alert('Document Form States Saved Successfully.')">Save</button>
+    <button type="button" class="btn btn-send" onclick="alert('Document Sent for Processing.')">Send</button>
+    <button type="button" class="btn btn-edit" onclick="alert('Editing Mode Unlocked.')">Edit</button>
+    <button type="button" class="btn btn-modify" onclick="trackModifications()">Modify</button>
+</div>
+
+<!-- Dedicated Separate Audit Track Page (Appended on Bottom for Display) -->
+<div class="page-break"></div>
+<div class="container audit-section" id="auditPage">
+    <h2 style="margin-top: 0; color: #b71c1c;">SYSTEM AUDIT LOG: AGREEMENT MODIFICATIONS</h2>
+    <p style="font-size: 13px; color: #555;">All edits processed via the "Modify" button action step write structural logs below securely:</p>
+    <div id="logContainer">
+        <!-- Generated tracking entries are appended programmatically here -->
+    </div>
+</div>
+
+<script>
+    // Live Image Preview processing function logic
+    function previewPO(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('po-preview');
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Keep state of fields to identify exact modifications made
+    let initialStates = {};
+    window.addEventListener('load', () => {
+        document.querySelectorAll('#agreementForm input, #agreementForm textarea').forEach((el, index) => {
+            const fieldId = el.getAttribute('data-field-name') || `Field-${index}`;
+            initialStates[fieldId] = el.value;
+        });
+    });
+
+    // Modification log computation implementation
+    function trackModifications() {
+        const timestamp = new Date().toLocaleString();
+        const logContainer = document.getElementById('logContainer');
+        let changesDetected = [];
+
+        document.querySelectorAll('#agreementForm input, #agreementForm textarea').forEach((el, index) => {
+            const fieldId = el.getAttribute('data-field-name') || `Field-${index}`;
+            if (initialStates[fieldId] !== el.value) {
+                changesDetected.push(`<strong>${fieldId}</strong> shifted from "${initialStates[fieldId]}" to "${el.value}"`);
+                // Update baseline state to prevent duplicate log tracing later
+                initialStates[fieldId] = el.value;
+            }
+        });
+
+        if (changesDetected.length === 0) {
+            alert("No data changes detected to modify or timestamp.");
+            return;
+        }
+
+        // Build element output string inside separate Audit view target
+        const entryBlock = document.createElement('div');
+        entryBlock.className = 'audit-log-entry';
+        entryBlock.innerHTML = `<strong>Timestamp:</strong> ${timestamp}<br><ul>${changesDetected.map(c => `<li>${c}</li>`).join('')}</ul>`;
+        logContainer.prepend(entryBlock);
+        
+        alert("Modifications captured and time-stamped in the log below successfully.");
+    }
+</script>
+
+</body>
+</html>

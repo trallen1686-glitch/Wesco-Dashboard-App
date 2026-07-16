@@ -1,0 +1,1381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wesco, Inc. Project Material Sheet</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5d6b7a;
+      --line: #cfd8e3;
+      --line-strong: #97a6b8;
+      --surface: #ffffff;
+      --soft: #f5f7fa;
+      --brand: #1f5f99;
+      --brand-dark: #174b78;
+      --accent: #2f7d55;
+      --danger: #b83232;
+      --shadow: 0 14px 40px rgba(22, 32, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: #e9edf3;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 38px;
+      padding: 8px 12px;
+    }
+
+    button:focus,
+    input:focus,
+    textarea:focus {
+      outline: 3px solid rgba(31, 95, 153, 0.22);
+      outline-offset: 1px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 9px;
+    }
+
+    input[type="radio"] {
+      width: auto;
+    }
+
+    textarea {
+      min-height: 39px;
+      resize: vertical;
+    }
+
+    .app-shell {
+      width: min(1480px, calc(100% - 32px));
+      margin: 24px auto;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .toolbar h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 24px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-dark);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--line-strong);
+      background: var(--soft);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: #fff;
+      border-color: #e5b9b9;
+      color: var(--danger);
+    }
+
+    .sheet {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .sheet-header {
+      padding: 26px 28px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-heading {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr) 190px;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .company-logo {
+      display: block;
+      width: 180px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .sheet-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 28px;
+      letter-spacing: 0;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.span-2 {
+      grid-column: span 2;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .change-order-options {
+      display: flex;
+      align-items: center;
+      min-height: 39px;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #fff;
+      padding: 7px 9px;
+    }
+
+    .choice {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .materials-section {
+      padding: 18px 20px 24px;
+    }
+
+    .section-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .section-bar h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1240px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 6px;
+      vertical-align: top;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    thead th {
+      background: var(--brand);
+      color: #fff;
+      font-size: 12px;
+      text-align: left;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td input,
+    td textarea {
+      border-color: transparent;
+      border-radius: 4px;
+      min-height: 34px;
+      padding: 6px;
+    }
+
+    td input:focus,
+    td textarea:focus {
+      border-color: var(--brand);
+      background: #f7fbff;
+    }
+
+    .col-item {
+      width: 88px;
+    }
+
+    .col-description {
+      width: 210px;
+    }
+
+    .col-small {
+      width: 88px;
+    }
+
+    .col-medium {
+      width: 128px;
+    }
+
+    .col-wide {
+      width: 180px;
+    }
+
+    .col-money {
+      width: 110px;
+    }
+
+    .col-action {
+      width: 58px;
+      text-align: center;
+    }
+
+    .money,
+    .row-total {
+      text-align: right;
+    }
+
+    .row-total {
+      display: block;
+      padding: 7px 4px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .remove-row {
+      width: 36px;
+      min-height: 34px;
+      padding: 0;
+      border-color: #e5b9b9;
+      background: #fff;
+      color: var(--danger);
+      line-height: 1;
+    }
+
+    .totals {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 0 0;
+    }
+
+    .total-box {
+      min-width: 280px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+      padding: 14px 16px;
+      text-align: right;
+    }
+
+    .total-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .total-value {
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .sheet-footer {
+      border-top: 1px solid var(--line);
+      padding: 14px 24px 18px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 20px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .send-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      align-items: start;
+      justify-items: end;
+      background: rgba(23, 32, 42, 0.34);
+      padding: 76px 24px 24px;
+    }
+
+    .send-backdrop[hidden] {
+      display: none;
+    }
+
+    .send-panel {
+      width: min(420px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .send-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+
+    .send-panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .send-close {
+      width: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-color: var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .recipient-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 14px 16px 8px;
+    }
+
+    .recipient-option {
+      background: var(--soft);
+      border-color: var(--line);
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .recipient-option.is-selected {
+      border-color: var(--brand);
+      background: #eaf2fb;
+      color: var(--brand-dark);
+    }
+
+    .recipient-tools {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 16px 10px;
+    }
+
+    .recipient-edit {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+
+    .recipient-edit label {
+      color: var(--ink);
+      font-size: 13px;
+      text-transform: none;
+    }
+
+    .recipient-edit[hidden] {
+      display: none;
+    }
+
+    .send-selected {
+      min-height: 22px;
+      padding: 0 16px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .send-panel-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+      padding: 12px 16px 14px;
+    }
+
+    .preview-only {
+      display: none;
+    }
+
+    body.preview-mode .edit-only {
+      display: none !important;
+    }
+
+    body.preview-mode .preview-only {
+      display: initial;
+    }
+
+    body.preview-mode input,
+    body.preview-mode textarea {
+      border-color: transparent;
+      background: transparent;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    body.preview-mode textarea {
+      resize: none;
+    }
+
+    @media (max-width: 980px) {
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        width: min(100% - 16px, 1480px);
+        margin: 10px auto;
+      }
+
+      .sheet-header {
+        padding: 20px 14px 14px;
+      }
+
+      .sheet-title {
+        font-size: 23px;
+      }
+
+      .brand-heading {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 12px;
+      }
+
+      .brand-heading::after {
+        display: none;
+      }
+
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.span-2 {
+        grid-column: auto;
+      }
+
+      .materials-section {
+        padding: 14px 10px 18px;
+      }
+
+      .section-bar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .total-box {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .send-backdrop {
+        align-items: stretch;
+        justify-items: stretch;
+        padding: 64px 12px 12px;
+      }
+
+      .recipient-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      @page {
+        margin: 0.35in;
+        size: landscape;
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+        font-size: 10px;
+      }
+
+      .app-shell {
+        width: 100%;
+        margin: 0;
+      }
+
+      .toolbar,
+      .edit-only,
+      .status,
+      .send-backdrop {
+        display: none !important;
+      }
+
+      .sheet {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .sheet-header {
+        padding: 0 0 10px;
+      }
+
+      .sheet-title {
+        margin-bottom: 12px;
+        font-size: 18px;
+      }
+
+      .brand-heading {
+        grid-template-columns: 140px minmax(0, 1fr) 140px;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .company-logo {
+        width: 132px;
+      }
+
+      .project-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px 12px;
+      }
+
+      label {
+        color: #000;
+        font-size: 8px;
+      }
+
+      input,
+      textarea,
+      td input,
+      td textarea {
+        border: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+      }
+
+      input[type="radio"] {
+        width: auto;
+      }
+
+      .change-order-options {
+        min-height: 0;
+        border: 0;
+        padding: 0;
+      }
+
+      textarea {
+        min-height: 0;
+      }
+
+      .materials-section {
+        padding: 10px 0 0;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        border-radius: 0;
+      }
+
+      table {
+        min-width: 0;
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        padding: 3px;
+        word-break: break-word;
+      }
+
+      thead th {
+        background: #4472c4 !important;
+        color: #fff !important;
+        font-size: 7px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .col-item {
+        width: 7%;
+      }
+
+      .col-description {
+        width: 15%;
+      }
+
+      .col-small {
+        width: 6%;
+      }
+
+      .col-medium {
+        width: 8%;
+      }
+
+      .col-wide {
+        width: 11%;
+      }
+
+      .col-money {
+        width: 7%;
+      }
+
+      .total-box {
+        min-width: 220px;
+        padding: 8px 10px;
+      }
+
+      .total-value {
+        font-size: 16px;
+      }
+
+      .sheet-footer {
+        padding: 10px 0 0;
+        color: #555;
+        font-size: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <div class="toolbar">
+      <h1>Wesco, Inc. Project Material Sheet</h1>
+      <div class="actions edit-only" aria-label="Material sheet actions">
+        <button class="btn-secondary" type="button" id="previewButton">Preview</button>
+        <button class="btn-secondary" type="button" id="saveButton">Save</button>
+        <button class="btn-secondary" type="button" id="csvButton">Export CSV</button>
+        <button class="btn-primary" type="button" id="printButton">Print / PDF</button>
+        <button class="btn-primary" type="button" id="sendButton">Send</button>
+        <button class="btn-danger" type="button" id="clearButton">Clear</button>
+      </div>
+      <div class="actions preview-only" aria-label="Preview actions">
+        <button class="btn-secondary" type="button" id="editButton">Edit</button>
+        <button class="btn-primary" type="button" id="previewPrintButton">Print / PDF</button>
+        <button class="btn-primary" type="button" id="previewSendButton">Send</button>
+      </div>
+    </div>
+
+    <form class="sheet" id="materialSheetForm" autocomplete="on">
+      <section class="sheet-header" aria-labelledby="sheetTitle">
+        <div class="brand-heading">
+          <img class="company-logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc. logo">
+          <h2 class="sheet-title" id="sheetTitle">Wesco, Inc. Project Material Sheet</h2>
+          <span aria-hidden="true"></span>
+        </div>
+        <div class="project-grid">
+          <div class="field">
+            <label for="projectNumber">Project Number</label>
+            <input id="projectNumber" name="projectNumber" type="text">
+          </div>
+          <div class="field">
+            <label for="projectPhase">Project Phase</label>
+            <input id="projectPhase" name="projectPhase" type="text">
+          </div>
+          <div class="field">
+            <label for="clientName">Client</label>
+            <input id="clientName" name="clientName" type="text">
+          </div>
+          <div class="field span-2">
+            <label for="projectName">Project Name</label>
+            <input id="projectName" name="projectName" type="text">
+          </div>
+          <div class="field full">
+            <label for="address">Address</label>
+            <input id="address" name="address" type="text">
+          </div>
+          <div class="field">
+            <label for="projectManager">Project Manager</label>
+            <input id="projectManager" name="projectManager" type="text">
+          </div>
+          <div class="field">
+            <label for="estimator">Estimator</label>
+            <input id="estimator" name="estimator" type="text">
+          </div>
+          <div class="field">
+            <label for="generatedDate">Date Generated</label>
+            <input id="generatedDate" name="generatedDate" type="date">
+          </div>
+          <div class="field">
+            <label>Change Order</label>
+            <div class="change-order-options" role="radiogroup" aria-label="Change Order">
+              <label class="choice" for="changeOrderYes">
+                <input id="changeOrderYes" name="changeOrder" type="radio" value="Yes" required>
+                Yes
+              </label>
+              <label class="choice" for="changeOrderNo">
+                <input id="changeOrderNo" name="changeOrder" type="radio" value="No" required>
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="materials-section" aria-labelledby="materialsTitle">
+        <div class="section-bar">
+          <h2 id="materialsTitle">Material List</h2>
+          <button class="btn-accent edit-only" type="button" id="addRowButton">Add Material Item</button>
+        </div>
+
+        <div class="table-wrap">
+          <table aria-label="Material list">
+            <thead>
+              <tr>
+                <th class="col-item" scope="col">Item</th>
+                <th class="col-description" scope="col">Description</th>
+                <th class="col-small" scope="col">Size</th>
+                <th class="col-small" scope="col">Qty</th>
+                <th class="col-medium" scope="col">Brand</th>
+                <th class="col-medium" scope="col">Model</th>
+                <th class="col-small" scope="col">Finish</th>
+                <th class="col-wide" scope="col">Supplier</th>
+                <th class="col-wide" scope="col">Specification</th>
+                <th class="col-money" scope="col">Unit Price</th>
+                <th class="col-money" scope="col">Total</th>
+                <th class="col-action edit-only" scope="col">Remove</th>
+              </tr>
+            </thead>
+            <tbody id="materialsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="totals">
+          <div class="total-box" aria-live="polite">
+            <div class="total-label">Total Value</div>
+            <div class="total-value" id="totalValue">$0.00</div>
+          </div>
+        </div>
+
+        <div class="status edit-only" id="statusMessage" role="status" aria-live="polite"></div>
+      </section>
+
+      <footer class="sheet-footer">
+        This is an automatically generated Material Sheet. Please contact your estimator with any questions or corrections.
+      </footer>
+    </form>
+  </main>
+
+  <div class="send-backdrop" id="sendDialog" role="dialog" aria-modal="true" aria-labelledby="sendDialogTitle" hidden>
+    <section class="send-panel">
+      <div class="send-panel-header">
+        <h2 id="sendDialogTitle">Send To</h2>
+        <button class="send-close" type="button" id="closeSendButton" aria-label="Close send options">&times;</button>
+      </div>
+      <div class="recipient-options" aria-label="Recipient options">
+        <button class="recipient-option" type="button" data-recipient-name="Stephanie">Stephanie</button>
+        <button class="recipient-option" type="button" data-recipient-name="Rebecca">Rebecca</button>
+        <button class="recipient-option" type="button" data-recipient-name="Wes">Wes</button>
+        <button class="recipient-option" type="button" data-recipient-name="Joe">Joe</button>
+        <button class="recipient-option" type="button" data-recipient-name="Chris">Chris</button>
+        <button class="recipient-option" type="button" data-recipient-name="Theo">Theo</button>
+        <button class="recipient-option" type="button" data-recipient-name="Jesse">Jesse</button>
+        <button class="recipient-option" type="button" data-recipient-name="Other">Other</button>
+      </div>
+      <div class="recipient-tools">
+        <button class="btn-secondary" type="button" id="recipientEditButton">Edit</button>
+      </div>
+      <div class="recipient-edit" id="recipientEditArea" hidden>
+        <div class="field">
+          <label for="recipientName">Name:</label>
+          <input id="recipientName" type="text" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="recipientEmail">Email:</label>
+          <input id="recipientEmail" type="email" autocomplete="email">
+        </div>
+      </div>
+      <div class="send-selected" id="sendSelectedStatus">No recipient selected.</div>
+      <div class="send-panel-footer">
+        <button class="btn-secondary" type="button" id="cancelSendButton">Cancel</button>
+        <button class="btn-primary" type="button" id="openEmailButton">Open Email</button>
+      </div>
+    </section>
+  </div>
+
+  <template id="rowTemplate">
+    <tr>
+      <td><input class="js-item" type="text" aria-label="Item"></td>
+      <td><textarea class="js-description" aria-label="Description"></textarea></td>
+      <td><input class="js-size" type="text" aria-label="Size"></td>
+      <td><input class="js-quantity" type="number" min="0" step="1" inputmode="numeric" aria-label="Quantity"></td>
+      <td><input class="js-brand" type="text" aria-label="Brand"></td>
+      <td><input class="js-model" type="text" aria-label="Model"></td>
+      <td><input class="js-finish" type="text" aria-label="Finish"></td>
+      <td><textarea class="js-supplier" aria-label="Supplier"></textarea></td>
+      <td><textarea class="js-specification" aria-label="Specification"></textarea></td>
+      <td><input class="js-unit-price money" type="number" min="0" step="0.01" inputmode="decimal" aria-label="Unit price"></td>
+      <td><span class="row-total">$0.00</span></td>
+      <td class="edit-only"><button class="remove-row" type="button" aria-label="Remove row">&times;</button></td>
+    </tr>
+  </template>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "wesco-material-sheet-html-v1";
+      const rowTemplate = document.getElementById("rowTemplate");
+      const body = document.getElementById("materialsBody");
+      const form = document.getElementById("materialSheetForm");
+      const statusMessage = document.getElementById("statusMessage");
+      const sendDialog = document.getElementById("sendDialog");
+      const recipientEditArea = document.getElementById("recipientEditArea");
+      const recipientNameInput = document.getElementById("recipientName");
+      const recipientEmailInput = document.getElementById("recipientEmail");
+      const sendSelectedStatus = document.getElementById("sendSelectedStatus");
+      const recipientButtons = Array.from(document.querySelectorAll(".recipient-option"));
+      const moneyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+      });
+      let selectedRecipientName = "";
+
+      const fields = [
+        "projectNumber",
+        "projectPhase",
+        "clientName",
+        "projectName",
+        "address",
+        "projectManager",
+        "estimator",
+        "generatedDate"
+      ];
+
+      const rowFields = [
+        ["item", ".js-item"],
+        ["description", ".js-description"],
+        ["size", ".js-size"],
+        ["quantity", ".js-quantity"],
+        ["brand", ".js-brand"],
+        ["model", ".js-model"],
+        ["finish", ".js-finish"],
+        ["supplier", ".js-supplier"],
+        ["specification", ".js-specification"],
+        ["unitPrice", ".js-unit-price"]
+      ];
+
+      function todayISO() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function parseNumber(value) {
+        const parsed = Number.parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function formatMoney(value) {
+        return moneyFormatter.format(value || 0);
+      }
+
+      function setStatus(message) {
+        statusMessage.textContent = message;
+        if (!message) {
+          return;
+        }
+        window.clearTimeout(setStatus.timer);
+        setStatus.timer = window.setTimeout(function () {
+          statusMessage.textContent = "";
+        }, 3500);
+      }
+
+      function showRecipientEdit() {
+        recipientEditArea.hidden = false;
+      }
+
+      function updateRecipientStatus(message) {
+        if (message) {
+          sendSelectedStatus.textContent = message;
+          return;
+        }
+
+        const name = recipientNameInput.value.trim() || selectedRecipientName;
+        const email = recipientEmailInput.value.trim();
+        sendSelectedStatus.textContent = name
+          ? "Selected: " + name + (email ? " <" + email + ">" : "")
+          : "No recipient selected.";
+      }
+
+      function selectRecipient(name) {
+        selectedRecipientName = name === "Other" ? "" : name;
+        recipientButtons.forEach(function (button) {
+          button.classList.toggle("is-selected", button.dataset.recipientName === name);
+        });
+
+        recipientNameInput.value = name === "Other" ? "" : name;
+        recipientEmailInput.value = "";
+
+        if (name === "Other") {
+          showRecipientEdit();
+          updateRecipientStatus("Enter the recipient name and email.");
+          recipientNameInput.focus();
+          return;
+        }
+
+        updateRecipientStatus();
+      }
+
+      function openSendDialog() {
+        saveData(false);
+        sendDialog.hidden = false;
+        updateRecipientStatus();
+        window.setTimeout(function () {
+          const selected = sendDialog.querySelector(".recipient-option.is-selected");
+          (selected || recipientButtons[0]).focus();
+        }, 0);
+      }
+
+      function closeSendDialog() {
+        sendDialog.hidden = true;
+      }
+
+      function buildEmailBody(data, recipientName) {
+        return [
+          "Hello " + recipientName + ",",
+          "",
+          "The Wesco, Inc. Project Material Sheet is ready for review.",
+          "",
+          "Project Number: " + (data.projectNumber || ""),
+          "Project Phase: " + (data.projectPhase || ""),
+          "Project Name: " + (data.projectName || ""),
+          "Client: " + (data.clientName || ""),
+          "Change Order: " + (data.changeOrder || ""),
+          "Total Value: " + document.getElementById("totalValue").textContent,
+          "",
+          "Thank you."
+        ].join("\r\n");
+      }
+
+      function openEmailDraft() {
+        const recipientName = recipientNameInput.value.trim() || selectedRecipientName;
+        const recipientEmail = recipientEmailInput.value.trim();
+
+        if (!recipientName) {
+          showRecipientEdit();
+          updateRecipientStatus("Enter the recipient name and email.");
+          recipientNameInput.focus();
+          return;
+        }
+
+        if (!recipientEmail) {
+          showRecipientEdit();
+          updateRecipientStatus("Enter an email for " + recipientName + ".");
+          recipientEmailInput.focus();
+          return;
+        }
+
+        if (!recipientEmailInput.checkValidity()) {
+          showRecipientEdit();
+          updateRecipientStatus("Enter a valid email address.");
+          recipientEmailInput.focus();
+          return;
+        }
+
+        const data = getFormData();
+        const projectLabel = [data.projectNumber, data.projectName].filter(Boolean).join(" - ");
+        const subject = "Wesco, Inc. Project Material Sheet" + (projectLabel ? " - " + projectLabel : "");
+        const mailto = "mailto:" + encodeURIComponent(recipientEmail)
+          + "?subject=" + encodeURIComponent(subject)
+          + "&body=" + encodeURIComponent(buildEmailBody(data, recipientName));
+
+        window.location.href = mailto;
+        closeSendDialog();
+      }
+
+      function addRow(item) {
+        const fragment = rowTemplate.content.cloneNode(true);
+        const row = fragment.querySelector("tr");
+
+        rowFields.forEach(function ([key, selector]) {
+          const input = row.querySelector(selector);
+          input.value = item && item[key] ? item[key] : "";
+        });
+
+        row.querySelector(".remove-row").addEventListener("click", function () {
+          if (body.children.length === 1) {
+            clearRow(row);
+          } else {
+            row.remove();
+          }
+          updateTotals();
+          saveData(false);
+        });
+
+        row.querySelectorAll("input, textarea").forEach(function (control) {
+          control.addEventListener("input", function () {
+            updateTotals();
+            saveData(false);
+          });
+        });
+
+        body.appendChild(row);
+        updateRowTotal(row);
+        return row;
+      }
+
+      function clearRow(row) {
+        row.querySelectorAll("input, textarea").forEach(function (control) {
+          control.value = "";
+        });
+      }
+
+      function updateRowTotal(row) {
+        const quantity = parseNumber(row.querySelector(".js-quantity").value);
+        const unitPrice = parseNumber(row.querySelector(".js-unit-price").value);
+        const total = quantity * unitPrice;
+        row.querySelector(".row-total").textContent = formatMoney(total);
+        return total;
+      }
+
+      function updateTotals() {
+        let grandTotal = 0;
+        body.querySelectorAll("tr").forEach(function (row) {
+          grandTotal += updateRowTotal(row);
+        });
+        document.getElementById("totalValue").textContent = formatMoney(grandTotal);
+      }
+
+      function getRowData(row) {
+        const data = {};
+        rowFields.forEach(function ([key, selector]) {
+          data[key] = row.querySelector(selector).value;
+        });
+        data.total = parseNumber(data.quantity) * parseNumber(data.unitPrice);
+        return data;
+      }
+
+      function getFormData() {
+        const data = {};
+        fields.forEach(function (field) {
+          data[field] = document.getElementById(field).value;
+        });
+        const checkedChangeOrder = document.querySelector('input[name="changeOrder"]:checked');
+        data.changeOrder = checkedChangeOrder ? checkedChangeOrder.value : "";
+        data.materials = Array.from(body.querySelectorAll("tr")).map(getRowData);
+        return data;
+      }
+
+      function saveData(showMessage) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData()));
+        if (showMessage) {
+          setStatus("Saved in this browser.");
+        }
+      }
+
+      function loadData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        let data = null;
+
+        if (saved) {
+          try {
+            data = JSON.parse(saved);
+          } catch (error) {
+            data = null;
+          }
+        }
+
+        fields.forEach(function (field) {
+          document.getElementById(field).value = data && data[field] ? data[field] : "";
+        });
+
+        document.querySelectorAll('input[name="changeOrder"]').forEach(function (radio) {
+          radio.checked = Boolean(data && data.changeOrder === radio.value);
+        });
+
+        if (!document.getElementById("generatedDate").value) {
+          document.getElementById("generatedDate").value = todayISO();
+        }
+
+        body.innerHTML = "";
+        if (data && Array.isArray(data.materials) && data.materials.length) {
+          data.materials.forEach(addRow);
+        } else {
+          addRow({ quantity: "1" });
+          addRow({ quantity: "1" });
+          addRow({ quantity: "1" });
+        }
+        updateTotals();
+      }
+
+      function clearAll() {
+        const confirmed = window.confirm("Clear all project and material information from this browser?");
+        if (!confirmed) {
+          return;
+        }
+
+        localStorage.removeItem(STORAGE_KEY);
+        fields.forEach(function (field) {
+          document.getElementById(field).value = field === "generatedDate" ? todayISO() : "";
+        });
+        document.querySelectorAll('input[name="changeOrder"]').forEach(function (radio) {
+          radio.checked = false;
+        });
+        body.innerHTML = "";
+        addRow({ quantity: "1" });
+        addRow({ quantity: "1" });
+        addRow({ quantity: "1" });
+        updateTotals();
+        setStatus("Cleared.");
+      }
+
+      function csvEscape(value) {
+        const text = String(value || "");
+        if (/[",\r\n]/.test(text)) {
+          return '"' + text.replace(/"/g, '""') + '"';
+        }
+        return text;
+      }
+
+      function exportCSV() {
+        const data = getFormData();
+        const lines = [
+          ["Project Number", data.projectNumber],
+          ["Project Phase", data.projectPhase],
+          ["Client", data.clientName],
+          ["Project Name", data.projectName],
+          ["Address", data.address],
+          ["Project Manager", data.projectManager],
+          ["Estimator", data.estimator],
+          ["Date Generated", data.generatedDate],
+          ["Change Order", data.changeOrder],
+          [],
+          ["Item", "Description", "Size", "Qty", "Brand", "Model", "Finish", "Supplier", "Specification", "Unit Price", "Total"]
+        ];
+
+        data.materials.forEach(function (item) {
+          lines.push([
+            item.item,
+            item.description,
+            item.size,
+            item.quantity,
+            item.brand,
+            item.model,
+            item.finish,
+            item.supplier,
+            item.specification,
+            item.unitPrice,
+            item.total.toFixed(2)
+          ]);
+        });
+
+        const csv = lines.map(function (line) {
+          return line.map(csvEscape).join(",");
+        }).join("\r\n");
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const project = data.projectNumber || "material-sheet";
+        const fileName = project.replace(/[^a-z0-9_-]+/gi, "_") + "_materials.csv";
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        setStatus("CSV exported.");
+      }
+
+      function printSheet() {
+        saveData(false);
+        closeSendDialog();
+        document.body.classList.add("preview-mode");
+        window.print();
+      }
+
+      document.getElementById("addRowButton").addEventListener("click", function () {
+        const row = addRow({ quantity: "1" });
+        row.querySelector(".js-item").focus();
+        updateTotals();
+        saveData(false);
+      });
+
+      document.getElementById("saveButton").addEventListener("click", function () {
+        saveData(true);
+      });
+
+      document.getElementById("clearButton").addEventListener("click", clearAll);
+      document.getElementById("csvButton").addEventListener("click", exportCSV);
+      document.getElementById("printButton").addEventListener("click", printSheet);
+      document.getElementById("previewPrintButton").addEventListener("click", printSheet);
+      document.getElementById("sendButton").addEventListener("click", openSendDialog);
+      document.getElementById("previewSendButton").addEventListener("click", openSendDialog);
+      document.getElementById("closeSendButton").addEventListener("click", closeSendDialog);
+      document.getElementById("cancelSendButton").addEventListener("click", closeSendDialog);
+      document.getElementById("openEmailButton").addEventListener("click", openEmailDraft);
+      document.getElementById("recipientEditButton").addEventListener("click", function () {
+        showRecipientEdit();
+        if (!recipientNameInput.value && selectedRecipientName) {
+          recipientNameInput.value = selectedRecipientName;
+        }
+        updateRecipientStatus();
+        recipientNameInput.focus();
+      });
+
+      recipientButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          selectRecipient(button.dataset.recipientName);
+        });
+      });
+
+      recipientNameInput.addEventListener("input", function () {
+        selectedRecipientName = recipientNameInput.value.trim();
+        updateRecipientStatus();
+      });
+
+      recipientEmailInput.addEventListener("input", function () {
+        updateRecipientStatus();
+      });
+
+      sendDialog.addEventListener("click", function (event) {
+        if (event.target === sendDialog) {
+          closeSendDialog();
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !sendDialog.hidden) {
+          closeSendDialog();
+        }
+      });
+
+      document.getElementById("previewButton").addEventListener("click", function () {
+        saveData(false);
+        document.body.classList.add("preview-mode");
+      });
+
+      document.getElementById("editButton").addEventListener("click", function () {
+        document.body.classList.remove("preview-mode");
+      });
+
+      fields.forEach(function (field) {
+        document.getElementById(field).addEventListener("input", function () {
+          saveData(false);
+        });
+      });
+
+      document.querySelectorAll('input[name="changeOrder"]').forEach(function (radio) {
+        radio.addEventListener("change", function () {
+          saveData(false);
+        });
+      });
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+      });
+
+      window.addEventListener("afterprint", function () {
+        document.body.classList.remove("preview-mode");
+      });
+
+      loadData();
+    })();
+  </script>
+</body>
+</html>
