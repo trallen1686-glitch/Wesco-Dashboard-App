@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102b3d">
+  <title>Master Wesco Staff Team Member Calendar</title>
+  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+  <style>
+    :root{--navy:#102b3d;--blue:#1769aa;--sky:#e9f3fb;--ink:#172532;--muted:#687985;--line:#dbe4ea;--bg:#f3f6f8;--green:#2f7d5c;--orange:#b4681b;--red:#b33d37;--purple:#7354a8;--shadow:0 12px 30px rgba(18,50,70,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{min-height:100vh;display:grid;grid-template-columns:250px minmax(0,1fr)}
+    .sidebar{padding:25px 17px;background:linear-gradient(180deg,#102b3d,#0b2231);color:#fff}.brand{display:flex;align-items:center;gap:11px;margin-bottom:28px}.logo{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:#fff;color:var(--navy);font-size:22px;font-weight:950}.brand b{display:block;font-size:14px}.brand small{display:block;margin-top:3px;color:#afc2ce;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.nav-label{margin:24px 8px 9px;color:#7895a6;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.nav-btn{width:100%;padding:11px 12px;border:0;border-radius:8px;display:flex;align-items:center;gap:10px;background:transparent;color:#d7e4eb;text-align:left;font-size:11px;font-weight:750}.nav-btn.active,.nav-btn:hover{background:#21485f;color:#fff}.nav-btn span{width:20px;color:#78b9e5;text-align:center}.calendar-card{margin-top:22px;padding:14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(255,255,255,.06)}.calendar-card small{color:#89a8b9;font-size:8px;text-transform:uppercase}.calendar-card b{display:block;margin:7px 0 5px;font-size:11px}.calendar-card p{margin:0;color:#b9cbd5;font-size:9px;line-height:1.5}.main{min-width:0}.topbar{min-height:76px;padding:15px 30px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border-bottom:1px solid var(--line)}.eyebrow{color:#83929c;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em}.topbar h1{margin:4px 0 0;color:var(--navy);font-size:20px}.auth{display:flex;align-items:center;gap:9px}.connection{padding:6px 9px;border-radius:999px;background:#eef2f5;color:#687985;font-size:9px;font-weight:850}.connection.online{background:#e8f4ed;color:var(--green)}.button{padding:10px 13px;border:0;border-radius:7px;background:var(--blue);color:#fff;font-size:10px;font-weight:850}.button.secondary{border:1px solid var(--line);background:#fff;color:#405462}.button.danger{background:var(--red)}.content{padding:24px 30px 45px}.toolbar{display:grid;grid-template-columns:auto auto minmax(190px,1fr) 160px auto;gap:9px;align-items:center;margin-bottom:18px}.month-title{min-width:190px;color:var(--navy);font-size:18px;font-weight:900}.select,.field{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:#405462;font-size:10px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{padding:15px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:var(--shadow)}.stat small{display:block;color:#7b8b96;font-size:8px;font-weight:850;text-transform:uppercase}.stat b{display:block;margin-top:6px;color:var(--navy);font-size:23px}.layout{display:grid;grid-template-columns:minmax(0,1.4fr) 355px;gap:17px}.panel{border:1px solid var(--line);border-radius:11px;background:#fff;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:15px 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;color:var(--navy);font-size:13px}.panel-head span{color:#84939d;font-size:9px}.event-list{min-height:430px}.day-group{border-bottom:1px solid #edf1f3}.day-title{padding:10px 16px;background:#f8fafb;color:#61737f;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.event{width:100%;padding:12px 15px;border:0;border-top:1px solid #edf1f3;display:grid;grid-template-columns:88px 8px minmax(0,1fr) auto;gap:10px;align-items:center;background:#fff;color:inherit;text-align:left}.event:hover,.event.selected{background:#f0f7fc}.time{color:#677a86;font-size:9px;font-weight:800}.stripe{width:8px;height:39px;border-radius:999px;background:var(--blue)}.stripe.ooo{background:var(--red)}.stripe.travel{background:var(--purple)}.stripe.site{background:var(--orange)}.stripe.deadline{background:#be891b}.event-copy b{display:block;color:#213746;font-size:11px}.event-copy small{display:block;margin-top:4px;color:#82919b;font-size:9px}.pill{padding:5px 8px;border-radius:999px;background:var(--sky);color:var(--blue);font-size:8px;font-weight:900}.pill.ooo{background:#f9e8e7;color:var(--red)}.pill.travel{background:#efeaf7;color:var(--purple)}.pill.site{background:#fff0df;color:var(--orange)}.empty{padding:65px 22px;color:#83929c;text-align:center;font-size:10px}.form{padding:17px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form label{display:block;color:#70818c;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}.form label.full{grid-column:1/-1}.form input,.form select,.form textarea{width:100%;margin-top:5px;padding:9px;border:1px solid var(--line);border-radius:7px;background:#fbfcfd;color:#314653;font-size:10px}.form textarea{min-height:80px;resize:vertical}.check-row{grid-column:1/-1;display:flex;align-items:center;gap:7px;color:#506572!important;text-transform:none!important}.check-row input{width:auto;margin:0;accent-color:var(--blue)}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.form-note{margin:12px 0 0;color:#85949e;font-size:8px;line-height:1.55}.notice{margin-bottom:16px;padding:11px 13px;border:1px solid #cfe2ef;border-radius:9px;background:#eef7fd;color:#496d82;font-size:9px;line-height:1.5}.error{border-color:#ecc8c5;background:#fff2f1;color:#93443f}.hidden{display:none!important}
+    @media(max-width:1050px){.shell{grid-template-columns:1fr}.sidebar{display:none}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:auto auto 1fr}.toolbar .select{grid-column:span 1}.stats{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:620px){.topbar,.content{padding-left:15px;padding-right:15px}.topbar{align-items:flex-start;flex-direction:column}.toolbar{grid-template-columns:1fr 1fr}.month-title{grid-column:1/-1}.stats{grid-template-columns:1fr 1fr}.event{grid-template-columns:70px 7px minmax(0,1fr)}.event .pill{grid-column:3}.form-grid{grid-template-columns:1fr}.form label.full,.check-row{grid-column:auto}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">W</div><div><b>WescoNC</b><small>Staff calendar</small></div></div>
+    <button class="nav-btn active"><span>▦</span>Team schedule</button>
+    <button class="nav-btn" id="todayNav"><span>●</span>Today</button>
+    <button class="nav-btn" id="newNav"><span>＋</span>New staff entry</button>
+    <div class="nav-label">Connected calendar</div>
+    <div class="calendar-card"><small>Outlook calendar</small><b>Wesco Team Meeting Calendar</b><p>Team meetings, travel, site visits, deadlines, and staff out-of-office coverage.</p></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">Wesco Dashboard / Staff Operations</div><h1>Master Wesco Staff Team Member Calendar</h1></div>
+      <div class="auth"><span id="connection" class="connection">Offline</span><button id="signIn" class="button">Sign in with Microsoft</button><button id="signOut" class="button secondary hidden">Sign out</button></div>
+    </header>
+    <div class="content">
+      <div id="notice" class="notice">Sign in with your Wesco Microsoft account to load the team calendar.</div>
+      <div class="toolbar">
+        <button id="previous" class="button secondary" aria-label="Previous month">←</button><button id="next" class="button secondary" aria-label="Next month">→</button>
+        <div id="monthTitle" class="month-title"></div>
+        <select id="staffFilter" class="select" aria-label="Filter by staff member"><option value="all">All staff members</option></select>
+        <button id="refresh" class="button secondary">Refresh</button>
+      </div>
+      <section class="stats">
+        <div class="stat"><small>Entries this month</small><b id="entryCount">0</b></div>
+        <div class="stat"><small>Out of office</small><b id="oooCount">0</b></div>
+        <div class="stat"><small>Travel / site visits</small><b id="travelCount">0</b></div>
+        <div class="stat"><small>Staff represented</small><b id="staffCount">0</b></div>
+      </section>
+      <section class="layout">
+        <article class="panel"><div class="panel-head"><h2>Team schedule</h2><span id="rangeLabel"></span></div><div id="eventList" class="event-list"><div class="empty">Calendar entries will appear here after sign-in.</div></div></article>
+        <aside class="panel"><div class="panel-head"><h2 id="formTitle">Add staff calendar entry</h2><span id="selectedLabel">New entry</span></div>
+          <form id="eventForm" class="form">
+            <div class="form-grid">
+              <label>Staff member<select id="staffMember" required></select></label>
+              <label>Entry type<select id="entryType"><option>Meeting</option><option>Out of Office</option><option>Travel</option><option>Site Visit</option><option>Office</option><option>Deadline</option><option>Other</option></select></label>
+              <label class="full">Title<input id="eventTitle" required placeholder="What is scheduled?"></label>
+              <label>Date<input id="eventDate" type="date" required></label>
+              <label class="check-row"><input id="allDay" type="checkbox">All-day entry</label>
+              <label id="startWrap">Start time<input id="startTime" type="time" value="09:00"></label>
+              <label id="endWrap">End time<input id="endTime" type="time" value="10:00"></label>
+              <label class="full">Location<input id="location" placeholder="Office, project, city, or Teams"></label>
+              <label class="full">Notes<textarea id="notes" placeholder="Purpose, coverage, contact, or preparation notes"></textarea></label>
+              <label>Reminder<select id="reminder"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="1080">18 hours</option><option value="1440">1 day</option><option value="0">No reminder</option></select></label>
+              <label>Availability<select id="showAs"><option value="busy">Busy</option><option value="free">Free</option><option value="tentative">Tentative</option><option value="oof">Out of office</option><option value="workingElsewhere">Working elsewhere</option></select></label>
+            </div>
+            <div class="actions"><button class="button" type="submit" id="saveEvent">Create entry</button><button class="button secondary" type="button" id="clearForm">Clear</button><button class="button danger hidden" type="button" id="deleteEvent">Delete</button></div>
+            <p class="form-note">Changes are written directly to the connected “Wesco Team Meeting Calendar.” Only users with calendar edit permission can create, update, or delete entries.</p>
+          </form>
+        </aside>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+  const CLIENT_ID='cb882f2c-7555-427e-8484-92d6d0a21494';
+  const TENANT_ID='5bfae2d1-ca2b-45bc-850a-90de45c02287';
+  const CALENDAR_ID='AAMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgBGAAAAAAC6DW7Kzg_sS5BcQPqo4yPNBwCkVNVFY9M3Q4AcfAVFudcgAAAAAAEGAACkVNVFY9M3Q4AcfAVFudcgAACl8R88AAA=';
+  const SCOPES=['User.Read','Calendars.ReadWrite'];
+  const STAFF=['Wes Atkinson','Joe','Chris','Oscar Centeno','Stephanie Atkinson','Theo Allen'];
+  const $=id=>document.getElementById(id);
+  let msalApp=null,account=null,events=[],selectedEvent=null,viewDate=new Date();
+
+  function safe(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function typeClass(type){const t=type.toLowerCase();return t.includes('out of office')||t==='ooo'?'ooo':t.includes('travel')?'travel':t.includes('site')?'site':t.includes('deadline')?'deadline':''}
+  function formatDate(d){return d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'})}
+  function formatTime(d){return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}
+  function parseBody(text,label){const line=String(text||'').split(/\r?\n/).find(x=>x.toLowerCase().startsWith(label.toLowerCase()+':'));return line?line.slice(label.length+1).trim():''}
+  function stripHtml(html){const el=document.createElement('div');el.innerHTML=html||'';return el.textContent||''}
+  function eventMeta(event){const body=stripHtml(event.body&&event.body.content||event.bodyPreview||'');const prefix=(event.subject||'').split(' - ')[0].trim();return {staff:parseBody(body,'Staff Member')||STAFF.find(x=>prefix.toLowerCase().includes(x.split(' ')[0].toLowerCase()))||prefix||'Team',type:parseBody(body,'Entry Type')||((event.subject||'').toLowerCase().includes('vac')||(event.subject||'').toLowerCase().includes('ooo')?'Out of Office':'Meeting'),notes:parseBody(body,'Notes')||event.bodyPreview||''}}
+  function monthBounds(){const start=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);const end=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);return {start,end}}
+  function setNotice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error)}
+
+  async function initializeAuth(){
+    if(typeof msal==='undefined'){setNotice('Microsoft sign-in library did not load. Check the internet connection or browser security settings.',true);return}
+    msalApp=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:`https://login.microsoftonline.com/${TENANT_ID}`,redirectUri:window.location.origin},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}});
+    const accounts=msalApp.getAllAccounts();if(accounts.length){account=accounts[0];setSignedIn(true);await loadEvents()}
+  }
+  async function signIn(){try{const result=await msalApp.loginPopup({scopes:SCOPES,prompt:'select_account'});account=result.account;setSignedIn(true);await loadEvents()}catch(error){console.error(error);setNotice(`Microsoft sign-in failed: ${error.message||error}`,true)}}
+  function setSignedIn(on){$('connection').textContent=on?'Online':'Offline';$('connection').classList.toggle('online',on);$('signIn').classList.toggle('hidden',on);$('signOut').classList.toggle('hidden',!on);if(on)setNotice(`Connected as ${account.name||account.username}. Loading the Wesco team calendar…`)}
+  async function signOut(){if(!msalApp)return;await msalApp.logoutPopup({account,postLogoutRedirectUri:window.location.href});account=null;events=[];setSignedIn(false);renderEvents()}
+  async function token(){if(!account){setNotice('Sign in with Microsoft first.',true);return null}try{return (await msalApp.acquireTokenSilent({scopes:SCOPES,account})).accessToken}catch{return (await msalApp.acquireTokenPopup({scopes:SCOPES,account})).accessToken}}
+  async function graph(url,options={}){const accessToken=await token();if(!accessToken)throw new Error('Microsoft sign-in is required.');const response=await fetch(url,{...options,headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json',...(options.headers||{})}});if(!response.ok){let detail='';try{const data=await response.json();detail=data.error&&data.error.message||''}catch{}throw new Error(detail||`Microsoft Graph returned ${response.status}.`)}return response.status===204?null:response.json()}
+  async function loadEvents(){
+    const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;$('eventList').innerHTML='<div class="empty">Loading the team calendar…</div>';
+    try{const endpoint=`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/calendarView?startDateTime=${encodeURIComponent(start.toISOString())}&endDateTime=${encodeURIComponent(end.toISOString())}&$orderby=start/dateTime&$top=250`;const data=await graph(endpoint,{headers:{Prefer:'outlook.timezone="Eastern Standard Time"'}});events=data.value||[];setNotice(`Calendar connected. ${events.length} entr${events.length===1?'y':'ies'} loaded for ${viewDate.toLocaleDateString([], {month:'long',year:'numeric'})}.`);renderEvents()}catch(error){console.error(error);setNotice(`Calendar could not load: ${error.message}`,true);$('eventList').innerHTML='<div class="empty">The team calendar could not be loaded. Confirm calendar access and Azure API permissions.</div>'}
+  }
+  function renderEvents(){
+    $('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});const filter=$('staffFilter').value;const visible=events.filter(e=>filter==='all'||eventMeta(e).staff===filter);$('entryCount').textContent=visible.length;$('oooCount').textContent=visible.filter(e=>typeClass(eventMeta(e).type)==='ooo').length;$('travelCount').textContent=visible.filter(e=>['travel','site'].includes(typeClass(eventMeta(e).type))).length;$('staffCount').textContent=new Set(visible.map(e=>eventMeta(e).staff)).size;
+    if(!visible.length){$('eventList').innerHTML='<div class="empty">No staff calendar entries match this month and filter.</div>';return}
+    const groups={};visible.forEach(e=>{const key=new Date(e.start.dateTime).toLocaleDateString();(groups[key]||(groups[key]=[])).push(e)});
+    $('eventList').innerHTML=Object.entries(groups).map(([day,items])=>`<section class="day-group"><div class="day-title">${safe(formatDate(new Date(items[0].start.dateTime)))}</div>${items.map(e=>{const m=eventMeta(e),start=new Date(e.start.dateTime),end=new Date(e.end.dateTime),allDay=e.isAllDay||(!e.start.dateTime.includes('T'));const cls=typeClass(m.type);return `<button class="event ${selectedEvent&&selectedEvent.id===e.id?'selected':''}" data-id="${safe(e.id)}"><span class="time">${allDay?'All day':`${formatTime(start)} – ${formatTime(end)}`}</span><span class="stripe ${cls}"></span><span class="event-copy"><b>${safe(e.subject||'Untitled')}</b><small>${safe(m.staff)}${e.location&&e.location.displayName?' · '+safe(e.location.displayName):''}</small></span><span class="pill ${cls}">${safe(m.type)}</span></button>`}).join('')}</section>`).join('');
+    document.querySelectorAll('.event').forEach(button=>button.onclick=()=>selectEvent(events.find(e=>e.id===button.dataset.id)));
+  }
+  function selectEvent(event){selectedEvent=event;const m=eventMeta(event),start=new Date(event.start.dateTime),end=new Date(event.end.dateTime);$('formTitle').textContent='Edit staff calendar entry';$('selectedLabel').textContent='Selected entry';$('staffMember').value=STAFF.includes(m.staff)?m.staff:'Team';$('entryType').value=[...$('entryType').options].some(o=>o.value===m.type)?m.type:'Other';$('eventTitle').value=(event.subject||'').replace(new RegExp(`^${m.staff.split(' ')[0]}\\s*-\\s*`,'i'),'');$('eventDate').value=start.toISOString().slice(0,10);$('allDay').checked=!!event.isAllDay;$('startTime').value=start.toTimeString().slice(0,5);$('endTime').value=end.toTimeString().slice(0,5);$('location').value=event.location&&event.location.displayName||'';$('notes').value=m.notes;$('reminder').value=String(event.isReminderOn===false?0:event.reminderMinutesBeforeStart||15);$('showAs').value=event.showAs||'busy';$('saveEvent').textContent='Update entry';$('deleteEvent').classList.remove('hidden');toggleTimes();renderEvents();$('eventForm').scrollIntoView({behavior:'smooth',block:'start'})}
+  function clearForm(){selectedEvent=null;$('eventForm').reset();$('staffMember').value='Team';$('entryType').value='Meeting';$('eventDate').value=new Date().toISOString().slice(0,10);$('startTime').value='09:00';$('endTime').value='10:00';$('reminder').value='15';$('showAs').value='busy';$('formTitle').textContent='Add staff calendar entry';$('selectedLabel').textContent='New entry';$('saveEvent').textContent='Create entry';$('deleteEvent').classList.add('hidden');toggleTimes();renderEvents()}
+  function toggleTimes(){const all=$('allDay').checked;$('startWrap').classList.toggle('hidden',all);$('endWrap').classList.toggle('hidden',all)}
+  function payload(){const staff=$('staffMember').value,type=$('entryType').value,title=$('eventTitle').value.trim(),date=$('eventDate').value;if(!staff||!title||!date)throw new Error('Staff member, title, and date are required.');const all=$('allDay').checked;let start,end;if(all){start={dateTime:`${date}T00:00:00`,timeZone:'Eastern Standard Time'};const next=new Date(`${date}T12:00:00`);next.setDate(next.getDate()+1);end={dateTime:`${next.toISOString().slice(0,10)}T00:00:00`,timeZone:'Eastern Standard Time'}}else{if(!$('startTime').value||!$('endTime').value)throw new Error('Start and end times are required.');start={dateTime:`${date}T${$('startTime').value}:00`,timeZone:'Eastern Standard Time'};end={dateTime:`${date}T${$('endTime').value}:00`,timeZone:'Eastern Standard Time'}}const notes=$('notes').value.trim();return {subject:`${staff.split(' ')[0]} - ${title}`,start,end,isAllDay:all,location:{displayName:$('location').value.trim()},body:{contentType:'Text',content:`Staff Member: ${staff}\nEntry Type: ${type}\nNotes: ${notes||'None'}`},isReminderOn:Number($('reminder').value)>0,reminderMinutesBeforeStart:Number($('reminder').value)||0,showAs:type==='Out of Office'?'oof':$('showAs').value}}
+  async function saveEvent(event){event.preventDefault();try{const data=payload(),base=`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;if(selectedEvent){await graph(`${base}/${encodeURIComponent(selectedEvent.id)}`,{method:'PATCH',body:JSON.stringify(data)});setNotice('Staff calendar entry updated successfully.')}else{await graph(base,{method:'POST',body:JSON.stringify(data)});setNotice('Staff calendar entry created successfully.')}clearForm();await loadEvents()}catch(error){console.error(error);setNotice(error.message,true)}}
+  async function deleteSelected(){if(!selectedEvent)return;if(!confirm(`Delete “${selectedEvent.subject}” from the Wesco team calendar?`))return;try{await graph(`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${encodeURIComponent(selectedEvent.id)}`,{method:'DELETE'});setNotice('Staff calendar entry deleted.');clearForm();await loadEvents()}catch(error){setNotice(`Entry could not be deleted: ${error.message}`,true)}}
+
+  STAFF.concat('Team').forEach(name=>{$('staffMember').add(new Option(name,name));if(name!=='Team')$('staffFilter').add(new Option(name,name))});
+  $('eventDate').value=new Date().toISOString().slice(0,10);$('signIn').onclick=signIn;$('signOut').onclick=signOut;$('refresh').onclick=loadEvents;$('previous').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);loadEvents()};$('next').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);loadEvents()};$('staffFilter').onchange=renderEvents;$('allDay').onchange=toggleTimes;$('eventForm').onsubmit=saveEvent;$('clearForm').onclick=clearForm;$('deleteEvent').onclick=deleteSelected;$('todayNav').onclick=()=>{viewDate=new Date();loadEvents()};$('newNav').onclick=()=>{$('eventForm').scrollIntoView({behavior:'smooth'});$('eventTitle').focus()};
+  const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;initializeAuth();
+</script>
+</body>
+</html>
