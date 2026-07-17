@@ -19,7 +19,7 @@ The GitHub repository already contains an Azure Static Web Apps workflow with `a
 
 The expected production address is:
 
-`https://wonderful-field-08b34ac0f.azurestaticapps.net/staff-team-calendar/`
+`https://wonderful-field-08b34ac0f.7.azurestaticapps.net/staff-team-calendar/`
 
 ## Local review
 
