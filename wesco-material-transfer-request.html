@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wesco Material Transfer Request</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .header {
+      background: #1f3d5a;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin: 25px 0 15px;
+      color: #1f3d5a;
+      border-bottom: 2px solid #1f3d5a;
+      padding-bottom: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 11px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    button {
+      border: none;
+      padding: 13px 22px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .submit-btn {
+      background: #1f3d5a;
+      color: white;
+    }
+
+    .clear-btn {
+      background: #d9534f;
+      color: white;
+    }
+
+    .print-btn {
+      background: #4a7c59;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      font-size: 14px;
+    }
+
+    th {
+      background: #1f3d5a;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+      background: #f7f7f7;
+    }
+
+    .note-box {
+      background: #eef4fa;
+      border-left: 5px solid #1f3d5a;
+      padding: 14px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .total-box {
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    @media print {
+      .button-row {
+        display: none;
+      }
+
+      body {
+        background: white;
+      }
+
+      .container {
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full-width {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Wesco Material Transfer Request</h1>
+      <p>
+        This form is used by Project Managers to request inventory or material to be moved from one project to another,
+        or from a job back into inventory. This helps protect job cost accuracy, invoice tracking, financial reporting,
+        and material integrity.
+      </p>
+    </div>
+
+    <div class="note-box">
+      PMs should use the job named <strong>Inventory</strong> when locating available material or inventory related invoice information.
+      The request should clearly identify the invoice, vendor, item, quantity, cost, and the job receiving or releasing the material.
+    </div>
+
+    <form id="transferForm">
+      <div class="section-title">Request Information</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="requestDate">Request Date</label>
+          <input type="date" id="requestDate" required />
+        </div>
+
+        <div class="form-group">
+          <label for="projectManager">Project Manager</label>
+          <input type="text" id="projectManager" placeholder="Enter PM name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="transferType">Transfer Type</label>
+          <select id="transferType" required>
+            <option value="">Select transfer type</option>
+            <option value="Project to Project">Move from one project to another project</option>
+            <option value="Project to Inventory">Move from project back to inventory</option>
+            <option value="Inventory to Project">Move from inventory to project</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="invoiceNumber">Invoice Number</label>
+          <input type="text" id="invoiceNumber" placeholder="Enter invoice number" required />
+        </div>
+
+        <div class="form-group">
+          <label for="vendorName">Vendor Name</label>
+          <input type="text" id="vendorName" placeholder="Enter vendor name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="itemCost">Cost Per Item</label>
+          <input type="number" id="itemCost" placeholder="0.00" step="0.01" min="0" required />
+        </div>
+
+        <div class="form-group">
+          <label for="quantityMove">Quantity To Move</label>
+          <input type="number" id="quantityMove" placeholder="Enter quantity" step="0.01" min="0" required />
+        </div>
+
+        <div class="form-group">
+          <label for="totalMove">Total Amount To Move</label>
+          <input type="number" id="totalMove" placeholder="Auto calculated" step="0.01" readonly />
+        </div>
+
+        <div class="form-group">
+          <label for="moveFromJob">Move From Job Name</label>
+          <input type="text" id="moveFromJob" placeholder="Example: Inventory or Project Name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="moveToJob">Move To Job Name</label>
+          <input type="text" id="moveToJob" placeholder="Enter receiving job name" required />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="itemDescription">Item Description</label>
+          <textarea id="itemDescription" placeholder="Describe the material or inventory item being moved" required></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="reason">Reason For Transfer</label>
+          <textarea id="reason" placeholder="Explain why this material needs to be moved"></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="notes">Additional Notes</label>
+          <textarea id="notes" placeholder="Add any extra notes, invoice details, or job cost comments"></textarea>
+        </div>
+      </div>
+
+      <div class="total-box">
+        Total Amount To Move: $<span id="totalDisplay">0.00</span>
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="submit-btn">Submit Transfer Request</button>
+        <button type="button" class="print-btn" onclick="window.print()">Print Request</button>
+        <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>
+      </div>
+    </form>
+
+    <div class="section-title">Submitted Transfer Requests</div>
+
+    <table id="requestTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>PM</th>
+          <th>Transfer Type</th>
+          <th>Invoice</th>
+          <th>Vendor</th>
+          <th>Item</th>
+          <th>From Job</th>
+          <th>To Job</th>
+          <th>Qty</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const itemCost = document.getElementById("itemCost");
+    const quantityMove = document.getElementById("quantityMove");
+    const totalMove = document.getElementById("totalMove");
+    const totalDisplay = document.getElementById("totalDisplay");
+    const transferForm = document.getElementById("transferForm");
+    const requestTable = document.getElementById("requestTable").querySelector("tbody");
+
+    function calculateTotal() {
+      const cost = parseFloat(itemCost.value) || 0;
+      const qty = parseFloat(quantityMove.value) || 0;
+      const total = cost * qty;
+
+      totalMove.value = total.toFixed(2);
+      totalDisplay.textContent = total.toFixed(2);
+    }
+
+    itemCost.addEventListener("input", calculateTotal);
+    quantityMove.addEventListener("input", calculateTotal);
+
+    transferForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const requestDate = document.getElementById("requestDate").value;
+      const projectManager = document.getElementById("projectManager").value;
+      const transferType = document.getElementById("transferType").value;
+      const invoiceNumber = document.getElementById("invoiceNumber").value;
+      const vendorName = document.getElementById("vendorName").value;
+      const itemDescription = document.getElementById("itemDescription").value;
+      const moveFromJob = document.getElementById("moveFromJob").value;
+      const moveToJob = document.getElementById("moveToJob").value;
+      const qty = document.getElementById("quantityMove").value;
+      const total = document.getElementById("totalMove").value;
+
+      const newRow = requestTable.insertRow();
+
+      newRow.innerHTML = `
+        <td>${requestDate}</td>
+        <td>${projectManager}</td>
+        <td>${transferType}</td>
+        <td>${invoiceNumber}</td>
+        <td>${vendorName}</td>
+        <td>${itemDescription}</td>
+        <td>${moveFromJob}</td>
+        <td>${moveToJob}</td>
+        <td>${qty}</td>
+        <td>$${total}</td>
+      `;
+
+      alert("Transfer request submitted successfully.");
+
+      transferForm.reset();
+      totalMove.value = "";
+      totalDisplay.textContent = "0.00";
+    });
+
+    function clearForm() {
+      transferForm.reset();
+      totalMove.value = "";
+      totalDisplay.textContent = "0.00";
+    }
+  </script>
+</body>
+</html>
