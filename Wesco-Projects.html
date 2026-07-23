@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco – Projects</title>
+<link rel="canonical" href="https://www.wescodashboardapp.com/Wesco-Projects.html">
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.1/lib/msal-browser.min.js"></script>
+<style>
+/* ==========================================================================
+   WESCO EXTERIORS, INC. — Projects Screen (live SharePoint sync)
+   Signs in with Microsoft (MSAL.js) and browses the real "Projects"
+   SharePoint folder through Microsoft Graph. Folders open INLINE on this
+   screen (click in, breadcrumb back out) — nothing hardcoded, nothing opens
+   a new SharePoint tab unless you click an actual file.
+   White body text, Wesco orange (#FF7012) for headings/labels and every
+   underline rule, fully transparent background.
+   ========================================================================== */
+:root{
+  --orange:      #FF7012;
+  --white:       #FFFFFF;
+  --muted:       rgba(255,255,255,.62);
+  --muted-soft:  rgba(255,255,255,.42);
+  --line:        #FF7012;
+  --row-hover:   rgba(255,112,18,.10);
+  --focus-ring:  rgba(255,112,18,.55);
+  --err:         #FF6B6B;
+  --font: 'Segoe UI', 'Open Sans', system-ui, -apple-system, Arial, sans-serif;
+}
+*{ box-sizing:border-box; }
+html,body{
+  margin:0; padding:0;
+  min-height:100%;
+  background:#090e10;
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 14.5px;
+  line-height:1.45;
+}
+.app-shell{
+  background:rgba(9,14,16,.74);
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ---------- Header ---------- */
+.header{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding: 16px 22px; border-bottom: 2px solid var(--line);
+}
+.header .titles{ flex:1; min-width:0; }
+.header h1{ margin:0; font-size:20px; font-weight:800; color:var(--white); letter-spacing:.01em; }
+.header .subtitle{ margin:3px 0 0; font-size:12px; color:var(--muted); }
+.header-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
+.btn-ms{
+  display:flex; align-items:center; gap:9px;
+  font-size:13px; font-weight:700; color:#1a1a1a; text-decoration:none;
+  border:none; border-radius:4px; padding:8px 14px; white-space:nowrap; cursor:pointer;
+  background:var(--white); font-family:var(--font);
+}
+.btn-ms:hover{ filter:brightness(.95); }
+.btn-ms svg{ flex-shrink:0; }
+
+.account-chip{ display:flex; align-items:center; gap:10px; }
+.account-name{ font-size:12.5px; color:var(--muted); }
+.signout-link{
+  font-size:12px; font-weight:700; color:var(--orange); text-decoration:none;
+  border:1px solid var(--orange); border-radius:4px; padding:6px 12px; background:transparent; cursor:pointer; font-family:var(--font);
+}
+.signout-link:hover{ background:var(--orange); color:#1a1a1a; }
+
+.open-root-link{
+  font-size:12.5px; font-weight:700; color:var(--orange); text-decoration:none;
+  border:1px solid var(--orange); border-radius:4px; padding:7px 13px; white-space:nowrap;
+  background:transparent; transition:background .12s ease, color .12s ease;
+}
+.open-root-link:hover{ background:var(--orange); color:#1a1a1a; }
+
+/* ---------- Signed-out gate ---------- */
+.signin-gate{ flex:1; display:flex; align-items:center; justify-content:center; padding:60px 22px; }
+.signin-card{ text-align:center; max-width:360px; }
+.signin-card .signin-title{ font-size:16px; font-weight:800; color:var(--white); margin-bottom:8px; }
+.signin-card .signin-body{ font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+
+/* ---------- Body layout ---------- */
+.body-grid{ display:none; flex:1 1 auto; min-height:0; overflow:hidden; }
+.body-grid.show{ display:flex; }
+
+/* ---------- Left: category nav ---------- */
+.category-col{
+  width:270px; flex-shrink:0; padding:10px 0; border-right:1px solid rgba(255,255,255,.14);
+  display:flex; flex-direction:column;
+}
+.cat-item{
+  display:flex; align-items:center; gap:10px;
+  width:100%; text-align:left; background:transparent; border:none;
+  border-bottom:1px solid var(--line);
+  color:var(--white); font-family:var(--font); font-size:14px; font-weight:600;
+  padding:14px 22px; cursor:pointer; transition:background .12s ease, color .12s ease;
+}
+.cat-item .cat-icon{ width:18px; height:18px; color:var(--orange); opacity:.95; flex-shrink:0; }
+.cat-item .cat-icon svg, .item-row .item-icon svg{ display:block; width:100%; height:100%; }
+.cat-item:hover{ background:var(--row-hover); }
+.cat-item:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
+.cat-item.active{ color:var(--orange); background:var(--row-hover); }
+
+/* ---------- Right: item list ---------- */
+.folder-col{ flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; }
+.folder-col-head{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:14px 22px 12px; border-bottom:2px solid var(--line);
+}
+.breadcrumb{ display:flex; align-items:center; flex-wrap:wrap; gap:4px; font-size:13.5px; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:.03em; }
+.breadcrumb button{
+  background:none; border:none; color:var(--orange); font-family:var(--font);
+  font-size:13.5px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; padding:2px;
+}
+.breadcrumb button:hover{ text-decoration:underline; }
+.breadcrumb .crumb-sep{ color:var(--muted-soft); font-weight:400; }
+.breadcrumb .crumb-current{ color:var(--white); }
+
+.folder-col-actions{ display:flex; align-items:center; gap:10px; margin-left:auto; }
+#itemSearch{
+  background:transparent; border:1px solid rgba(255,255,255,.3); border-radius:4px;
+  color:var(--white); font-family:var(--font); font-size:13px; padding:7px 10px; width:200px;
+}
+#itemSearch::placeholder{ color:var(--muted-soft); }
+#itemSearch:focus{ outline:none; border-color:var(--orange); }
+.open-cat-link{
+  font-size:12px; font-weight:700; color:var(--orange); text-decoration:none; white-space:nowrap;
+}
+.open-cat-link:hover{ text-decoration:underline; }
+
+.item-list{ flex:1 1 auto; min-height:0; overflow-y:auto; padding:0 22px; }
+.item-row{
+  display:flex; align-items:center; gap:12px;
+  padding:13px 4px; border-bottom:1px solid var(--line);
+  background:transparent; border-left:none; border-right:none; border-top:none;
+  width:100%; text-align:left; cursor:pointer; text-decoration:none;
+  color:var(--white); font-family:var(--font); font-size:13.5px;
+  transition:background .12s ease;
+}
+.item-row:hover{ background:var(--row-hover); }
+.item-row:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
+.item-row .item-icon{ width:18px; height:18px; color:var(--orange); flex-shrink:0; opacity:.95; }
+.item-row .item-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.item-row .item-type{ font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; }
+.item-row .item-open{ font-size:11.5px; color:var(--orange); opacity:0; flex-shrink:0; transition:opacity .12s ease; }
+.item-row:hover .item-open, .item-row:focus-visible .item-open{ opacity:1; }
+
+.state-block{ padding:36px 4px; text-align:center; color:var(--muted); }
+.state-block .state-title{ font-size:14px; font-weight:700; color:var(--white); margin-bottom:6px; }
+.state-block .state-body{ font-size:12.5px; line-height:1.6; max-width:380px; margin:0 auto 16px; }
+.state-block.err .state-title{ color:var(--err); }
+.state-block a, .state-block button.retry, .signin-card button.retry{
+  color:var(--orange); font-weight:700; text-decoration:none; background:none; border:1px solid var(--orange);
+  border-radius:4px; padding:7px 14px; font-family:var(--font); font-size:12.5px; cursor:pointer;
+}
+.state-block a:hover, .state-block button.retry:hover, .signin-card button.retry:hover{ background:var(--orange); color:#1a1a1a; }
+
+/* ---------- Footer / data notice ---------- */
+details.data-note{
+  font-family:var(--font); font-size:11.5px; color:var(--muted);
+  border-top:2px solid var(--line); padding:0; background:transparent;
+}
+details.data-note summary{ cursor:pointer; padding:10px 22px; font-weight:700; color:var(--orange); list-style:none; }
+details.data-note summary::-webkit-details-marker{ display:none; }
+details.data-note summary:before{ content:"+ "; }
+details.data-note[open] summary:before{ content:"− "; }
+details.data-note .body{ padding:0 22px 16px; line-height:1.65; }
+details.data-note .body p{ margin:0 0 8px; }
+details.data-note .body p:last-child{ margin-bottom:0; }
+details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border-radius:3px; color:var(--white); }
+
+@media (max-width:720px){
+  .app-shell{ overflow:visible; }
+  .header{ padding:14px 16px; align-items:flex-start; }
+  .header .titles{ flex:0 0 100%; }
+  .header-actions{ width:100%; }
+  .body-grid{ flex-direction:column; }
+  .category-col{
+    width:100%; flex-direction:row; overflow-x:auto; border-right:none;
+    border-bottom:1px solid rgba(255,255,255,.14);
+  }
+  .cat-item{ border-bottom:none; border-right:1px solid var(--line); white-space:nowrap; padding:12px 16px; }
+  .folder-col-actions{ width:100%; margin-left:0; }
+  #itemSearch{ flex:1; width:auto; }
+  .folder-col-head{ padding:12px 16px; }
+  .item-list{ padding:0 16px; overflow:visible; }
+  .item-row .item-type{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="header">
+    <div class="titles">
+      <h1>Projects</h1>
+      <div class="subtitle">Wesco Exteriors — Projects Library</div>
+    </div>
+    <div class="header-actions" id="headerActions">
+      <button type="button" class="btn-ms" id="signInBtn">
+        <svg width="16" height="16" viewBox="0 0 21 21"><rect width="9" height="9" x="1" y="1" fill="#f25022"/><rect width="9" height="9" x="11" y="1" fill="#7fba00"/><rect width="9" height="9" x="1" y="11" fill="#00a4ef"/><rect width="9" height="9" x="11" y="11" fill="#ffb900"/></svg>
+        Sign in with Microsoft
+      </button>
+      <div class="account-chip" id="accountChip" style="display:none;">
+        <span class="account-name" id="accountName"></span>
+        <button type="button" class="signout-link" id="signOutBtn">Sign out</button>
+      </div>
+      <a class="open-root-link" href="https://wesconc.sharepoint.com/sites/Wesco/Shared%20Documents/Projects" target="_blank" rel="noopener">Open in SharePoint</a>
+    </div>
+  </div>
+
+  <div class="signin-gate" id="signinGate">
+    <div class="signin-card">
+      <div class="signin-title">Sign in to load your projects</div>
+      <div class="signin-body">This screen reads live folders and files straight from Wesco's SharePoint. Sign in with your Microsoft 365 account to see them here — nothing loads until you do.</div>
+      <button type="button" class="btn-ms" id="signInBtnGate" style="margin:0 auto;">
+        <svg width="16" height="16" viewBox="0 0 21 21"><rect width="9" height="9" x="1" y="1" fill="#f25022"/><rect width="9" height="9" x="11" y="1" fill="#7fba00"/><rect width="9" height="9" x="1" y="11" fill="#00a4ef"/><rect width="9" height="9" x="11" y="11" fill="#ffb900"/></svg>
+        Sign in with Microsoft
+      </button>
+      <div id="signinStatus" style="margin-top:14px; font-size:12.5px; line-height:1.6; min-height:1px;"></div>
+    </div>
+  </div>
+
+  <div class="body-grid" id="bodyGrid">
+    <nav class="category-col" id="categoryCol"></nav>
+
+    <section class="folder-col">
+      <div class="folder-col-head">
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="folder-col-actions">
+          <input type="text" id="itemSearch" placeholder="Search this list…" autocomplete="off">
+          <a class="open-cat-link" id="openCatLink" href="#" target="_blank" rel="noopener">Open in SharePoint</a>
+        </div>
+      </div>
+      <div class="item-list" id="itemList"></div>
+    </section>
+  </div>
+
+  <details class="data-note">
+    <summary>About this screen</summary>
+    <div class="body">
+      <p>This screen signs in with Microsoft and reads live data from the real <code>Documents / Projects</code> folder in Wesco's SharePoint through Microsoft Graph — nothing here is hardcoded, so new, renamed, or moved project folders show up automatically the next time you open a category.</p>
+      <p>Click a category on the left, then click any folder to open it right here on the screen — use the breadcrumb at the top to go back up. Clicking a file (like a tracker spreadsheet) opens it in SharePoint in a new tab, since files still need Word/Excel/SharePoint to view.</p>
+      <p>If sign-in fails, double check the <strong>Redirect URI</strong> registered on the <code>Wesco Dashboard App</code> registration in Azure matches this page's exact web address, and that <code>Files.Read.All</code> / <code>Sites.Read.All</code> permissions have admin consent granted.</p>
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     CONFIG — fill in / confirm these three things:
+     1. redirectUri below must exactly match the Single-page application
+        redirect URI saved on the "Wesco Dashboard App" registration in
+        Azure (Authentication tab). Any mismatch (even a trailing slash)
+        breaks sign-in.
+     2. SITE_HOSTNAME / SITE_PATH point at the Wesco SharePoint site.
+     3. CATEGORIES lists the root plus 5 status folders in display order;
+        edit ONLY if a folder gets renamed or a new category is
+        added; the project list inside each one is always fetched live.
+     ------------------------------------------------------------------ */
+  var msalConfig = {
+    auth: {
+      clientId: '945e4897-7055-4420-b5a8-ece83b8a96bf',
+      authority: 'https://login.microsoftonline.com/5bfae2d1-ca2b-45bc-850a-90de45c02287',
+      redirectUri: window.location.protocol === 'file:'
+        ? 'https://www.wescodashboardapp.com/Wesco-Projects.html'
+        : window.location.origin + window.location.pathname
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+  };
+  var GRAPH_SCOPES = ['User.Read', 'Sites.Read.All', 'Files.Read.All'];
+
+  var SITE_HOSTNAME = 'wesconc.sharepoint.com';
+  var SITE_PATH = '/sites/Wesco';
+  var SITE_WEBURL_BASE = 'https://wesconc.sharepoint.com/sites/Wesco/Shared%20Documents';
+
+  var CATEGORIES = [
+    { key:'all',       label:'All Projects',            relPath:'Projects' },
+    { key:'active',    label:'Active',                  relPath:'Projects/Active' },
+    { key:'bidding',   label:'Bidding',                 relPath:'Projects/Bidding' },
+    { key:'pipeline',  label:'Pipeline Awarded',        relPath:'Projects/Pipeline Awarded' },
+    { key:'closed',    label:'Closed',                  relPath:'Projects/Closed' },
+    { key:'warehouse', label:'Warehouse Inventory',     relPath:'Projects/Warehouse Inventory' }
+  ];
+
+  var LAST_CAT_KEY = 'wesco_projects_last_category_v1';
+
+  /* ------------------------------------------------------------------
+     Helpers
+     ------------------------------------------------------------------ */
+  function $(id){ return document.getElementById(id); }
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function encodeGraphPath(relPath){
+    return relPath.split('/').map(encodeURIComponent).join('/');
+  }
+  function folderWebUrl(relPath){
+    return encodeURI(SITE_WEBURL_BASE + '/' + relPath);
+  }
+  function iconSvg(type){
+    if(type === 'folder'){
+      return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h6l2 2H21v9.5H3z"/></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/></svg>';
+  }
+
+  /* ------------------------------------------------------------------
+     MSAL auth
+     ------------------------------------------------------------------ */
+  var msalInstance = null;
+  var activeAccount = null;
+
+  function showFatalError(message){
+    var gate = $('signinGate');
+    if(gate){
+      gate.innerHTML =
+        '<div class="signin-card">' +
+          '<div class="signin-title" style="color:#FF6B6B;">Couldn\u2019t start sign-in</div>' +
+          '<div class="signin-body">' + escapeHtml(message) + '</div>' +
+          '<button type="button" class="retry" id="fatalRetryBtn">Try again</button>' +
+        '</div>';
+      var btn = $('fatalRetryBtn');
+      if(btn) btn.addEventListener('click', function(){ location.reload(); });
+    }
+  }
+
+  function loadScript(src){
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function(){ resolve(); };
+      s.onerror = function(){ reject(new Error('Failed to load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureMsalLoaded(){
+    if(typeof msal !== 'undefined') return;
+    // Primary CDN tag in <head> didn't come through — try a second, independent CDN before giving up.
+    await loadScript('https://unpkg.com/@azure/msal-browser@2.38.1/lib/msal-browser.min.js');
+    if(typeof msal === 'undefined') throw new Error('Microsoft sign-in library did not load from either source.');
+  }
+
+  async function initAuth(){
+    try{
+      await ensureMsalLoaded();
+    }catch(e){
+      showFatalError('The Microsoft sign-in library couldn\u2019t be loaded from either of its sources. This is almost always a network or firewall block (ad blocker, company proxy, DNS filter) rather than a problem with this page — try a different network, or whitelist cdn.jsdelivr.net and unpkg.com, then click Try again.');
+      return;
+    }
+    try{
+      msalInstance = new msal.PublicClientApplication(msalConfig);
+      await msalInstance.handleRedirectPromise().catch(function(){});
+      var accounts = msalInstance.getAllAccounts();
+      if(accounts.length > 0){
+        activeAccount = accounts[0];
+        msalInstance.setActiveAccount(activeAccount);
+        onSignedIn();
+      }
+    }catch(e){
+      showFatalError((e && e.message) ? e.message : String(e));
+    }
+  }
+
+  function setStatus(message, isError){
+    var el = $('signinStatus');
+    if(el){ el.textContent = message; el.style.color = isError ? '#FF6B6B' : 'rgba(255,255,255,.62)'; }
+    console.log('[Wesco Projects sign-in] ' + message);
+  }
+
+  async function signIn(){
+    setStatus('Opening Microsoft sign-in\u2026', false);
+    if(!msalInstance){ setStatus('Sign-in isn\u2019t ready yet \u2014 refresh the page and try again.', true); return; }
+    try{
+      var result = await msalInstance.loginPopup({ scopes: GRAPH_SCOPES });
+      setStatus('Signed in.', false);
+      activeAccount = result.account;
+      msalInstance.setActiveAccount(activeAccount);
+      onSignedIn();
+    }catch(e){
+      var msg = (e && e.message) ? e.message : String(e);
+      if(e && e.errorCode === 'popup_window_error' || (msg && msg.toLowerCase().indexOf('popup') !== -1)){
+        setStatus('The sign-in popup was blocked. Look for a popup-blocked icon in your browser\u2019s address bar and allow popups for this site, then click Sign in again.', true);
+      } else {
+        setStatus('Sign-in didn\u2019t go through: ' + msg, true);
+      }
+      console.error('[Wesco Projects sign-in] full error:', e);
+    }
+  }
+
+  function signOut(){
+    if(msalInstance) msalInstance.logoutPopup({ account: activeAccount }).catch(function(){});
+    activeAccount = null;
+    $('signInBtn').style.display = '';
+    $('accountChip').style.display = 'none';
+    $('bodyGrid').classList.remove('show');
+    $('signinGate').style.display = 'flex';
+  }
+
+  async function getAccessToken(){
+    if(!activeAccount) throw new Error('Not signed in');
+    try{
+      var result = await msalInstance.acquireTokenSilent({ scopes: GRAPH_SCOPES, account: activeAccount });
+      return result.accessToken;
+    }catch(e){
+      var result2 = await msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
+      activeAccount = result2.account;
+      msalInstance.setActiveAccount(activeAccount);
+      return result2.accessToken;
+    }
+  }
+
+  function onSignedIn(){
+    $('signInBtn').style.display = 'none';
+    $('accountChip').style.display = 'flex';
+    $('accountName').textContent = activeAccount.name || activeAccount.username || 'Signed in';
+    $('signinGate').style.display = 'none';
+    $('bodyGrid').classList.add('show');
+
+    var startKey = 'all';
+    try{
+      var saved = localStorage.getItem(LAST_CAT_KEY);
+      if(saved && CATEGORIES.some(function(c){ return c.key === saved; })) startKey = saved;
+    }catch(e){}
+    renderCategoryNav(startKey);
+    openCategory(startKey);
+  }
+
+  /* ------------------------------------------------------------------
+     Microsoft Graph
+     ------------------------------------------------------------------ */
+  var siteIdCache = null;
+
+  async function graphFetch(url){
+    var token = await getAccessToken();
+    var res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    if(!res.ok){
+      var text = await res.text().catch(function(){ return ''; });
+      throw new Error('Graph error ' + res.status + (text ? ': ' + text.slice(0,180) : ''));
+    }
+    return res.json();
+  }
+
+  async function resolveSiteId(){
+    if(siteIdCache) return siteIdCache;
+    var data = await graphFetch('https://graph.microsoft.com/v1.0/sites/' + SITE_HOSTNAME + ':' + SITE_PATH);
+    siteIdCache = data.id;
+    return siteIdCache;
+  }
+
+  async function listChildren(relPath){
+    var siteId = await resolveSiteId();
+    var url = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/drive/root:/' + encodeGraphPath(relPath) +
+      ':/children?$select=name,webUrl,folder,file,lastModifiedDateTime&$top=400';
+    var items = [];
+    while(url){
+      var data = await graphFetch(url);
+      items = items.concat(data.value || []);
+      url = data['@odata.nextLink'] || null;
+    }
+    items.sort(function(a, b){
+      var af = !!a.folder, bf = !!b.folder;
+      if(af !== bf) return af ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+    return items;
+  }
+
+  /* ------------------------------------------------------------------
+     Category nav + breadcrumb + item list
+     ------------------------------------------------------------------ */
+  var activeCatKey = null;
+  var pathStack = [];   // [{label, relPath}], element 0 is always the category root
+  var currentItems = [];
+
+  function renderCategoryNav(activeKey){
+    $('categoryCol').innerHTML = CATEGORIES.map(function(cat){
+      return (
+        '<button type="button" class="cat-item' + (cat.key === activeKey ? ' active' : '') + '" data-key="' + cat.key + '">' +
+          '<span class="cat-icon" aria-hidden="true">' + iconSvg('folder') + '</span>' +
+          '<span class="cat-label">' + escapeHtml(cat.label) + '</span>' +
+        '</button>'
+      );
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.cat-item'), function(btn){
+      btn.addEventListener('click', function(){ openCategory(btn.getAttribute('data-key')); });
+    });
+  }
+
+  function openCategory(key){
+    var cat = CATEGORIES.filter(function(c){ return c.key === key; })[0];
+    if(!cat) return;
+    activeCatKey = key;
+    try{ localStorage.setItem(LAST_CAT_KEY, key); }catch(e){}
+    renderCategoryNav(key);
+    pathStack = [{ label: cat.label, relPath: cat.relPath }];
+    loadCurrentFolder();
+  }
+
+  function renderBreadcrumb(){
+    $('breadcrumb').innerHTML = pathStack.map(function(node, i){
+      var isLast = i === pathStack.length - 1;
+      if(isLast) return '<span class="crumb-current">' + escapeHtml(node.label) + '</span>';
+      return (
+        '<button type="button" data-idx="' + i + '">' + escapeHtml(node.label) + '</button>' +
+        '<span class="crumb-sep">/</span>'
+      );
+    }).join('');
+    Array.prototype.forEach.call($('breadcrumb').querySelectorAll('button'), function(btn){
+      btn.addEventListener('click', function(){
+        var idx = Number(btn.getAttribute('data-idx'));
+        pathStack = pathStack.slice(0, idx + 1);
+        loadCurrentFolder();
+      });
+    });
+  }
+
+  async function loadCurrentFolder(){
+    renderBreadcrumb();
+    var here = pathStack[pathStack.length - 1];
+    $('openCatLink').href = folderWebUrl(here.relPath);
+    $('itemSearch').value = '';
+    $('itemList').innerHTML = '<div class="state-block"><div class="state-title">Loading…</div><div class="state-body">Pulling the live folder list from SharePoint.</div></div>';
+
+    try{
+      currentItems = await listChildren(here.relPath);
+      renderItemList('');
+    }catch(err){
+      $('itemList').innerHTML =
+        '<div class="state-block err">' +
+          '<div class="state-title">Couldn\u2019t load this folder</div>' +
+          '<div class="state-body">' + escapeHtml(err.message || String(err)) + '</div>' +
+          '<button type="button" class="retry" id="retryBtn">Try again</button>' +
+        '</div>';
+      var retry = $('retryBtn');
+      if(retry) retry.addEventListener('click', loadCurrentFolder);
+    }
+  }
+
+  function renderItemList(filterText){
+    var root = $('itemList');
+    var filtered = currentItems.filter(function(item){
+      return !filterText || item.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
+    });
+
+    if(currentItems.length === 0){
+      var here = pathStack[pathStack.length - 1];
+      root.innerHTML =
+        '<div class="state-block">' +
+          '<div class="state-title">This folder is empty</div>' +
+          '<div class="state-body">There\u2019s nothing in ' + escapeHtml(here.label) + ' yet.</div>' +
+          '<a href="' + folderWebUrl(here.relPath) + '" target="_blank" rel="noopener">Open in SharePoint</a>' +
+        '</div>';
+      return;
+    }
+    if(filtered.length === 0){
+      root.innerHTML = '<div class="state-block"><div class="state-body">No items match "' + escapeHtml(filterText) + '".</div></div>';
+      return;
+    }
+
+    root.innerHTML = filtered.map(function(item, i){
+      var isFolder = !!item.folder;
+      return (
+        '<button type="button" class="item-row" data-idx="' + i + '">' +
+          '<span class="item-icon" aria-hidden="true">' + iconSvg(isFolder ? 'folder' : 'file') + '</span>' +
+          '<span class="item-name">' + escapeHtml(item.name) + '</span>' +
+          '<span class="item-type">' + (isFolder ? ((item.folder.childCount || 0) + ' items') : 'File') + '</span>' +
+          '<span class="item-open">' + (isFolder ? 'Open' : 'Open in SharePoint') + '</span>' +
+        '</button>'
+      );
+    }).join('');
+
+    Array.prototype.forEach.call(root.querySelectorAll('.item-row'), function(btn){
+      btn.addEventListener('click', function(){
+        var item = filtered[Number(btn.getAttribute('data-idx'))];
+        if(item.folder){
+          pathStack.push({ label: item.name, relPath: pathStack[pathStack.length - 1].relPath + '/' + item.name });
+          loadCurrentFolder();
+        } else {
+          window.open(item.webUrl, '_blank', 'noopener');
+        }
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Wire up
+     ------------------------------------------------------------------ */
+  document.addEventListener('DOMContentLoaded', function(){
+    initAuth();
+    $('signInBtn').addEventListener('click', signIn);
+    var gateBtn = $('signInBtnGate');
+    if(gateBtn) gateBtn.addEventListener('click', signIn);
+    $('signOutBtn').addEventListener('click', signOut);
+    $('itemSearch').addEventListener('input', function(){
+      renderItemList($('itemSearch').value.trim());
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
