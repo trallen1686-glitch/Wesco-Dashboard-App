@@ -182,6 +182,156 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
 .toast.show{ opacity:1; }
 .toast.err{ background:var(--urgent); }
 
+
+/* ---------- Staff Portal color and transparency match ---------- */
+:root{
+  --blue:        #C65300;
+  --blue-bright: #F36A00;
+  --urgent:      #F36A00;
+  --urgent-tint: rgba(243,106,0,.16);
+  --success:     #F36A00;
+  --success-tint:rgba(243,106,0,.12);
+  --neutral:     #839097;
+  --page-bg:     #080D10;
+  --card-bg:     rgba(9, 14, 16, 0.74);
+  --border:      rgba(255,255,255,.14);
+  --ink:         #FFFFFF;
+  --ink-soft:    rgba(255,255,255,.82);
+  --maroon:      #F36A00;
+  --maroon-tint: rgba(243,106,0,.14);
+  --amber:       #F36A00;
+  --amber-tint:  rgba(243,106,0,.14);
+  --font: 'Open Sans', sans-serif;
+  --radius: 4px;
+}
+button,input,textarea,select,option{ font-family:var(--font); }
+html,body{
+  min-height:100%;
+  background-color:var(--page-bg);
+  background-image:
+    linear-gradient(115deg, rgba(6,10,12,.96) 0%, rgba(9,14,16,.82) 42%, rgba(9,14,16,.94) 100%),
+    radial-gradient(circle at 72% 18%, rgba(243,106,0,.10), transparent 32%),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.018) 80px),
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(255,255,255,.014) 80px);
+  background-attachment:fixed;
+}
+.card{
+  background:var(--card-bg);
+  border-color:var(--border);
+  box-shadow:0 18px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  overflow:hidden;
+}
+.header{
+  border-bottom-color:var(--blue-bright);
+  background:rgba(4,8,10,.62);
+}
+.header h1{ color:var(--ink); }
+.header .subtitle{ color:var(--blue-bright); }
+.tag{
+  background:transparent;
+  color:var(--ink-soft);
+}
+.tag.company{
+  background:transparent;
+  color:#FF9A4D;
+}
+.sub-section-title{ color:var(--blue-bright); }
+.sub-card{
+  background:rgba(5,10,12,.72);
+  border-color:var(--border);
+}
+.sub-card:hover{
+  border-color:var(--blue-bright);
+  background:rgba(243,106,0,.08);
+  box-shadow:0 7px 18px rgba(0,0,0,.28);
+}
+.avatar{
+  background:transparent;
+  color:#FF8A32;
+}
+.sub-name,.detail-name,.messages-title,.msg-author,.msg-text{ color:var(--ink); }
+.sub-contact{ color:var(--ink-soft); }
+.detail-header,.messages-header{
+  background:rgba(4,8,10,.42);
+  border-bottom-color:var(--border);
+}
+.back-link{ color:var(--blue-bright); }
+.back-link:hover{ color:#FF9A4D; text-decoration:none; }
+.section-heading{ color:#FFFFFF; }
+.tab-tile{
+  background:rgba(5,10,12,.76);
+  border-color:var(--border);
+}
+.tab-tile:hover{
+  border-color:var(--blue-bright);
+  background:rgba(243,106,0,.08);
+  box-shadow:0 8px 20px rgba(0,0,0,.32);
+}
+.tab-tile .tab-icon{ color:var(--blue-bright); }
+.tab-tile .tab-label{ color:var(--ink); }
+.tab-tile .tab-desc{ color:#FF8A32; }
+.btn{
+  border:1px solid var(--blue-bright);
+  background:var(--blue-bright);
+  color:#FFFFFF;
+}
+.btn:hover{ background:#FF7A14; filter:none; }
+.btn-ghost{
+  background:rgba(5,10,12,.76);
+  color:var(--ink);
+  border-color:var(--border);
+}
+.btn-ghost:hover{
+  background:rgba(243,106,0,.10);
+  border-color:var(--blue-bright);
+}
+.modal-overlay{ background:rgba(0,0,0,.66); }
+.modal-box{
+  background:rgba(9,14,16,.96);
+  border:1px solid var(--border);
+  color:var(--ink);
+  box-shadow:0 18px 50px rgba(0,0,0,.48);
+}
+.modal-box h3,.modal-box label{ color:var(--ink); }
+.modal-box input[type="text"],
+.msg-compose input[type="text"],
+.msg-compose textarea{
+  background:rgba(3,7,9,.72);
+  color:var(--ink);
+  border-color:var(--border);
+}
+.modal-box input[type="text"]::placeholder,
+.msg-compose input[type="text"]::placeholder,
+.msg-compose textarea::placeholder{ color:rgba(255,255,255,.48); }
+.modal-note,.msg-time,.empty-messages{ color:var(--ink-soft); }
+.msg-compose{ border-bottom-color:var(--border); }
+.msg-item{
+  background:rgba(5,10,12,.76);
+  border-color:var(--border);
+}
+details.data-note{
+  background:rgba(3,7,9,.44);
+  border-top-color:var(--border);
+  color:var(--ink-soft);
+}
+details.data-note code{
+  background:rgba(255,255,255,.08);
+  color:#FF9A4D;
+}
+.toast{
+  background:#111A1E;
+  color:#FFFFFF;
+  border:1px solid rgba(243,106,0,.45);
+}
+.toast.err{ background:var(--urgent); }
+body > a[href="index.html"]{
+  background:rgba(5,10,12,.76) !important;
+  color:#FFFFFF !important;
+  border:1px solid var(--border);
+}
+
 @media (max-width:480px){
   .tab-grid{ grid-template-columns: 1fr 1fr; }
 }
