@@ -1,18 +1,32 @@
-# Wesco Meeting Notebook — Azure package
+# Wesco Dashboard App
 
-This folder is a standalone Azure Static Web Apps package for the Wesco Meeting Notebook. It does not include the older Wesco Estimator Workflow.
+Static HTML dashboard and operational templates deployed from GitHub to Azure Static Web Apps.
 
-## Azure deployment
+## Website addresses
 
-- App location: `azure/Wesco Meeting Notebook`
-- Output location: leave blank
-- API location: leave blank
+- Planned primary address: <https://www.wescodashboardapp.com>
+- Azure deployment address: <https://wonderful-field-08b34ac0f.7.azurestaticapps.net>
+
+The repository deploys through `.github/workflows/azure-static-web-apps-wonderful-field-08b34ac0f.yml` whenever `main` changes.
+
+## Custom-domain configuration
+
+This project uses Azure Static Web Apps, not GitHub Pages. Do not add a GitHub Pages `CNAME` file. The custom domain must be added under the Azure Static App's **Custom domains** settings, and the public DNS record for `www` must point to the same Azure Static App.
+
+After Azure validates `www.wescodashboardapp.com`, set it as the default domain so requests to the generated Azure hostname redirect to the public website address.
+
+## Microsoft sign-in
+
+Pages using Microsoft sign-in need their exact deployed URLs listed as Single-page application redirect URIs in the Microsoft Entra app registration. For the Projects page, register both addresses if both will remain usable:
+
+- `https://www.wescodashboardapp.com/Wesco-Projects.html`
+- `https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco-Projects.html`
+
+The Projects page requests the delegated Microsoft Graph permissions `User.Read`, `Sites.Read.All`, and `Files.ReadWrite.All`. The page uses the write permission only to upload files into the currently open folder under `Documents / We App / Projects`; it does not expose delete, rename, or move actions. An Entra administrator must grant consent before staff uploads will work.
+
+## Deployment layout
+
+- App location: `/`
+- API location: blank
+- Output location: blank
 - Start file: `index.html`
-
-After Azure deploys the site, share the generated `https://<name>.azurestaticapps.net` URL with staff.
-
-## Saving behavior
-
-The standalone review version saves meeting changes in the current browser. That is suitable for individual review and template use. For shared team records across devices, connect the notebook to Dataverse, a SharePoint List, or an Azure database/API.
-
-The **Files & photos** tab accepts secure links to plans, estimates, change orders, contracts, vendor/customer documents, and job photos. Device-uploaded photos are browser-local; use SharePoint or OneDrive links when the whole team needs access.
