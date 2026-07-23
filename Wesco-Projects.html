@@ -226,7 +226,7 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
         <span class="account-name" id="accountName"></span>
         <button type="button" class="signout-link" id="signOutBtn">Sign out</button>
       </div>
-      <a class="open-root-link" href="https://wesconc.sharepoint.com/sites/Wesco/Shared%20Documents/Projects" target="_blank" rel="noopener">Open in SharePoint</a>
+      <a class="open-root-link" href="https://wesconc.sharepoint.com/sites/Wesco/Shared%20Documents/We%20App/Projects" target="_blank" rel="noopener">Open in SharePoint</a>
     </div>
   </div>
 
@@ -263,7 +263,7 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
   <details class="data-note">
     <summary>About this screen</summary>
     <div class="body">
-      <p>This screen signs in with Microsoft and reads live data from the real <code>Documents / Projects</code> folder in Wesco's SharePoint through Microsoft Graph — nothing here is hardcoded, so new, renamed, or moved project folders show up automatically the next time you open a category.</p>
+      <p>This screen signs in with Microsoft and reads live data from the real <code>Documents / We App / Projects</code> folder in Wesco's SharePoint through Microsoft Graph — nothing here is hardcoded, so new, renamed, or moved project folders show up automatically the next time you open a category.</p>
       <p>Click a category on the left, then open a project folder. Use <strong>Add files</strong> to upload one or more files into the folder currently shown. Existing files with the same name are preserved; SharePoint gives the uploaded copy a unique name.</p>
       <p>Clicking an existing file opens it in SharePoint in a new tab. This screen does not provide delete, rename, or move actions.</p>
       <p>If sign-in fails, double check the <strong>Redirect URI</strong> registered on the <code>Wesco Dashboard App</code> registration in Azure matches this page's exact web address, and that <code>Files.ReadWrite.All</code> / <code>Sites.Read.All</code> delegated permissions have admin consent granted.</p>
@@ -304,12 +304,12 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
   var SITE_WEBURL_BASE = 'https://wesconc.sharepoint.com/sites/Wesco/Shared%20Documents';
 
   var CATEGORIES = [
-    { key:'all',       label:'All Projects',            relPath:'Projects' },
-    { key:'active',    label:'Active',                  relPath:'Projects/Active' },
-    { key:'bidding',   label:'Bidding',                 relPath:'Projects/Bidding' },
-    { key:'pipeline',  label:'Pipeline Awarded',        relPath:'Projects/Pipeline Awarded' },
-    { key:'closed',    label:'Closed',                  relPath:'Projects/Closed' },
-    { key:'warehouse', label:'Warehouse Inventory',     relPath:'Projects/Warehouse Inventory' }
+    { key:'all',      label:'All Projects',       relPath:'We App/Projects/All Projects' },
+    { key:'active',   label:'Active',             relPath:'We App/Projects/Active Projects' },
+    { key:'bidding',  label:'Bidding',            relPath:'We App/Projects/Bidding Projects' },
+    { key:'pipeline', label:'Pipeline Awarded',   relPath:'We App/Projects/Pipeline Awarded' },
+    { key:'closed',   label:'Closed',             relPath:'We App/Projects/Closed Projects' },
+    { key:'new-bids', label:'New Bids',           relPath:'We App/Projects/New Bids' }
   ];
 
   var LAST_CAT_KEY = 'wesco_projects_last_category_v1';
