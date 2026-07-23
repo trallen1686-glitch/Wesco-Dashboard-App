@@ -96,7 +96,46 @@
       td::before { content: attr(data-label); display: block; color: #93c5fd; font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; }
       .brand img { width: 120px; }
     }
-  </style>
+  
+/* Subcontractor Portal visual theme — colors and transparency only */
+:root{
+  --portal-orange:#F36A00;
+  --portal-orange-light:#FF9A4D;
+  --portal-bg:#080D10;
+  --portal-panel:rgba(9,14,16,.74);
+  --portal-panel-strong:rgba(5,10,12,.82);
+  --portal-line:rgba(255,255,255,.14);
+  --portal-text:#FFFFFF;
+  --portal-muted:rgba(255,255,255,.82);
+  --portal-shadow:0 18px 50px rgba(0,0,0,.42);
+}
+html,body{
+  min-height:100%;
+  background-color:var(--portal-bg)!important;
+  background-image:
+    linear-gradient(115deg,rgba(6,10,12,.96) 0%,rgba(9,14,16,.82) 42%,rgba(9,14,16,.94) 100%),
+    radial-gradient(circle at 72% 18%,rgba(243,106,0,.10),transparent 32%),
+    repeating-linear-gradient(90deg,transparent 0 79px,rgba(255,255,255,.018) 80px),
+    repeating-linear-gradient(0deg,transparent 0 79px,rgba(255,255,255,.014) 80px);
+  background-attachment:fixed;
+  color:var(--portal-text);
+}
+
+:root{--bg:#080D10;--panel:rgba(9,14,16,.74);--panel2:rgba(5,10,12,.76);--line:rgba(255,255,255,.14);--text:#FFFFFF;--muted:rgba(255,255,255,.82);--blue:#F36A00;--blue2:#FF7A14;--green:#F36A00;--yellow:#F36A00;--red:#F36A00;--teal:#F36A00;--purple:#F36A00}
+header{background:rgba(4,8,10,.62);border-bottom:3px solid var(--portal-orange);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.subtitle{color:var(--portal-orange-light)}
+button,button.secondary,button.green,button.yellow,button.red,button.teal,button.purple{background:var(--portal-orange);color:#fff;border:1px solid var(--portal-orange)}
+button:hover{background:#FF7A14}
+.status-card,.card{background:var(--portal-panel);border-color:var(--portal-line);box-shadow:var(--portal-shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.status-card .label,label,.small-note{color:var(--portal-muted)}
+input,select,textarea,.details-box,.calendar-chip,.share-panel,.stack-box,code{background:rgba(3,7,9,.72);color:#fff;border-color:var(--portal-line)}
+input:focus,select:focus,textarea:focus{border-color:var(--portal-orange);box-shadow:0 0 0 3px rgba(243,106,0,.16)}
+thead{background:var(--portal-orange)}th{color:#fff}th,td{border-color:var(--portal-line)}
+tbody tr:hover{background:rgba(243,106,0,.08)}tbody tr.selected{background:rgba(243,106,0,.14);outline-color:var(--portal-orange)}
+.pill,.pill.green,.pill.yellow,.pill.red,.pill.teal,.pill.purple{background:rgba(243,106,0,.14);color:var(--portal-orange-light);border:1px solid rgba(243,106,0,.30)}
+.calendar-chip strong,.check-item{color:#fff}.utility-note,td::before{color:var(--portal-orange-light)}
+
+</style>
 </head>
 <body>
 <a href="index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#102b3d;color:#fff;font:700 11px Arial,sans-serif;padding:7px 12px;border-radius:20px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)">&#8592; Wesco Hub</a>
