@@ -22,6 +22,8 @@ Pages using Microsoft sign-in need their exact deployed URLs listed as Single-pa
 - `https://www.wescodashboardapp.com/Wesco-Projects.html`
 - `https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco-Projects.html`
 
+The Projects page requests the delegated Microsoft Graph permissions `User.Read`, `Sites.Read.All`, and `Files.ReadWrite.All`. The page uses the write permission only to upload files into the currently open folder under `Documents / Projects`; it does not expose delete, rename, or move actions. An Entra administrator must grant consent before staff uploads will work.
+
 ## Deployment layout
 
 - App location: `/`
