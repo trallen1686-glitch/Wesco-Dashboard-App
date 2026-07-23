@@ -3,13 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Opening Wesco Dashboard</title>
-  <meta http-equiv="refresh" content="0; url=https://apps.powerapps.com/play/e/75ef4566-d452-e5b1-ad01-b7884e6aa11a/a/efbe5606-5eb8-40a3-8cdf-a46b4b2f9ee2?tenantId=5bfae2d1-ca2b-45bc-850a-90de45c02287">
-  <script>
-    window.location.replace("https://apps.powerapps.com/play/e/75ef4566-d452-e5b1-ad01-b7884e6aa11a/a/efbe5606-5eb8-40a3-8cdf-a46b4b2f9ee2?tenantId=5bfae2d1-ca2b-45bc-850a-90de45c02287");
-  </script>
+  <title>Sign in | Wesco Dashboard</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(rgba(9,14,16,.82), rgba(9,14,16,.9)),
+        radial-gradient(circle at top right, rgba(255,106,0,.18), transparent 42%),
+        #090e10;
+      color: #fff;
+      font-family: "Open Sans", Arial, sans-serif;
+    }
+    main {
+      width: min(460px, 100%);
+      padding: 38px;
+      border: 1px solid #ff6a00;
+      border-radius: 14px;
+      background: rgba(9,14,16,.74);
+      box-shadow: 0 22px 60px rgba(0,0,0,.42);
+      text-align: center;
+    }
+    .mark {
+      width: 54px;
+      height: 5px;
+      margin: 0 auto 26px;
+      border-radius: 999px;
+      background: #ff6a00;
+    }
+    h1 { margin: 0 0 12px; font-size: 30px; }
+    p { margin: 0 0 26px; color: #d9dddf; line-height: 1.55; }
+    a {
+      display: block;
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .primary { background: #ff6a00; color: #fff; }
+    .primary:hover { background: #e95f00; }
+    .secondary {
+      margin-top: 12px;
+      border: 1px solid rgba(255,106,0,.78);
+      color: #fff;
+      background: transparent;
+    }
+    small {
+      display: block;
+      margin-top: 22px;
+      color: #aeb6ba;
+      line-height: 1.45;
+    }
+  </style>
 </head>
-<body style="margin:0;background:#090e10;color:#fff;font-family:'Open Sans',Arial,sans-serif;display:grid;place-items:center;min-height:100vh">
-  <p>Opening the Wesco Dashboard… <a style="color:#ff6a00" href="https://apps.powerapps.com/play/e/75ef4566-d452-e5b1-ad01-b7884e6aa11a/a/efbe5606-5eb8-40a3-8cdf-a46b4b2f9ee2?tenantId=5bfae2d1-ca2b-45bc-850a-90de45c02287">Continue</a></p>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true"></div>
+    <h1>Wesco Dashboard</h1>
+    <p>Sign in with your Wesco Microsoft 365 account to continue.</p>
+    <a class="primary" href="https://apps.powerapps.com/play/e/75ef4566-d452-e5b1-ad01-b7884e6aa11a/a/efbe5606-5eb8-40a3-8cdf-a46b4b2f9ee2?tenantId=5bfae2d1-ca2b-45bc-850a-90de45c02287">Sign in</a>
+    <a class="secondary" href="https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=https%3A%2F%2Fwww.wescodashboardapp.com">Switch Microsoft account</a>
+    <small>Microsoft may continue automatically when this browser is already signed in. Use “Switch Microsoft account” on a shared device.</small>
+  </main>
 </body>
 </html>
