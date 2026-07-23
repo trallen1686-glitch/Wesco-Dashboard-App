@@ -276,7 +276,7 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
         ? 'https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco-Projects-fixed.html'
         : window.location.origin + window.location.pathname
     },
-    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+    cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
   };
   var GRAPH_SCOPES = ['User.Read', 'Sites.Read.All', 'Files.Read.All'];
 
@@ -381,9 +381,26 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
     console.log('[Wesco Projects sign-in] ' + message);
   }
 
+  var signInInProgress = false;
+
+  function setSignInButtonsDisabled(disabled){
+    var headerButton = $('signInBtn');
+    var gateButton = $('signInBtnGate');
+    if(headerButton) headerButton.disabled = disabled;
+    if(gateButton) gateButton.disabled = disabled;
+  }
+
   async function signIn(){
+    if(signInInProgress) return;
+    signInInProgress = true;
+    setSignInButtonsDisabled(true);
     setStatus('Opening Microsoft sign-in\u2026', false);
-    if(!msalInstance){ setStatus('Sign-in isn\u2019t ready yet \u2014 refresh the page and try again.', true); return; }
+    if(!msalInstance){
+      setStatus('Sign-in isn\u2019t ready yet \u2014 refresh the page and try again.', true);
+      signInInProgress = false;
+      setSignInButtonsDisabled(false);
+      return;
+    }
     try{
       var result = await msalInstance.loginPopup({ scopes: GRAPH_SCOPES });
       setStatus('Signed in.', false);
@@ -398,6 +415,9 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
         setStatus('Sign-in didn\u2019t go through: ' + msg, true);
       }
       console.error('[Wesco Projects sign-in] full error:', e);
+    }finally{
+      signInInProgress = false;
+      setSignInButtonsDisabled(false);
     }
   }
 
