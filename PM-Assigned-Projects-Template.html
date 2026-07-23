@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM Assigned Projects | Wesco Exteriors</title>
+  <style>
+    :root {
+      --orange: #f36a00;
+      --orange-light: #ff9a4d;
+      --bg: #080d10;
+      --panel: rgba(9, 14, 16, .74);
+      --panel-strong: rgba(5, 10, 12, .84);
+      --line: rgba(255, 255, 255, .14);
+      --text: #fff;
+      --muted: rgba(255, 255, 255, .76);
+      --shadow: 0 18px 50px rgba(0, 0, 0, .42);
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(115deg, rgba(6,10,12,.96), rgba(9,14,16,.82) 42%, rgba(9,14,16,.94)),
+        radial-gradient(circle at 72% 18%, rgba(243,106,0,.10), transparent 32%),
+        repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.018) 80px),
+        repeating-linear-gradient(0deg, transparent 0 79px, rgba(255,255,255,.014) 80px);
+      background-attachment: fixed;
+    }
+    button, input, textarea { font: inherit; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 3px solid var(--orange);
+      background: rgba(4,8,10,.72);
+      backdrop-filter: blur(10px);
+    }
+    .header-inner, main { width: min(1500px, calc(100% - 32px)); margin: auto; }
+    .header-inner {
+      min-height: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 0;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 5px; font-size: clamp(25px, 4vw, 38px); letter-spacing: -.03em; }
+    .subtitle { margin: 0; color: var(--orange-light); }
+    main { padding: 24px 0 50px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    button {
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid var(--orange);
+      border-radius: 10px;
+      color: #fff;
+      background: var(--orange);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:hover { background: #ff7a14; }
+    button.secondary { background: rgba(255,255,255,.08); border-color: var(--line); }
+    button.secondary:hover { border-color: var(--orange); color: var(--orange-light); }
+    .card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .form-card { display: none; margin-bottom: 22px; }
+    .form-card.open { display: block; }
+    .card-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+    .card-heading p { color: var(--muted); margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
+    .field.span-2 { grid-column: span 2; }
+    .field.full { grid-column: 1 / -1; }
+    label { display: block; margin-bottom: 7px; color: var(--muted); font-size: 13px; font-weight: 800; }
+    input, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      color: #fff;
+      background: rgba(3,7,9,.72);
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(243,106,0,.16); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .section-top { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+    .section-top h2 { margin-bottom: 4px; }
+    .section-top p { margin-bottom: 0; color: var(--muted); }
+    #search { max-width: 330px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+    thead { background: var(--orange); }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; }
+    th { color: #fff; text-transform: uppercase; letter-spacing: .04em; font-size: 12px; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: rgba(243,106,0,.08); }
+    .project-link { color: var(--orange-light); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+    .empty { padding: 30px; text-align: center; color: var(--muted); }
+    dialog {
+      width: min(760px, calc(100% - 28px));
+      max-height: 85vh;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: #fff;
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    dialog::backdrop { background: rgba(0,0,0,.72); }
+    .dialog-head { display: flex; justify-content: space-between; gap: 16px; padding: 20px; border-bottom: 3px solid var(--orange); }
+    .dialog-head h2 { margin-bottom: 3px; }
+    .dialog-body { padding: 20px; overflow: auto; }
+    .audit-list { display: grid; gap: 10px; margin-top: 16px; }
+    .audit-item { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(3,7,9,.62); }
+    .audit-item strong { color: var(--orange-light); }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+    .detail-grid div { padding-bottom: 9px; border-bottom: 1px solid var(--line); color: var(--muted); }
+    .detail-grid strong { display: block; color: #fff; margin-bottom: 4px; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 30; padding: 13px 16px; border-radius: 10px; background: var(--orange); box-shadow: var(--shadow); font-weight: 800; transform: translateY(100px); opacity: 0; transition: .25s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 650px) {
+      header { position: static; }
+      .header-inner, .section-top, .card-heading { align-items: stretch; flex-direction: column; }
+      .toolbar { justify-content: stretch; }
+      .toolbar button { flex: 1; }
+      .grid, .detail-grid { grid-template-columns: 1fr; }
+      .field.span-2 { grid-column: auto; }
+      #search { max-width: none; }
+      .card { padding: 16px; }
+    }
+    @media print {
+      body { background: #fff; color: #000; }
+      header, .form-card, .toolbar, #search, dialog, .toast { display: none !important; }
+      main, .header-inner { width: 100%; }
+      .card { border: 0; box-shadow: none; padding: 0; background: #fff; }
+      .section-top p { color: #333; }
+      .table-wrap { overflow: visible; border-color: #777; }
+      table { min-width: 0; color: #000; }
+      thead { background: #ddd; }
+      th { color: #000; }
+      th, td { border-color: #aaa; font-size: 10px; padding: 7px; }
+      .project-link { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>PM Assigned Projects</h1>
+        <p class="subtitle">Wesco Exteriors Project Management Dashboard</p>
+      </div>
+      <div class="toolbar">
+        <button id="addNewBtn" type="button">+ Add New Project</button>
+        <button id="saveBtn" class="secondary" type="button">Save</button>
+        <button id="printBtn" class="secondary" type="button">Print</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="formCard" class="card form-card" aria-labelledby="formTitle">
+      <div class="card-heading">
+        <div>
+          <h2 id="formTitle">Add New Assigned Project</h2>
+          <p>Complete the project information below, then select Submit Project.</p>
+        </div>
+        <button id="closeFormBtn" class="secondary" type="button">Close</button>
+      </div>
+      <form id="projectForm">
+        <input id="recordId" type="hidden">
+        <div class="grid">
+          <div class="field">
+            <label for="projectNumber">Project Number *</label>
+            <input id="projectNumber" required placeholder="Example: 26-104">
+          </div>
+          <div class="field">
+            <label for="projectName">Project Name *</label>
+            <input id="projectName" required placeholder="Project name">
+          </div>
+          <div class="field span-2">
+            <label for="address">Address *</label>
+            <input id="address" required placeholder="Street, city, state and ZIP">
+          </div>
+          <div class="field full">
+            <label for="scope">Scope of Work *</label>
+            <textarea id="scope" required placeholder="Describe the assigned scope of work"></textarea>
+          </div>
+          <div class="field">
+            <label for="estimatePrice">Estimate Price *</label>
+            <input id="estimatePrice" type="number" required min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="field">
+            <label for="budget">Budget *</label>
+            <input id="budget" type="number" required min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="field">
+            <label for="startDate">Estimated Start Date *</label>
+            <input id="startDate" type="date" required>
+          </div>
+          <div class="field">
+            <label for="completionDate">Estimated Completion Date *</label>
+            <input id="completionDate" type="date" required>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit">Submit Project</button>
+          <button id="clearBtn" class="secondary" type="button">Clear Form</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="section-top">
+        <div>
+          <h2>Current Projects</h2>
+          <p>Select any project to view its information and complete audit trail.</p>
+        </div>
+        <input id="search" type="search" placeholder="Search current projects">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Project #</th>
+              <th>Project Name</th>
+              <th>Address</th>
+              <th>Estimate Price</th>
+              <th>Budget</th>
+              <th>Start Date</th>
+              <th>Completion Date</th>
+              <th>Last Saved</th>
+            </tr>
+          </thead>
+          <tbody id="projectRows"></tbody>
+        </table>
+        <div id="emptyState" class="empty">No projects have been added yet. Select Add New Project to begin.</div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="auditDialog">
+    <div class="dialog-head">
+      <div>
+        <h2 id="auditTitle">Project Audit Trail</h2>
+        <span id="auditSubtitle" class="subtitle"></span>
+      </div>
+      <button id="closeDialogBtn" class="secondary" type="button">Close</button>
+    </div>
+    <div class="dialog-body">
+      <div id="projectDetails" class="detail-grid"></div>
+      <h3 style="margin-top:22px">Audit History</h3>
+      <div id="auditList" class="audit-list"></div>
+      <div class="actions">
+        <button id="editProjectBtn" type="button">Edit Project</button>
+        <button id="printAuditBtn" class="secondary" type="button">Print</button>
+      </div>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "wescoPmAssignedProjects";
+    const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+    const dateFormat = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
+    const formCard = document.getElementById("formCard");
+    const form = document.getElementById("projectForm");
+    const rows = document.getElementById("projectRows");
+    const emptyState = document.getElementById("emptyState");
+    const auditDialog = document.getElementById("auditDialog");
+    let selectedId = null;
+
+    function loadProjects() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    }
+    function persist(projects) { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); }
+    function text(value) {
+      const span = document.createElement("span");
+      span.textContent = value ?? "";
+      return span.innerHTML;
+    }
+    function displayDate(value) {
+      if (!value) return "";
+      return dateFormat.format(new Date(value + "T12:00:00"));
+    }
+    function displayTime(value) { return new Date(value).toLocaleString(); }
+    function notify(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+    function resetForm() {
+      form.reset();
+      document.getElementById("recordId").value = "";
+      document.getElementById("formTitle").textContent = "Add New Assigned Project";
+    }
+    function openNew() {
+      resetForm();
+      formCard.classList.add("open");
+      document.getElementById("projectNumber").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function projectFromForm() {
+      return {
+        projectNumber: document.getElementById("projectNumber").value.trim(),
+        projectName: document.getElementById("projectName").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        scope: document.getElementById("scope").value.trim(),
+        estimatePrice: Number(document.getElementById("estimatePrice").value),
+        budget: Number(document.getElementById("budget").value),
+        startDate: document.getElementById("startDate").value,
+        completionDate: document.getElementById("completionDate").value
+      };
+    }
+    function render() {
+      const query = document.getElementById("search").value.toLowerCase().trim();
+      const projects = loadProjects().filter(p =>
+        [p.projectNumber, p.projectName, p.address, p.scope].join(" ").toLowerCase().includes(query)
+      );
+      rows.innerHTML = projects.map(p => `
+        <tr data-id="${text(p.id)}">
+          <td><span class="project-link">${text(p.projectNumber)}</span></td>
+          <td>${text(p.projectName)}</td>
+          <td>${text(p.address)}</td>
+          <td>${money.format(p.estimatePrice)}</td>
+          <td>${money.format(p.budget)}</td>
+          <td>${displayDate(p.startDate)}</td>
+          <td>${displayDate(p.completionDate)}</td>
+          <td>${displayTime(p.updatedAt)}</td>
+        </tr>`).join("");
+      emptyState.style.display = projects.length ? "none" : "block";
+    }
+    function openAudit(id) {
+      const project = loadProjects().find(p => p.id === id);
+      if (!project) return;
+      selectedId = id;
+      document.getElementById("auditTitle").textContent = project.projectName;
+      document.getElementById("auditSubtitle").textContent = "Project #" + project.projectNumber;
+      const fields = [
+        ["Address", project.address], ["Scope of Work", project.scope],
+        ["Estimate Price", money.format(project.estimatePrice)], ["Budget", money.format(project.budget)],
+        ["Estimated Start Date", displayDate(project.startDate)], ["Estimated Completion Date", displayDate(project.completionDate)]
+      ];
+      document.getElementById("projectDetails").innerHTML = fields.map(([label, value]) =>
+        `<div><strong>${text(label)}</strong>${text(value)}</div>`).join("");
+      document.getElementById("auditList").innerHTML = [...project.audit].reverse().map(item =>
+        `<div class="audit-item"><strong>${text(item.action)}</strong><br>${text(displayTime(item.timestamp))}<br>${text(item.note)}</div>`
+      ).join("");
+      auditDialog.showModal();
+    }
+    function editSelected() {
+      const project = loadProjects().find(p => p.id === selectedId);
+      if (!project) return;
+      auditDialog.close();
+      document.getElementById("recordId").value = project.id;
+      ["projectNumber", "projectName", "address", "scope", "estimatePrice", "budget", "startDate", "completionDate"]
+        .forEach(key => document.getElementById(key).value = project[key]);
+      document.getElementById("formTitle").textContent = "Edit Assigned Project";
+      formCard.classList.add("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const projects = loadProjects();
+      const data = projectFromForm();
+      const recordId = document.getElementById("recordId").value;
+      const duplicate = projects.find(p => p.projectNumber.toLowerCase() === data.projectNumber.toLowerCase() && p.id !== recordId);
+      if (duplicate) return notify("That project number already exists.");
+      const now = new Date().toISOString();
+      if (recordId) {
+        const index = projects.findIndex(p => p.id === recordId);
+        projects[index] = {
+          ...projects[index], ...data, updatedAt: now,
+          audit: [...projects[index].audit, { action: "Project Updated", timestamp: now, note: "Project information was edited and saved." }]
+        };
+        notify("Project updated and saved.");
+      } else {
+        projects.unshift({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          ...data, createdAt: now, updatedAt: now,
+          audit: [{ action: "Project Created", timestamp: now, note: "Project was submitted to the current projects list." }]
+        });
+        notify("Project submitted and saved.");
+      }
+      persist(projects);
+      resetForm();
+      formCard.classList.remove("open");
+      render();
+    });
+    rows.addEventListener("click", event => {
+      const row = event.target.closest("tr[data-id]");
+      if (row) openAudit(row.dataset.id);
+    });
+    document.getElementById("addNewBtn").addEventListener("click", openNew);
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      if (formCard.classList.contains("open")) {
+        if (form.reportValidity()) form.requestSubmit();
+      } else {
+        persist(loadProjects());
+        notify("Current project list saved.");
+      }
+    });
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+    document.getElementById("printAuditBtn").addEventListener("click", () => window.print());
+    document.getElementById("closeFormBtn").addEventListener("click", () => formCard.classList.remove("open"));
+    document.getElementById("clearBtn").addEventListener("click", resetForm);
+    document.getElementById("closeDialogBtn").addEventListener("click", () => auditDialog.close());
+    document.getElementById("editProjectBtn").addEventListener("click", editSelected);
+    document.getElementById("search").addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
