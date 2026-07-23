@@ -107,6 +107,32 @@ html,body{
 .cat-item:hover{ background:var(--row-hover); }
 .cat-item:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
 .cat-item.active{ color:var(--orange); background:var(--row-hover); }
+.add-project{
+  margin-top:auto; flex-shrink:0; padding:12px 14px 4px;
+  border-top:2px solid var(--line);
+}
+.add-project summary{
+  display:block; list-style:none; cursor:pointer; user-select:none;
+  padding:11px 13px; border:1px solid var(--orange); border-radius:4px;
+  color:var(--orange); font-size:13px; font-weight:800; text-align:center;
+  transition:background .12s ease, color .12s ease;
+}
+.add-project summary::-webkit-details-marker{ display:none; }
+.add-project summary:hover,
+.add-project summary:focus-visible,
+.add-project[open] summary{ background:var(--orange); color:#1a1a1a; outline:none; }
+.add-project-menu{
+  display:flex; flex-direction:column; margin-top:8px;
+  border:1px solid rgba(255,102,0,.7); border-radius:4px; overflow:hidden;
+  background:rgba(9,14,16,.98);
+}
+.add-project-menu a{
+  color:var(--white); text-decoration:none; font-size:12.5px; font-weight:700;
+  padding:10px 12px; border-bottom:1px solid var(--line);
+}
+.add-project-menu a:last-child{ border-bottom:none; }
+.add-project-menu a:hover,
+.add-project-menu a:focus-visible{ background:var(--row-hover); color:var(--orange); outline:none; }
 
 /* ---------- Right: item list ---------- */
 .folder-col{ flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; }
@@ -200,6 +226,9 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
     border-bottom:1px solid rgba(255,255,255,.14);
   }
   .cat-item{ border-bottom:none; border-right:1px solid var(--line); white-space:nowrap; padding:12px 16px; }
+  .add-project{ margin-top:0; padding:6px 12px; border-top:none; border-left:1px solid var(--line); }
+  .add-project summary{ white-space:nowrap; }
+  .add-project-menu{ min-width:190px; }
   .folder-col-actions{ width:100%; margin-left:0; flex-wrap:wrap; }
   #itemSearch{ flex:1; width:auto; }
   .upload-status{ text-align:left; }
@@ -604,7 +633,7 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
   var currentItems = [];
 
   function renderCategoryNav(activeKey){
-    $('categoryCol').innerHTML = CATEGORIES.map(function(cat){
+    var categoryButtons = CATEGORIES.map(function(cat){
       return (
         '<button type="button" class="cat-item' + (cat.key === activeKey ? ' active' : '') + '" data-key="' + cat.key + '">' +
           '<span class="cat-icon" aria-hidden="true">' + iconSvg('folder') + '</span>' +
@@ -612,6 +641,18 @@ details.data-note code{ background:rgba(255,255,255,.1); padding:1px 5px; border
         '</button>'
       );
     }).join('');
+    var addProjectMenu =
+      '<details class="add-project" id="addProject">' +
+        '<summary>+ Add Project</summary>' +
+        '<div class="add-project-menu" aria-label="Choose project status">' +
+          '<a href="New-Project-Template.html?status=Active">Active</a>' +
+          '<a href="New-Project-Template.html?status=Bidding">Bidding</a>' +
+          '<a href="New-Project-Template.html?status=Pipeline%20Awarded">Pipeline Awarded</a>' +
+          '<a href="New-Project-Template.html?status=Closed">Closed</a>' +
+          '<a href="New-Project-Template.html?status=New%20Bids">New Bids</a>' +
+        '</div>' +
+      '</details>';
+    $('categoryCol').innerHTML = categoryButtons + addProjectMenu;
     Array.prototype.forEach.call(document.querySelectorAll('.cat-item'), function(btn){
       btn.addEventListener('click', function(){ openCategory(btn.getAttribute('data-key')); });
     });

@@ -211,6 +211,18 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
 
       <div class="section-label">Project Details</div>
       <div class="field-grid">
+        <div class="field full" id="f_projectStatus">
+          <label for="projectStatus">Project Status<span class="req">*</span></label>
+          <select id="projectStatus">
+            <option value="">Select…</option>
+            <option value="Active">Active</option>
+            <option value="Bidding">Bidding</option>
+            <option value="Pipeline Awarded">Pipeline Awarded</option>
+            <option value="Closed">Closed</option>
+            <option value="New Bids">New Bids</option>
+          </select>
+          <span class="error-msg">Select a project status.</span>
+        </div>
         <div class="field" id="f_jobNumber">
           <label for="jobNumber">Job Number<span class="req">*</span></label>
           <input type="text" id="jobNumber" placeholder="e.g. 24-1058" maxlength="40" autocomplete="off">
@@ -377,7 +389,18 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
      Validation
      ------------------------------------------------------------------ */
   var REQUIRED_TEXT_IDS = ['jobNumber','jobName','customer','projectManager','location'];
-  var REQUIRED_SELECT_IDS = ['sow','contractExecuted'];
+  var REQUIRED_SELECT_IDS = ['projectStatus','sow','contractExecuted'];
+  var VALID_PROJECT_STATUSES = ['Active','Bidding','Pipeline Awarded','Closed','New Bids'];
+
+  function requestedProjectStatus(){
+    var status = new URLSearchParams(window.location.search).get('status') || '';
+    return VALID_PROJECT_STATUSES.indexOf(status) !== -1 ? status : '';
+  }
+
+  function applyRequestedProjectStatus(){
+    var status = requestedProjectStatus();
+    if(status) $('projectStatus').value = status;
+  }
 
   function clearErrors(){
     Array.prototype.forEach.call(document.querySelectorAll('.field.invalid'), function(f){
@@ -427,6 +450,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   function collectFormData(){
     return {
       id: uid(),
+      projectStatus: $('projectStatus').value,
       jobNumber: $('jobNumber').value.trim(),
       jobName: $('jobName').value.trim(),
       customer: $('customer').value.trim(),
@@ -444,12 +468,14 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
 
   function resetForm(){
     $('projectForm').reset();
+    applyRequestedProjectStatus();
     clearErrors();
     // restore default error message text after any duplicate-check override
     $('f_jobNumber').querySelector('.error-msg').textContent = 'Enter a job number.';
   }
 
   function projectCardHtml(p){
+    var statusTag = p.projectStatus ? '<span class="tag">' + escapeHtml(p.projectStatus) + '</span>' : '';
     var sowTag = p.sow === 'Y'
       ? '<span class="tag yes">SOW: Yes</span>'
       : (p.sow === 'N' ? '<span class="tag no">SOW: No</span>' : '');
@@ -472,7 +498,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '</div>' +
           '<div class="meta-row">' +
             '<span class="tag">' + escapeHtml(p.customer) + '</span>' +
-            pmTag + priceTag + dateTag + sowTag + execTag +
+            statusTag + pmTag + priceTag + dateTag + sowTag + execTag +
           '</div>' +
         '</div>' +
         '<div class="project-actions">' +
@@ -527,6 +553,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
      Wire up
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', function(){
+    applyRequestedProjectStatus();
     allProjects = loadProjects();
     renderList();
 
