@@ -35,6 +35,15 @@ project or document subfolder in its configured SharePoint location and upload
 files into the folder currently open on screen. It does not expose delete,
 rename, or move actions.
 
+The embedded Master Punch List viewer needs this additional Single-page
+application redirect URI:
+
+- `https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco-Master-Punch-ToDo-Panel.html`
+
+It requests the delegated Microsoft Graph permissions `User.Read` and
+`Tasks.Read`. An Entra administrator may need to grant consent for `Tasks.Read`
+before staff can load the list inside the app.
+
 ## Deployment layout
 
 - App location: `/`
