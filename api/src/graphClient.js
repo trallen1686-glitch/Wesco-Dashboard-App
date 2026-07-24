@@ -1,9 +1,21 @@
 const { ConfidentialClientApplication } = require("@azure/msal-node");
 
-const DRIVE_ID = process.env.EXCEL_DRIVE_ID;
-const ITEM_ID = process.env.EXCEL_ITEM_ID;
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
-const WORKBOOK_BASE = `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${ITEM_ID}/workbook`;
+
+// Each entry is a separate Excel workbook this API can read/write, sharing the
+// same app-only Graph credentials (granted Sites.Selected on the whole site).
+const WORKBOOKS = {
+  equipment: { driveId: process.env.EXCEL_DRIVE_ID, itemId: process.env.EXCEL_ITEM_ID },
+  trailer: { driveId: process.env.TRAILER_EXCEL_DRIVE_ID, itemId: process.env.TRAILER_EXCEL_ITEM_ID },
+};
+
+function workbookBase(workbookKey) {
+  const cfg = WORKBOOKS[workbookKey];
+  if (!cfg || !cfg.driveId || !cfg.itemId) {
+    throw new Error(`Missing drive/item ID app settings for workbook '${workbookKey}'`);
+  }
+  return `${GRAPH_BASE}/drives/${cfg.driveId}/items/${cfg.itemId}/workbook`;
+}
 
 let msalClient = null;
 function getMsalClient() {
@@ -31,9 +43,8 @@ async function getAccessToken() {
   return cachedToken.token;
 }
 
-async function graphFetch(path, options = {}) {
+async function rawFetch(url, options = {}) {
   const token = await getAccessToken();
-  const url = path.startsWith("http") ? path : `${WORKBOOK_BASE}${path}`;
   const res = await fetch(url, {
     ...options,
     headers: {
@@ -44,12 +55,25 @@ async function graphFetch(path, options = {}) {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    const err = new Error(`Graph ${options.method || "GET"} ${path} failed: ${res.status} ${text}`);
+    const err = new Error(`Graph ${options.method || "GET"} ${url} failed: ${res.status} ${text}`);
     err.status = res.status;
     throw err;
   }
   if (res.status === 204) return null;
   return res.json();
+}
+
+// Original signature: relative path against the "equipment" workbook.
+// Kept as-is so equipment.js/visits.js don't need to change.
+async function graphFetch(path, options = {}) {
+  const url = path.startsWith("http") ? path : `${workbookBase("equipment")}${path}`;
+  return rawFetch(url, options);
+}
+
+// New signature for additional workbooks (e.g. "trailer").
+async function graphFetchFor(workbookKey, path, options = {}) {
+  const url = path.startsWith("http") ? path : `${workbookBase(workbookKey)}${path}`;
+  return rawFetch(url, options);
 }
 
 // Must exactly match the sanitize() logic used in restructure_excel.py so
@@ -72,8 +96,9 @@ function sanitizeForSheetName(name) {
 
 module.exports = {
   graphFetch,
+  graphFetchFor,
+  workbookBase,
   visitsTableName,
   sanitizeForTableName,
   sanitizeForSheetName,
-  WORKBOOK_BASE,
 };
