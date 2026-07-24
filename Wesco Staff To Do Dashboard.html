@@ -88,5 +88,6 @@
   ['search','categoryFilter','priorityFilter'].forEach(id=>$(id).addEventListener('input',render));$('currentStaff').addEventListener('change',e=>{state.currentStaff=e.target.value;render()});$('addTask').addEventListener('click',()=>openDialog());$('closeDialog').addEventListener('click',()=>$('taskDialog').close());$('cancelDialog').addEventListener('click',()=>$('taskDialog').close());document.querySelectorAll('[name="verification"]').forEach(r=>r.addEventListener('change',updateVerification));$('shareOptions').addEventListener('change',updateShareSummary);
   setupStaff();render();
 </script>
+<script src="staff-portal-back.js"></script>
 </body>
 </html>
