@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Punch List Tasks</title>
+  <title>Wes Atkinson Everyday To List</title>
   <style>
     :root{
       color-scheme:dark;
@@ -50,13 +50,13 @@
   </style>
 </head>
 <body>
-  <section class="panel" aria-label="Read-only Master Punch List tasks">
+  <section class="panel" aria-label="Wes Atkinson Everyday To List">
     <header class="bar">
-      <span class="title">Master Punch List</span>
+      <span class="title">Wes Atkinson Everyday To List</span>
       <span class="count" id="taskCount"></span>
       <button class="action" id="refreshBtn" type="button">Refresh</button>
     </header>
-    <div class="state" id="state">Loading Master Punch List...</div>
+    <div class="state" id="state">Loading Wes Atkinson Everyday To List...</div>
     <div class="tasks" id="taskList" hidden></div>
   </section>
   <script>
@@ -102,14 +102,14 @@
       }).join(''):'<div class="state">No open punch-list tasks.</div>';
     }
     async function loadTasks(){
-      showState('Loading Master Punch List...',false);
+      showState('Loading Wes Atkinson Everyday To List...',false);
       try{
         var response=await fetch('/api/master-punch-tasks',{headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error('Task mirror returned '+response.status);
         var data=await response.json();
         render(data.tasks||[]);
       }catch(error){
-        showState('Master Punch List is temporarily unavailable.',true);
+        showState('Wes Atkinson Everyday To List is temporarily unavailable.',true);
       }
     }
     document.addEventListener('DOMContentLoaded',function(){
