@@ -13,11 +13,9 @@ app.http("masterPunchTasks", {
     try {
       const owner = process.env.TODO_OWNER_USER || DEFAULT_OWNER;
       const listId = process.env.TODO_LIST_ID || DEFAULT_LIST_ID;
-      const fields = "id,title,status,importance,dueDateTime,lastModifiedDateTime";
       const path =
         `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(owner)}` +
-        `/todo/lists/${encodeURIComponent(listId)}/tasks` +
-        `?$top=100&$select=${fields}`;
+        `/todo/lists/${encodeURIComponent(listId)}/tasks`;
       const response = await graphFetch(path);
       const tasks = (response.value || []).map((task) => ({
         id: task.id,
