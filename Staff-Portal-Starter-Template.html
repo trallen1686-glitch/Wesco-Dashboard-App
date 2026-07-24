@@ -265,10 +265,9 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
         Atkinson</code>) once Estimates, Takeoffs, and Material Sheets have somewhere similar to send their
         approvals — right now it's one link, so it'll need to point at wherever all four end up living, whether
         that's one combined list or a page of its own.</p>
-        <p><b>Assigned Projects</b> and <b>To Do List</b> are marked <code>personAware: true</code>, so once
-        their base URL is filled in, this page automatically appends <code>?person=NAME</code> to it — the same
-        convention the To-Do widget already uses — so each person lands on their own filtered view instead of
-        everyone's.</p>
+        <p>The connected employee tabs are marked <code>personAware: true</code>, so this page automatically
+        appends <code>?person=NAME</code> to each destination. That lets every destination's Back to Staff
+        Portal button return the employee to their own portal page.</p>
         <p>This page itself follows that same convention: opening it with <code>?person=Jesse Warren</code> (for
         example) in the URL goes straight to that person's starter view, skipping the name picker. That's the
         URL each person's own screen in the WE App should embed this control with.</p>
@@ -284,10 +283,8 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
         polled or pushed to on an interval) behind <code>loadMessages()</code> / <code>saveMessages()</code>, or,
         more realistically, since Wesco already has Microsoft 365 — just point the Messages tile at Teams chat
         instead of building a custom inbox at all. Happy to wire up whichever direction makes more sense.</p>
-        <p><b>All Projects</b>, <b>Active Projects</b>, and <b>Pending Projects</b> are three separate views into
-        what's presumably one underlying project list, filtered by status — they're set up as plain company-wide
-        links (not <code>personAware</code>) since "active" and "pending" read as company-wide states rather than
-        something scoped to one person. <b>Forms</b> is a general company form library link; it's separate from
+        <p><b>All Projects</b>, <b>Active Projects</b>, and <b>Pending Projects</b> are separate live views of
+        the matching SharePoint folders. <b>Forms</b> is a general company form library link; it's separate from
         the Quick Tools chips below, which link straight to the individual form templates already built.</p>
       </div>
     </details>
@@ -329,12 +326,12 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      ------------------------------------------------------------------ */
   var TAB_LINKS = {
     assignedProjects: { label: 'Assigned Projects',   icon: '🏗️', desc: 'Projects currently assigned to you',    url: 'PM-Assigned-Projects-Template.html', personAware: true },
-    allProjects:      { label: 'All Projects',        icon: '📚', desc: 'Every project company-wide',             url: 'Wesco-Hub-Files.html?library=all-projects', personAware: false },
-    activeProjects:   { label: 'Active Projects',     icon: '🟢', desc: 'Projects currently in progress',         url: 'Wesco-Hub-Files.html?library=active-projects', personAware: false },
-    pendingProjects:  { label: 'Pending Projects',    icon: '🟡', desc: 'Bidding projects awaiting award',        url: 'Wesco-Hub-Files.html?library=bidding-projects', personAware: false },
+    allProjects:      { label: 'All Projects',        icon: '📚', desc: 'Every project company-wide',             url: 'Wesco-Hub-Files.html?library=all-projects', personAware: true },
+    activeProjects:   { label: 'Active Projects',     icon: '🟢', desc: 'Projects currently in progress',         url: 'Wesco-Hub-Files.html?library=active-projects', personAware: true },
+    pendingProjects:  { label: 'Pending Projects',    icon: '🟡', desc: 'Bidding projects awaiting award',        url: 'Wesco-Hub-Files.html?library=bidding-projects', personAware: true },
     toDoList:         { label: 'To Do List',          icon: '✅', desc: 'Your task list',                         url: 'Wesco%20To-Do%20List.html', personAware: true },
-    calendar:         { label: 'Calendar',            icon: '📅', desc: 'Company and project calendar',           url: 'staff-team-calendar/index.html', personAware: false },
-    subCalendar:      { label: 'Subcontractor Calendar', icon: '🗓️', desc: 'Subcontractor scheduling across all jobs', url: 'master_subcontractor_calendar_final_signin_fixed.html', personAware: false },
+    calendar:         { label: 'Calendar',            icon: '📅', desc: 'Company and project calendar',           url: 'staff-team-calendar/index.html', personAware: true },
+    subCalendar:      { label: 'Subcontractor Calendar', icon: '🗓️', desc: 'Subcontractor scheduling across all jobs', url: 'master_subcontractor_calendar_final_signin_fixed.html', personAware: true },
     documentUploads:  { label: 'Document Uploads',    icon: '📤', desc: 'Your private staff document folders',    url: 'Wesco-Hub-Files.html?library=document-upload', personAware: true },
     ccReceipts:       { label: 'CC Receipt Uploads',  icon: '💳', desc: 'Upload credit card purchase receipts',   url: '', personAware: false },
     deliveries:       { label: 'Deliveries',          icon: '🚚', desc: 'Material delivery tracker',              url: '', personAware: false },

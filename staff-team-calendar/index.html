@@ -165,5 +165,6 @@ html,body{
   $('eventDate').value=new Date().toISOString().slice(0,10);$('signIn').onclick=signIn;$('signOut').onclick=signOut;$('refresh').onclick=loadEvents;$('previous').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);loadEvents()};$('next').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);loadEvents()};$('staffFilter').onchange=renderEvents;$('allDay').onchange=toggleTimes;$('eventForm').onsubmit=saveEvent;$('clearForm').onclick=clearForm;$('deleteEvent').onclick=deleteSelected;$('todayNav').onclick=()=>{viewDate=new Date();loadEvents()};$('newNav').onclick=()=>{$('eventForm').scrollIntoView({behavior:'smooth'});$('eventTitle').focus()};
   const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;initializeAuth();
 </script>
+<script src="../staff-portal-back.js"></script>
 </body>
 </html>
