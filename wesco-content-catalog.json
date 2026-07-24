@@ -358,18 +358,6 @@
       "active": true
     },
     {
-      "name": "Construction Subcontract Agreement Template",
-      "path": "Subcontract-Agreement-Form.html",
-      "folder": ".",
-      "category": "Subcontractors",
-      "extension": "html",
-      "sizeBytes": 14693,
-      "sha256": "bbe1bc68ad4410047ddf67c6f1e9cd972cc531da1b273e300616bded91765dd1",
-      "azureUrl": "https://www.wescodashboardapp.com/Subcontract-Agreement-Form.html",
-      "githubUrl": "https://github.com/trallen1686-glitch/Wesco-Dashboard-App/blob/main/Subcontract-Agreement-Form.html",
-      "active": true
-    },
-    {
       "name": "Wesco \u2013 Subcontractor PO Tracker",
       "path": "Subcontractor-PO-Tracker-Template.html",
       "folder": ".",

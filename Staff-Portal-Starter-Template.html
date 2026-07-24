@@ -274,15 +274,9 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
         <p>Estimator, PM, Superintendent, and Management staff are listed here. Any other office or admin staff
         aren't on the roster yet — add them to the <code>PEOPLE</code> list at the top of the script (same
         pattern as the others) if they need a starter page too.</p>
-        <p><b>Messages works right now</b> — pick a name, type, hit Send, it shows up in that conversation with
-        a chat bubble and an unread badge on the tile. One important limit to know before rolling it out: it
-        saves to this browser's own <code>localStorage</code>, the same as everything else on this page. Two
-        people on two different computers are each writing to their own separate copy, so they won't actually
-        see each other's messages — a message "sent" here doesn't leave the device it was sent from. For that
-        to work for real between staff, it needs either a shared backend (a SharePoint list or Dataverse table,
-        polled or pushed to on an interval) behind <code>loadMessages()</code> / <code>saveMessages()</code>, or,
-        more realistically, since Wesco already has Microsoft 365 — just point the Messages tile at Teams chat
-        instead of building a custom inbox at all. Happy to wire up whichever direction makes more sense.</p>
+        <p><b>Messages is shared across staff portals.</b> Messages, unread badges, and read status are stored
+        in the connected Microsoft workbook through the website API. Staff members using their own portal link
+        can send messages and see replies from the other listed team members.</p>
         <p><b>All Projects</b>, <b>Active Projects</b>, and <b>Pending Projects</b> are separate live views of
         the matching SharePoint folders. <b>Forms</b> is a general company form library link; it's separate from
         the Quick Tools chips below, which link straight to the individual form templates already built.</p>
@@ -402,21 +396,34 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   }
 
   /* ------------------------------------------------------------------
-     Messages — a working staff-to-staff inbox. IMPORTANT: this saves to
-     localStorage, so it only works within one browser. Two people on
-     two different computers won't actually see each other's messages
-     until this is pointed at a real shared backend — see the note at
-     the bottom of the page for the honest version of this caveat.
+     Messages — shared through the website API and Microsoft workbook.
      ------------------------------------------------------------------ */
-  var MESSAGES_KEY = 'wesco_messages_v1';
+  var MESSAGES_API = '/api/messages';
   var allMessages = [];
-  function loadMessages(){
-    try{ var raw = localStorage.getItem(MESSAGES_KEY); return raw ? JSON.parse(raw) : []; }
-    catch(e){ return []; }
+  var messagePollTimer = null;
+
+  async function apiJson(url, options){
+    var response = await fetch(url, Object.assign({
+      headers: { 'Content-Type': 'application/json' }
+    }, options || {}));
+    var data = await response.json().catch(function(){ return {}; });
+    if(!response.ok) throw new Error(data.error || 'Messages are temporarily unavailable.');
+    return data;
   }
-  function saveMessages(list){
-    try{ localStorage.setItem(MESSAGES_KEY, JSON.stringify(list)); }
-    catch(e){ showToast('Could not save message: ' + e.message, true); }
+  async function loadMessages(){
+    if(!currentPersonObj) return [];
+    return apiJson(MESSAGES_API + '?person=' + encodeURIComponent(currentPersonObj.name));
+  }
+  async function refreshMessages(renderCurrentView){
+    try{
+      allMessages = await loadMessages();
+      if(renderCurrentView){
+        if($('threadSubView').style.display !== 'none' && currentContact) renderThreadMessages();
+        else if($('contactsSubView').style.display !== 'none') renderContactsList();
+      }
+    } catch(e){
+      showToast(e.message, true);
+    }
   }
   function getConversationMessages(personA, personB){
     return allMessages.filter(function(m){
@@ -429,17 +436,24 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   function getTotalUnreadFor(recipient){
     return allMessages.filter(function(m){ return m.to === recipient && !m.read; }).length;
   }
-  function markConversationRead(recipient, sender){
-    var changed = false;
-    allMessages.forEach(function(m){
-      if(m.to === recipient && m.from === sender && !m.read){ m.read = true; changed = true; }
+  async function markConversationRead(recipient, sender){
+    var unread = allMessages.filter(function(m){
+      return m.to === recipient && m.from === sender && !m.read;
     });
-    if(changed) saveMessages(allMessages);
+    if(!unread.length) return;
+    await Promise.all(unread.map(function(m){
+      return apiJson(MESSAGES_API + '/' + encodeURIComponent(m.id) + '/read?recipient=' + encodeURIComponent(recipient), {
+        method: 'PATCH'
+      });
+    }));
+    unread.forEach(function(m){ m.read = true; });
   }
-  function sendMessage(from, to, text){
-    if(!text.trim()) return;
-    allMessages.push({ id: uid(), from: from, to: to, text: text.trim(), sentAt: new Date().toISOString(), read: false });
-    saveMessages(allMessages);
+  async function sendMessage(from, to, text){
+    if(!text.trim()) return null;
+    return apiJson(MESSAGES_API, {
+      method: 'POST',
+      body: JSON.stringify({ id: uid(), from: from, to: to, text: text.trim() })
+    });
   }
 
   /* ------------------------------------------------------------------
@@ -562,15 +576,19 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      ------------------------------------------------------------------ */
   var currentContact = null;
 
-  function openMessagesView(){
+  async function openMessagesView(){
     $('starterView').style.display = 'none';
     $('messagesView').style.display = '';
     $('threadSubView').style.display = 'none';
     $('contactsSubView').style.display = '';
-    renderContactsList();
+    await refreshMessages(true);
+    clearInterval(messagePollTimer);
+    messagePollTimer = setInterval(function(){ refreshMessages(true); }, 10000);
   }
 
   function closeMessagesView(){
+    clearInterval(messagePollTimer);
+    messagePollTimer = null;
     $('messagesView').style.display = 'none';
     $('starterView').style.display = '';
     if(currentPersonObj) renderStarterView(currentPersonObj);
@@ -604,15 +622,20 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     });
   }
 
-  function openThread(contactName){
+  async function openThread(contactName){
     currentContact = contactName;
-    markConversationRead(currentPersonObj.name, contactName);
     $('contactsSubView').style.display = 'none';
     $('threadSubView').style.display = '';
     $('threadContactName').textContent = contactName;
     renderThreadMessages();
     $('messageInput').value = '';
     $('messageInput').focus();
+    try{
+      await markConversationRead(currentPersonObj.name, contactName);
+      renderThreadMessages();
+    } catch(e){
+      showToast(e.message, true);
+    }
   }
 
   function renderThreadMessages(){
@@ -633,20 +656,28 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     root.scrollTop = root.scrollHeight;
   }
 
-  function handleSendMessage(){
+  async function handleSendMessage(){
     var text = $('messageInput').value.trim();
     if(!text) return;
-    sendMessage(currentPersonObj.name, currentContact, text);
-    $('messageInput').value = '';
-    renderThreadMessages();
+    var button = $('sendMessageBtn');
+    button.disabled = true;
+    try{
+      var saved = await sendMessage(currentPersonObj.name, currentContact, text);
+      allMessages.push(saved);
+      $('messageInput').value = '';
+      renderThreadMessages();
+    } catch(e){
+      showToast(e.message, true);
+    } finally {
+      button.disabled = false;
+      $('messageInput').focus();
+    }
   }
 
   /* ------------------------------------------------------------------
      Wire up
      ------------------------------------------------------------------ */
-  document.addEventListener('DOMContentLoaded', function(){
-    allMessages = loadMessages();
-
+  document.addEventListener('DOMContentLoaded', async function(){
     var params = new URLSearchParams(window.location.search);
     var personParam = (params.get('person') || '').trim().toLowerCase();
     var match = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
@@ -654,6 +685,8 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     if(match){
       $('selectorView').style.display = 'none';
       $('starterView').style.display = '';
+      currentPersonObj = match;
+      await refreshMessages(false);
       renderStarterView(match);
     } else {
       $('starterView').style.display = 'none';
