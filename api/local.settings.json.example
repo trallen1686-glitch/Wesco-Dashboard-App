@@ -6,6 +6,8 @@
     "GRAPH_CLIENT_ID": "<app registration client id>",
     "GRAPH_CLIENT_SECRET": "<app registration client secret - never commit the real value>",
     "GRAPH_TENANT_ID": "<your Azure AD tenant id>",
+    "TODO_OWNER_USER": "tallen@wesconc.com",
+    "TODO_LIST_ID": "AQMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgAuAAADug1uys4PrEuQXED6qOMjzQEApFTVRWPTN0OAHHwFRbnXIAABDWwlRwAAAA==",
     "EXCEL_DRIVE_ID": "b!h9QHU6-BmEyZ2A-UpX9Mj3ugFNVf2RVFsGlXBkALgPm4W2vSwhvZRKs6Or0rMkyp",
     "EXCEL_ITEM_ID": "01JQO4HBRNQHWFD7YSVNAIBOZ4AWL2BOQD"
   }
