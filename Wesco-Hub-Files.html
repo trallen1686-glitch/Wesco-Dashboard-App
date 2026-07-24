@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wesco Hub Files</title>
-  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.1/lib/msal-browser.min.js"></script>
   <style>
     :root{
       --orange:#f36a00;--orange-light:#ff9a4d;--bg:#080d10;
@@ -64,22 +63,12 @@
     <div class="header-inner">
       <div><h1 id="pageTitle">Wesco Hub Files</h1><p class="subtitle" id="pageSubtitle">Live files from Wesco SharePoint</p></div>
       <div class="account">
-        <span id="accountName"></span>
-        <button id="signInTop" type="button">Sign in</button>
-        <button id="signOut" class="secondary" type="button" hidden>Sign out</button>
+        <span id="accountName">Always Connected</span>
       </div>
     </div>
   </header>
   <main>
-    <section id="signinGate" class="signin">
-      <div class="signin-card">
-        <h2>Sign in to Microsoft 365</h2>
-        <p>This page displays Wesco SharePoint folders inside the staff portal. Sign in with your Wesco account to browse files and add folders without navigating to SharePoint.</p>
-        <button id="signInGateBtn" type="button">Sign in with Microsoft</button>
-        <p id="signinStatus"></p>
-      </div>
-    </section>
-    <section id="workspace" class="workspace">
+    <section id="workspace" class="workspace show">
       <aside>
         <div class="pane-head">
           <div class="pane-title" id="listTitle">Projects</div>
@@ -132,21 +121,13 @@
     var config=PROJECTS[library]||PROJECTS['all-projects'];
     var rootPath=config.root;
     var rootItems=[],currentItems=[],pathStack=[],selectedRootName='';
-    var msalInstance=null,activeAccount=null,siteIdCache=null;
-    var msalConfig={auth:{clientId:'945e4897-7055-4420-b5a8-ece83b8a96bf',authority:'https://login.microsoftonline.com/5bfae2d1-ca2b-45bc-850a-90de45c02287',redirectUri:location.protocol==='file:'?'https://www.wescodashboardapp.com/Wesco-Hub-Files.html':location.origin+location.pathname},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}};
-    var SCOPES=['User.Read','Sites.Read.All','Files.ReadWrite.All'];
-    var HOST='wesconc.sharepoint.com',SITE_PATH='/sites/Wesco';
     function $(id){return document.getElementById(id)}
     function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-    function enc(path){return path.split('/').map(encodeURIComponent).join('/')}
     function setStatus(text,state){$('status').textContent=text||'';$('status').className='status'+(state?' '+state:'')}
-    function signinStatus(text,error){$('signinStatus').textContent=text||'';$('signinStatus').style.color=error?'#ff6b6b':''}
-    function loadScript(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
-    async function ensureMsal(){if(typeof msal!=='undefined')return;await loadScript('https://unpkg.com/@azure/msal-browser@2.38.1/lib/msal-browser.min.js');if(typeof msal==='undefined')throw new Error('Microsoft sign-in library did not load.')}
     async function init(){
       configurePage();
-      try{await ensureMsal();msalInstance=new msal.PublicClientApplication(msalConfig);await msalInstance.handleRedirectPromise().catch(function(){});var accounts=msalInstance.getAllAccounts();if(accounts.length){activeAccount=accounts[0];msalInstance.setActiveAccount(activeAccount);await onSignedIn()}}
-      catch(e){signinStatus(e.message||String(e),true)}
+      try{if(isDocuments)await resolveDocumentRoot();await refreshRoot()}
+      catch(e){$('folderList').innerHTML='<div class="state"><strong>Could not load folders</strong>'+esc(e.message||String(e))+'</div>'}
     }
     function configurePage(){
       var title=isDocuments?(person?person+' — Document Uploads':'Staff Document Uploads'):config.title;
@@ -158,34 +139,20 @@
       $('dialogTitle').textContent=isDocuments?'Add Document Folder':'Add Project';
       $('folderNameLabel').textContent=isDocuments?'Document folder name':'Project name';
     }
-    async function signIn(){
-      signinStatus('Opening Microsoft sign-in…',false);
-      try{var result=await msalInstance.loginPopup({scopes:SCOPES});activeAccount=result.account;msalInstance.setActiveAccount(activeAccount);await onSignedIn()}
-      catch(e){signinStatus('Sign-in did not complete: '+(e.message||String(e)),true)}
+    async function api(url,options){
+      var res=await fetch(url,options||{});
+      var data=await res.json().catch(function(){return{}});
+      if(!res.ok)throw new Error(data.error||('Wesco service returned '+res.status));
+      return data;
     }
-    function signOut(){if(msalInstance)msalInstance.logoutPopup({account:activeAccount}).catch(function(){});location.reload()}
-    async function token(){try{return(await msalInstance.acquireTokenSilent({scopes:SCOPES,account:activeAccount})).accessToken}catch(e){var r=await msalInstance.acquireTokenPopup({scopes:SCOPES});activeAccount=r.account;return r.accessToken}}
-    async function graph(url,options){
-      options=options||{};options.headers=Object.assign({Authorization:'Bearer '+await token()},options.headers||{});
-      var res=await fetch(url,options);if(!res.ok){var t=await res.text().catch(function(){return''});throw new Error('Microsoft Graph '+res.status+(t?': '+t.slice(0,180):''))}
-      if(res.status===204)return{};return res.json();
-    }
-    async function siteId(){if(siteIdCache)return siteIdCache;siteIdCache=(await graph('https://graph.microsoft.com/v1.0/sites/'+HOST+':'+SITE_PATH)).id;return siteIdCache}
     async function listChildren(path){
-      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path)+':/children?$select=id,name,webUrl,folder,file,lastModifiedDateTime&$top=400',items=[];
-      while(url){var data=await graph(url);items=items.concat(data.value||[]);url=data['@odata.nextLink']||null}
-      return items.sort(function(a,b){if(!!a.folder!==!!b.folder)return a.folder?-1:1;return a.name.localeCompare(b.name)})
+      return (await api('/api/hub-files?path='+encodeURIComponent(path))).items||[];
     }
     async function resolveDocumentRoot(){
       if(!person)throw new Error('The staff member name is missing from this link.');
       var staff=await listChildren('We App/Internal Staff'),match=staff.find(function(item){return item.folder&&item.name.toLowerCase()===person.toLowerCase()});
       if(!match)throw new Error('No Internal Staff folder was found for '+person+'.');
       rootPath='We App/Internal Staff/'+match.name+'/Document Upload';
-    }
-    async function onSignedIn(){
-      $('accountName').textContent=activeAccount.name||activeAccount.username||'Signed in';$('signInTop').hidden=true;$('signOut').hidden=false;$('signinGate').style.display='none';$('workspace').classList.add('show');
-      try{if(isDocuments)await resolveDocumentRoot();await refreshRoot()}
-      catch(e){$('folderList').innerHTML='<div class="state"><strong>Could not load folders</strong>'+esc(e.message||String(e))+'</div>'}
     }
     async function refreshRoot(preselect){
       $('folderList').innerHTML='<div class="state">Loading folders…</div>';rootItems=(await listChildren(rootPath)).filter(function(i){return !!i.folder});renderRoot();
@@ -212,8 +179,7 @@
       Array.prototype.forEach.call($('fileList').querySelectorAll('.file-item'),function(btn){btn.addEventListener('click',function(){var item=items[Number(btn.getAttribute('data-index'))];if(item.folder){pathStack.push({label:item.name,path:pathStack[pathStack.length-1].path+'/'+item.name});loadCurrent()}else window.open(item.webUrl,'_blank','noopener')})})
     }
     async function createFolder(name){
-      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(rootPath)+':/children';
-      await graph(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,folder:{},'@microsoft.graph.conflictBehavior':'fail'})});
+      await api('/api/hub-files/folder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:rootPath,name:name})});
     }
     async function submitFolder(e){
       e.preventDefault();var name=$('folderName').value.trim();if(!name)return;
@@ -221,9 +187,8 @@
       catch(err){setStatus(err.message||String(err),'err')}
     }
     async function uploadFile(path,file){
-      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path+'/'+file.name)+':/content?@microsoft.graph.conflictBehavior=rename';
-      if(file.size<=4000000){await graph(url,{method:'PUT',headers:{'Content-Type':file.type||'application/octet-stream'},body:file});return}
-      var session=await graph('https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path+'/'+file.name)+':/createUploadSession',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item:{'@microsoft.graph.conflictBehavior':'rename',name:file.name}})});
+      if(!file.size)throw new Error(file.name+' is empty and cannot be uploaded.');
+      var session=await api('/api/hub-files/upload-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:path,fileName:file.name})});
       var size=10*320*1024,start=0;while(start<file.size){var end=Math.min(start+size,file.size),res=await fetch(session.uploadUrl,{method:'PUT',headers:{'Content-Range':'bytes '+start+'-'+(end-1)+'/'+file.size},body:file.slice(start,end)});if(!(res.ok||res.status===202))throw new Error('Upload stopped for '+file.name);start=end}
     }
     async function uploadSelected(){
@@ -232,7 +197,7 @@
       catch(e){setStatus(e.message||String(e),'err')}finally{$('uploadInput').value='';$('uploadBtn').disabled=false}
     }
     document.addEventListener('DOMContentLoaded',function(){
-      init();$('signInTop').addEventListener('click',signIn);$('signInGateBtn').addEventListener('click',signIn);$('signOut').addEventListener('click',signOut);
+      init();
       $('addFolderBtn').addEventListener('click',function(){$('addDialog').showModal();$('folderName').focus()});$('cancelDialog').addEventListener('click',function(){$('addDialog').close()});
       $('addFolderForm').addEventListener('submit',submitFolder);$('uploadBtn').addEventListener('click',function(){$('uploadInput').click()});$('uploadInput').addEventListener('change',uploadSelected);
       $('search').addEventListener('input',function(){renderFiles(this.value.trim())});

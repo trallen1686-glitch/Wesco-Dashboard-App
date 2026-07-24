@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#102b3d">
   <title>Master Wesco Staff Team Member Calendar</title>
-  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
   <style>
     :root{--navy:#102b3d;--blue:#1769aa;--sky:#e9f3fb;--ink:#172532;--muted:#687985;--line:#dbe4ea;--bg:#f3f6f8;--green:#2f7d5c;--orange:#b4681b;--red:#b33d37;--purple:#7354a8;--shadow:0 12px 30px rgba(18,50,70,.08)}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{min-height:100vh;display:grid;grid-template-columns:250px minmax(0,1fr)}
@@ -73,10 +72,10 @@ html,body{
   <main class="main">
     <header class="topbar">
       <div><div class="eyebrow">Wesco Dashboard / Staff Operations</div><h1>Master Wesco Staff Team Member Calendar</h1></div>
-      <div class="auth"><span id="connection" class="connection">Offline</span><button id="signIn" class="button">Sign in with Microsoft</button><button id="signOut" class="button secondary hidden">Sign out</button></div>
+      <div class="auth"><span id="connection" class="connection online">Always Connected</span></div>
     </header>
     <div class="content">
-      <div id="notice" class="notice">Sign in with your Wesco Microsoft account to load the team calendar.</div>
+      <div id="notice" class="notice">Connecting to the Wesco team calendar…</div>
       <div class="toolbar">
         <button id="previous" class="button secondary" aria-label="Previous month">←</button><button id="next" class="button secondary" aria-label="Next month">→</button>
         <div id="monthTitle" class="month-title"></div>
@@ -90,7 +89,7 @@ html,body{
         <div class="stat"><small>Staff represented</small><b id="staffCount">0</b></div>
       </section>
       <section class="layout">
-        <article class="panel"><div class="panel-head"><h2>Team schedule</h2><span id="rangeLabel"></span></div><div id="eventList" class="event-list"><div class="empty">Calendar entries will appear here after sign-in.</div></div></article>
+        <article class="panel"><div class="panel-head"><h2>Team schedule</h2><span id="rangeLabel"></span></div><div id="eventList" class="event-list"><div class="empty">Loading calendar entries…</div></div></article>
         <aside class="panel"><div class="panel-head"><h2 id="formTitle">Add staff calendar entry</h2><span id="selectedLabel">New entry</span></div>
           <form id="eventForm" class="form">
             <div class="form-grid">
@@ -107,7 +106,7 @@ html,body{
               <label>Availability<select id="showAs"><option value="busy">Busy</option><option value="free">Free</option><option value="tentative">Tentative</option><option value="oof">Out of office</option><option value="workingElsewhere">Working elsewhere</option></select></label>
             </div>
             <div class="actions"><button class="button" type="submit" id="saveEvent">Create entry</button><button class="button secondary" type="button" id="clearForm">Clear</button><button class="button danger hidden" type="button" id="deleteEvent">Delete</button></div>
-            <p class="form-note">Changes are written directly to the connected “Wesco Team Meeting Calendar.” Only users with calendar edit permission can create, update, or delete entries.</p>
+            <p class="form-note">Changes are written directly to the connected “Wesco Team Meeting Calendar” through the Wesco app connection.</p>
           </form>
         </aside>
       </section>
@@ -115,13 +114,9 @@ html,body{
   </main>
 </div>
 <script>
-  const CLIENT_ID='cb882f2c-7555-427e-8484-92d6d0a21494';
-  const TENANT_ID='5bfae2d1-ca2b-45bc-850a-90de45c02287';
-  const CALENDAR_ID='AAMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgBGAAAAAAC6DW7Kzg_sS5BcQPqo4yPNBwCkVNVFY9M3Q4AcfAVFudcgAAAAAAEGAACkVNVFY9M3Q4AcfAVFudcgAACl8R88AAA=';
-  const SCOPES=['User.Read','Calendars.ReadWrite'];
   const STAFF=['Wes Atkinson','Joe','Chris','Oscar Centeno','Stephanie Atkinson','Theo Allen'];
   const $=id=>document.getElementById(id);
-  let msalApp=null,account=null,events=[],selectedEvent=null,viewDate=new Date();
+  let events=[],selectedEvent=null,viewDate=new Date();
 
   function safe(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function typeClass(type){const t=type.toLowerCase();return t.includes('out of office')||t==='ooo'?'ooo':t.includes('travel')?'travel':t.includes('site')?'site':t.includes('deadline')?'deadline':''}
@@ -133,19 +128,16 @@ html,body{
   function monthBounds(){const start=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);const end=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);return {start,end}}
   function setNotice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error)}
 
-  async function initializeAuth(){
-    if(typeof msal==='undefined'){setNotice('Microsoft sign-in library did not load. Check the internet connection or browser security settings.',true);return}
-    msalApp=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:`https://login.microsoftonline.com/${TENANT_ID}`,redirectUri:window.location.origin},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}});
-    const accounts=msalApp.getAllAccounts();if(accounts.length){account=accounts[0];setSignedIn(true);await loadEvents()}
+  async function calendarApi(url='/api/staff-calendar',options={}){
+    const response=await fetch(url,options);
+    if(response.status===204)return null;
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||`Wesco calendar service returned ${response.status}.`);
+    return data;
   }
-  async function signIn(){try{const result=await msalApp.loginPopup({scopes:SCOPES,prompt:'select_account'});account=result.account;setSignedIn(true);await loadEvents()}catch(error){console.error(error);setNotice(`Microsoft sign-in failed: ${error.message||error}`,true)}}
-  function setSignedIn(on){$('connection').textContent=on?'Online':'Offline';$('connection').classList.toggle('online',on);$('signIn').classList.toggle('hidden',on);$('signOut').classList.toggle('hidden',!on);if(on)setNotice(`Connected as ${account.name||account.username}. Loading the Wesco team calendar…`)}
-  async function signOut(){if(!msalApp)return;await msalApp.logoutPopup({account,postLogoutRedirectUri:window.location.href});account=null;events=[];setSignedIn(false);renderEvents()}
-  async function token(){if(!account){setNotice('Sign in with Microsoft first.',true);return null}try{return (await msalApp.acquireTokenSilent({scopes:SCOPES,account})).accessToken}catch{return (await msalApp.acquireTokenPopup({scopes:SCOPES,account})).accessToken}}
-  async function graph(url,options={}){const accessToken=await token();if(!accessToken)throw new Error('Microsoft sign-in is required.');const response=await fetch(url,{...options,headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json',...(options.headers||{})}});if(!response.ok){let detail='';try{const data=await response.json();detail=data.error&&data.error.message||''}catch{}throw new Error(detail||`Microsoft Graph returned ${response.status}.`)}return response.status===204?null:response.json()}
   async function loadEvents(){
     const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;$('eventList').innerHTML='<div class="empty">Loading the team calendar…</div>';
-    try{const endpoint=`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/calendarView?startDateTime=${encodeURIComponent(start.toISOString())}&endDateTime=${encodeURIComponent(end.toISOString())}&$orderby=start/dateTime&$top=250`;const data=await graph(endpoint,{headers:{Prefer:'outlook.timezone="Eastern Standard Time"'}});events=data.value||[];setNotice(`Calendar connected. ${events.length} entr${events.length===1?'y':'ies'} loaded for ${viewDate.toLocaleDateString([], {month:'long',year:'numeric'})}.`);renderEvents()}catch(error){console.error(error);setNotice(`Calendar could not load: ${error.message}`,true);$('eventList').innerHTML='<div class="empty">The team calendar could not be loaded. Confirm calendar access and Azure API permissions.</div>'}
+    try{const endpoint=`/api/staff-calendar?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`;const data=await calendarApi(endpoint);events=data.events||[];setNotice(`Calendar connected. ${events.length} entr${events.length===1?'y':'ies'} loaded for ${viewDate.toLocaleDateString([], {month:'long',year:'numeric'})}.`);renderEvents()}catch(error){console.error(error);setNotice(`Calendar could not load: ${error.message}`,true);$('eventList').innerHTML='<div class="empty">The team calendar could not be loaded. Please try Refresh.</div>'}
   }
   function renderEvents(){
     $('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});const filter=$('staffFilter').value;const visible=events.filter(e=>filter==='all'||eventMeta(e).staff===filter);$('entryCount').textContent=visible.length;$('oooCount').textContent=visible.filter(e=>typeClass(eventMeta(e).type)==='ooo').length;$('travelCount').textContent=visible.filter(e=>['travel','site'].includes(typeClass(eventMeta(e).type))).length;$('staffCount').textContent=new Set(visible.map(e=>eventMeta(e).staff)).size;
@@ -158,12 +150,12 @@ html,body{
   function clearForm(){selectedEvent=null;$('eventForm').reset();$('staffMember').value='Team';$('entryType').value='Meeting';$('eventDate').value=new Date().toISOString().slice(0,10);$('startTime').value='09:00';$('endTime').value='10:00';$('reminder').value='15';$('showAs').value='busy';$('formTitle').textContent='Add staff calendar entry';$('selectedLabel').textContent='New entry';$('saveEvent').textContent='Create entry';$('deleteEvent').classList.add('hidden');toggleTimes();renderEvents()}
   function toggleTimes(){const all=$('allDay').checked;$('startWrap').classList.toggle('hidden',all);$('endWrap').classList.toggle('hidden',all)}
   function payload(){const staff=$('staffMember').value,type=$('entryType').value,title=$('eventTitle').value.trim(),date=$('eventDate').value;if(!staff||!title||!date)throw new Error('Staff member, title, and date are required.');const all=$('allDay').checked;let start,end;if(all){start={dateTime:`${date}T00:00:00`,timeZone:'Eastern Standard Time'};const next=new Date(`${date}T12:00:00`);next.setDate(next.getDate()+1);end={dateTime:`${next.toISOString().slice(0,10)}T00:00:00`,timeZone:'Eastern Standard Time'}}else{if(!$('startTime').value||!$('endTime').value)throw new Error('Start and end times are required.');start={dateTime:`${date}T${$('startTime').value}:00`,timeZone:'Eastern Standard Time'};end={dateTime:`${date}T${$('endTime').value}:00`,timeZone:'Eastern Standard Time'}}const notes=$('notes').value.trim();return {subject:`${staff.split(' ')[0]} - ${title}`,start,end,isAllDay:all,location:{displayName:$('location').value.trim()},body:{contentType:'Text',content:`Staff Member: ${staff}\nEntry Type: ${type}\nNotes: ${notes||'None'}`},isReminderOn:Number($('reminder').value)>0,reminderMinutesBeforeStart:Number($('reminder').value)||0,showAs:type==='Out of Office'?'oof':$('showAs').value}}
-  async function saveEvent(event){event.preventDefault();try{const data=payload(),base=`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;if(selectedEvent){await graph(`${base}/${encodeURIComponent(selectedEvent.id)}`,{method:'PATCH',body:JSON.stringify(data)});setNotice('Staff calendar entry updated successfully.')}else{await graph(base,{method:'POST',body:JSON.stringify(data)});setNotice('Staff calendar entry created successfully.')}clearForm();await loadEvents()}catch(error){console.error(error);setNotice(error.message,true)}}
-  async function deleteSelected(){if(!selectedEvent)return;if(!confirm(`Delete “${selectedEvent.subject}” from the Wesco team calendar?`))return;try{await graph(`https://graph.microsoft.com/v1.0/me/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${encodeURIComponent(selectedEvent.id)}`,{method:'DELETE'});setNotice('Staff calendar entry deleted.');clearForm();await loadEvents()}catch(error){setNotice(`Entry could not be deleted: ${error.message}`,true)}}
+  async function saveEvent(event){event.preventDefault();try{const data=payload(),method=selectedEvent?'PATCH':'POST',requestBody=selectedEvent?{eventId:selectedEvent.id,event:data}:{event:data};await calendarApi('/api/staff-calendar',{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(requestBody)});setNotice(selectedEvent?'Staff calendar entry updated successfully.':'Staff calendar entry created successfully.');clearForm();await loadEvents()}catch(error){console.error(error);setNotice(error.message,true)}}
+  async function deleteSelected(){if(!selectedEvent)return;if(!confirm(`Delete “${selectedEvent.subject}” from the Wesco team calendar?`))return;try{await calendarApi('/api/staff-calendar',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({eventId:selectedEvent.id})});setNotice('Staff calendar entry deleted.');clearForm();await loadEvents()}catch(error){setNotice(`Entry could not be deleted: ${error.message}`,true)}}
 
   STAFF.concat('Team').forEach(name=>{$('staffMember').add(new Option(name,name));if(name!=='Team')$('staffFilter').add(new Option(name,name))});
-  $('eventDate').value=new Date().toISOString().slice(0,10);$('signIn').onclick=signIn;$('signOut').onclick=signOut;$('refresh').onclick=loadEvents;$('previous').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);loadEvents()};$('next').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);loadEvents()};$('staffFilter').onchange=renderEvents;$('allDay').onchange=toggleTimes;$('eventForm').onsubmit=saveEvent;$('clearForm').onclick=clearForm;$('deleteEvent').onclick=deleteSelected;$('todayNav').onclick=()=>{viewDate=new Date();loadEvents()};$('newNav').onclick=()=>{$('eventForm').scrollIntoView({behavior:'smooth'});$('eventTitle').focus()};
-  const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;initializeAuth();
+  $('eventDate').value=new Date().toISOString().slice(0,10);$('refresh').onclick=loadEvents;$('previous').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);loadEvents()};$('next').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);loadEvents()};$('staffFilter').onchange=renderEvents;$('allDay').onchange=toggleTimes;$('eventForm').onsubmit=saveEvent;$('clearForm').onclick=clearForm;$('deleteEvent').onclick=deleteSelected;$('todayNav').onclick=()=>{viewDate=new Date();loadEvents()};$('newNav').onclick=()=>{$('eventForm').scrollIntoView({behavior:'smooth'});$('eventTitle').focus()};
+  const {start,end}=monthBounds();$('monthTitle').textContent=viewDate.toLocaleDateString([], {month:'long',year:'numeric'});$('rangeLabel').textContent=`${formatDate(start)} – ${formatDate(new Date(end-1))}`;loadEvents();
 </script>
 <script src="../staff-portal-back.js"></script>
 </body>
