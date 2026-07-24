@@ -24,7 +24,7 @@ function tableSegment() {
 }
 
 function isMissing(err) {
-  return err && err.status === 404;
+  return err && (err.status === 400 || err.status === 404);
 }
 
 async function ensureMessagesTable() {
