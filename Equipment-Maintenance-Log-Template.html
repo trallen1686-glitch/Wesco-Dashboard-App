@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco – Equipment Maintenance Log</title>
+<style>
+:root{
+  --blue:        #106EBE;
+  --blue-bright: #0078D4;
+  --urgent:      #A80000;
+  --urgent-tint: #FBEAEA;
+  --success:     #2EC45A;
+  --success-tint:#E8F8ED;
+  --neutral:     #A19F9D;
+  --page-bg:     #F5F5F5;
+  --card-bg:     #FFFFFF;
+  --border:      #E1DFDD;
+  --ink:         #201F1E;
+  --ink-soft:    #605E5C;
+  --maroon:      #5C2B37;
+  --maroon-tint: #F3E7EC;
+  --amber:       #8A5A00;
+  --amber-tint:  #FDF2E3;
+  --font: 'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  --radius: 6px;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; background:var(--page-bg); color:var(--ink); font-family:var(--font); font-size:14.5px; line-height:1.45; }
+.widget{ max-width:1080px; margin:0 auto; padding:14px; }
+.card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom:16px; }
+
+.backlink{ position:fixed; top:10px; left:10px; z-index:9999; background:#102b3d; color:#fff; font:700 11px Arial,sans-serif; padding:7px 12px; border-radius:20px; text-decoration:none; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+
+.header{ display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:3px solid var(--maroon); }
+.header img.logo{ height:34px; display:block; flex-shrink:0; }
+.header .titles{ flex:1; min-width:0; }
+.header h1{ margin:0; font-size:16.5px; font-weight:700; color:var(--ink); }
+.header .subtitle{ margin:1px 0 0; font-size:12px; color:var(--ink-soft); }
+
+.btn{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font); font-weight:700; font-size:13.5px; padding:10px 16px; border-radius:var(--radius); border:none; cursor:pointer; background:var(--blue); color:#fff; }
+.btn:hover{ filter:brightness(1.08); }
+.btn:active{ transform:translateY(1px); }
+.btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--border); font-weight:600; }
+.btn-ghost:hover{ background:#F3F2F1; }
+.btn-sm{ padding:7px 12px; font-size:12.5px; }
+.btn-icon{ background:transparent; border:none; cursor:pointer; font-size:14px; color:var(--ink-soft); padding:4px 6px; line-height:1; }
+.btn-icon:hover{ color:var(--ink); }
+.btn-icon.delete:hover{ color:var(--urgent); }
+
+.toolbar{ display:flex; align-items:center; gap:10px; padding:14px 18px; flex-wrap:wrap; }
+.toolbar .filter-input{ flex:1; min-width:180px; font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:4px; padding:9px 10px; }
+
+.section-label{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--blue); padding:18px 18px 8px; border-top:1px solid var(--border); margin-top:6px; }
+.section-label:first-of-type{ border-top:none; margin-top:0; }
+
+.field-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 16px; padding:0 18px 18px; }
+.field{ display:flex; flex-direction:column; gap:5px; min-width:0; }
+.field.full{ grid-column:1 / -1; }
+.field label{ font-size:12.5px; font-weight:700; color:var(--ink); }
+.field label .req{ color:var(--urgent); font-weight:700; margin-left:2px; }
+.field label .hint{ font-weight:400; color:var(--ink-soft); font-size:11.5px; margin-left:4px; }
+.field input, .field select, .field textarea{ font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:4px; padding:9px 10px; background:#fff; color:var(--ink); width:100%; }
+.field textarea{ resize:vertical; min-height:60px; }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; padding:0 18px 18px; }
+.eq-card{ text-align:left; display:flex; flex-direction:column; gap:6px; padding:14px 16px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; }
+.eq-card:hover{ box-shadow:0 6px 16px rgba(24,48,65,.1); }
+.eq-card b{ color:var(--maroon); font-size:13.5px; }
+.eq-card span{ color:var(--ink-soft); font-size:11.5px; }
+.pill{ display:inline-block; align-self:flex-start; font-size:11px; font-weight:700; padding:3px 9px; border-radius:12px; background:var(--success-tint); color:#1a7d3a; }
+.pill.zero{ background:#F3F2F1; color:var(--ink-soft); }
+
+.detail-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px; flex-wrap:wrap; }
+.detail-header h2{ margin:0; font-size:17px; color:var(--maroon); }
+.info-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px 18px; padding:0 18px 18px; }
+.info-item span.k{ display:block; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); }
+.info-item span.v{ display:block; font-size:13.5px; color:var(--ink); }
+
+table.visits{ width:100%; border-collapse:collapse; margin:0 18px 18px; width:calc(100% - 36px); }
+table.visits th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); border-bottom:2px solid var(--border); padding:8px 8px; }
+table.visits td{ padding:9px 8px; border-bottom:1px solid var(--border); font-size:13px; }
+table.visits tr:last-child td{ border-bottom:none; }
+.empty-row td{ color:var(--ink-soft); font-style:italic; text-align:center; padding:18px 8px; }
+
+.legacy-note{ margin:0 18px 14px; padding:10px 12px; background:var(--amber-tint); color:var(--amber); border-radius:6px; font-size:12.5px; }
+
+.data-note{ margin:16px 0 0; border-top:1px solid var(--border); }
+.data-note summary{ cursor:pointer; padding:12px 18px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+.data-note .body{ padding:0 18px 16px; font-size:12.5px; color:var(--ink-soft); }
+.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; }
+
+.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto; z-index:1000; }
+.modal-backdrop.open{ display:flex; }
+.modal{ background:#fff; border-radius:8px; max-width:640px; width:100%; }
+.modal .header{ padding:14px 18px; }
+
+.actions-row{ display:flex; gap:10px; padding:0 18px 18px; flex-wrap:wrap; }
+
+@media print{ .no-print{ display:none !important; } }
+@media (max-width:640px){ .field-grid{ grid-template-columns:1fr; } .info-grid{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+<a href="index.html" class="backlink">&#8592; Wesco Hub</a>
+<div class="widget">
+
+  <div class="card">
+    <div class="header">
+      <img class="logo" src="Wesco%20Logo%202.png" alt="Wesco Exteriors, Inc.">
+      <div class="titles">
+        <h1>Equipment Maintenance Log</h1>
+        <p class="subtitle">Service history, cost, and details for company equipment</p>
+      </div>
+    </div>
+    <div class="toolbar no-print">
+      <input type="text" class="filter-input" id="listFilter" placeholder="Filter by machine, make, model, VIN…">
+      <button type="button" class="btn" id="addEquipmentBtn">+ Add Equipment</button>
+    </div>
+    <div class="grid" id="equipmentGrid"><!-- equipment cards rendered here --></div>
+  </div>
+
+  <div class="card" id="detailCard" style="display:none;">
+    <div class="detail-header">
+      <div>
+        <button type="button" class="btn btn-ghost btn-sm no-print" id="backToListBtn">&#8592; All Equipment</button>
+      </div>
+    </div>
+    <div class="detail-header" style="padding-top:0;">
+      <h2 id="detailMachineName">Machine</h2>
+      <div id="detailCostPill"></div>
+    </div>
+    <div class="info-grid" id="detailInfoGrid"><!-- header fields rendered here --></div>
+
+    <div class="legacy-note" id="legacyNote" style="display:none;"></div>
+
+    <div class="detail-header" style="padding-top:0;">
+      <span class="section-label" style="padding-left:0;border-top:none;">Service Visits</span>
+      <button type="button" class="btn btn-sm no-print" id="addVisitBtn">+ Add Service Visit</button>
+    </div>
+    <table class="visits">
+      <thead>
+        <tr><th>Date</th><th>Hours</th><th>Task</th><th>Cost</th><th>Notes</th><th class="no-print"></th></tr>
+      </thead>
+      <tbody id="visitsBody"><!-- visit rows rendered here --></tbody>
+    </table>
+  </div>
+
+  <details class="data-note">
+    <summary>ℹ How this template works right now</summary>
+    <div class="body">
+      <p>This page reads and writes <code>Equipment Maintenance Log - Copy.xlsx</code> directly through the
+      <code>/api/equipment</code> and <code>/api/equipment/{sheet}/visits</code> endpoints (Azure Functions calling
+      Microsoft Graph). "Add Equipment" copies the Template sheet in the real workbook; "Add Service Visit" appends a
+      row to that machine's <code>Visits_…</code> table. Whatever you see here is the actual file — and whatever's in
+      the file shows up here on refresh.</p>
+      <p>If the API isn't deployed/configured yet, the lists below will show a connection error instead of data —
+      that's expected until the Azure Function app settings (Graph client ID/secret/tenant, drive+item IDs) are set.</p>
+    </div>
+  </details>
+</div>
+
+<!-- Add Equipment Modal -->
+<div class="modal-backdrop" id="addEquipmentModal">
+  <div class="modal card">
+    <div class="header">
+      <div class="titles"><h1>Add Equipment</h1><p class="subtitle">Creates a new equipment sheet from the Template</p></div>
+    </div>
+    <form id="equipmentForm">
+      <div class="section-label" style="border-top:none;">Equipment Info</div>
+      <div class="field-grid">
+        <div class="field full"><label for="eqMachine">Machine Name<span class="req">*</span></label><input type="text" id="eqMachine" placeholder="e.g. 2024 Kubota SVL75" required></div>
+        <div class="field"><label for="eqMake">Vehicle Make</label><input type="text" id="eqMake" placeholder="e.g. Kubota"></div>
+        <div class="field"><label for="eqYear">Year</label><input type="text" id="eqYear" placeholder="e.g. 2024"></div>
+        <div class="field"><label for="eqModel">Model</label><input type="text" id="eqModel" placeholder="e.g. SVL75-3"></div>
+        <div class="field"><label for="eqVin">VIN No</label><input type="text" id="eqVin" placeholder="Vehicle identification number"></div>
+        <div class="field"><label for="eqOwner">Owner Name</label><input type="text" id="eqOwner" value="Wesco Exteriors"></div>
+        <div class="field"><label for="eqCondition">Condition</label>
+          <select id="eqCondition"><option value="">—</option><option>Very Good</option><option>Good</option><option>Fair</option><option>Average</option></select>
+        </div>
+        <div class="field"><label for="eqLocation">Last Location <span class="hint">(optional)</span></label><input type="text" id="eqLocation" placeholder="e.g. 208 Hillstone Dr."></div>
+        <div class="field"><label for="eqLicense">License No <span class="hint">(optional)</span></label><input type="text" id="eqLicense"></div>
+      </div>
+      <div class="actions-row">
+        <button type="button" class="btn btn-ghost" id="cancelAddEquipmentBtn">Cancel</button>
+        <button type="submit" class="btn">Add Equipment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Service Visit Modal -->
+<div class="modal-backdrop" id="addVisitModal">
+  <div class="modal card">
+    <div class="header">
+      <div class="titles"><h1>Add Service Visit</h1><p class="subtitle" id="visitForMachine">Appends a row to this machine's visit log</p></div>
+    </div>
+    <form id="visitForm">
+      <div class="section-label" style="border-top:none;">Visit Details</div>
+      <div class="field-grid">
+        <div class="field"><label for="vDate">Date<span class="req">*</span></label><input type="date" id="vDate" required></div>
+        <div class="field"><label for="vHours">Hours <span class="hint">(optional)</span></label><input type="number" id="vHours" min="0" step="0.1"></div>
+        <div class="field"><label for="vTask">Task<span class="req">*</span></label>
+          <select id="vTask" required></select>
+        </div>
+        <div class="field" id="vTaskOtherField" style="display:none;"><label for="vTaskOther">Describe task</label><input type="text" id="vTaskOther" placeholder="e.g. Replace hydraulic hose"></div>
+        <div class="field"><label for="vCost">Cost</label><input type="number" id="vCost" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="field full"><label for="vNotes">Notes <span class="hint">(optional)</span></label><textarea id="vNotes"></textarea></div>
+      </div>
+      <div class="actions-row">
+        <button type="button" class="btn btn-ghost" id="cancelAddVisitBtn">Cancel</button>
+        <button type="submit" class="btn">Add Visit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SERVICE_TASKS = ["Change oil","Lubricate chassis","Change oil filter","Change air filter",
+    "Change transmission fluid","Flush cooling system","Add antifreeze","Align wheels","Rotate tires",
+    "Replace tires","Adjust brakes","Tune engine","Other service"];
+
+  var API_BASE = "/api";
+
+  async function apiGet(path){
+    var res = await fetch(API_BASE + path);
+    if(!res.ok) throw new Error("Request failed ("+res.status+")");
+    return res.json();
+  }
+  async function apiSend(path, method, body){
+    var res = await fetch(API_BASE + path, {
+      method: method,
+      headers: {"Content-Type":"application/json"},
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if(!res.ok) throw new Error("Request failed ("+res.status+")");
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  function loadEquipment(){ return apiGet("/equipment"); }
+  function addEquipmentApi(data){ return apiSend("/equipment", "POST", data); }
+  function loadVisits(sheet){ return apiGet("/equipment/"+encodeURIComponent(sheet)+"/visits"); }
+  function addVisitApi(sheet, visit){ return apiSend("/equipment/"+encodeURIComponent(sheet)+"/visits", "POST", visit); }
+  function deleteVisitApi(sheet, index){ return apiSend("/equipment/"+encodeURIComponent(sheet)+"/visits/"+index, "DELETE"); }
+
+  function $(id){ return document.getElementById(id); }
+  function money(n){ n = Number(n)||0; return "$" + n.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+  var equipment = [];
+  var currentSheet = null;
+
+  function renderEquipmentGrid(filterText){
+    var grid = $("equipmentGrid");
+    grid.innerHTML = "";
+    var f = (filterText||"").toLowerCase();
+    var shown = equipment.filter(function(eq){
+      if(!f) return true;
+      return [eq.machine, eq.make, eq.model, eq.vin].join(" ").toLowerCase().indexOf(f) > -1;
+    });
+    if(shown.length === 0){
+      grid.innerHTML = '<p style="color:var(--ink-soft);font-size:13px;">No equipment matches that filter.</p>';
+      return;
+    }
+    shown.forEach(function(eq){
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "eq-card";
+      var pillClass = eq.legacyCost > 0 ? "pill" : "pill zero";
+      card.innerHTML =
+        '<b>'+escapeHtml(eq.machine)+'</b>' +
+        '<span>'+escapeHtml([eq.year, eq.make, eq.model].filter(Boolean).join(" · "))+'</span>' +
+        '<span>VIN: '+escapeHtml(eq.vin||"—")+'</span>' +
+        '<span class="'+pillClass+'">Recorded costs: '+money(eq.legacyCost)+'</span>';
+      card.addEventListener("click", function(){ openDetail(eq.sheet); });
+      grid.appendChild(card);
+    });
+  }
+
+  async function refreshEquipment(){
+    var grid = $("equipmentGrid");
+    grid.innerHTML = '<p style="color:var(--ink-soft);font-size:13px;">Loading equipment…</p>';
+    try{
+      equipment = await loadEquipment();
+      renderEquipmentGrid($("listFilter").value);
+    }catch(e){
+      grid.innerHTML = '<p style="color:var(--urgent);font-size:13px;">Could not load equipment from the API ('+escapeHtml(e.message)+'). The Azure Function may not be deployed/configured yet.</p>';
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  async function openDetail(sheet){
+    currentSheet = sheet;
+    var eq = equipment.find(function(e){ return e.sheet === sheet; });
+    if(!eq) return;
+    $("detailMachineName").textContent = eq.machine;
+    document.getElementById("equipmentGrid").closest(".card").style.display = "none";
+    $("detailCard").style.display = "block";
+
+    var info = [
+      ["Owner", eq.ownerName], ["Vehicle Make", eq.make], ["Year", eq.year], ["Model", eq.model],
+      ["VIN No", eq.vin], ["Condition", eq.condition], ["Last Location", eq.lastLocation], ["License No", eq.licenseNo]
+    ].filter(function(pair){ return pair[1]; });
+    $("detailInfoGrid").innerHTML = info.map(function(pair){
+      return '<div class="info-item"><span class="k">'+escapeHtml(pair[0])+'</span><span class="v">'+escapeHtml(pair[1])+'</span></div>';
+    }).join("");
+
+    var legacyNote = $("legacyNote");
+    if(eq.legacyCost > 0){
+      legacyNote.style.display = "block";
+      legacyNote.textContent = "Prior recorded costs of "+money(eq.legacyCost)+" exist on this machine's original Excel sheet (before this log was added). That history stays exactly as-is in Excel — it isn't edited from here.";
+    } else {
+      legacyNote.style.display = "none";
+    }
+
+    $("detailCostPill").innerHTML = '<span class="pill">Total: '+money(eq.legacyCost)+'</span>';
+    $("visitsBody").innerHTML = '<tr class="empty-row"><td colspan="6">Loading service visits…</td></tr>';
+    try{
+      var visits = await loadVisits(sheet);
+      var newTotal = visits.reduce(function(sum,v){ return sum + (Number(v.cost)||0); }, 0);
+      $("detailCostPill").innerHTML = '<span class="pill">Total: '+money(eq.legacyCost + newTotal)+'</span>';
+      renderVisits(visits);
+    }catch(e){
+      $("visitsBody").innerHTML = '<tr class="empty-row"><td colspan="6" style="color:var(--urgent);">Could not load service visits ('+escapeHtml(e.message)+').</td></tr>';
+    }
+  }
+
+  function renderVisits(visits){
+    var body = $("visitsBody");
+    if(visits.length === 0){
+      body.innerHTML = '<tr class="empty-row"><td colspan="6">No service visits logged yet. Click "+ Add Service Visit" to add the first one.</td></tr>';
+      return;
+    }
+    var sorted = visits.slice().sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+    body.innerHTML = sorted.map(function(v){
+      return '<tr>' +
+        '<td>'+escapeHtml(v.date||"")+'</td>' +
+        '<td>'+escapeHtml(v.hours||"")+'</td>' +
+        '<td>'+escapeHtml(v.task||"")+'</td>' +
+        '<td>'+money(v.cost)+'</td>' +
+        '<td>'+escapeHtml(v.notes||"")+'</td>' +
+        '<td class="no-print"><button type="button" class="btn-icon delete" data-visit-index="'+v.index+'" title="Delete">✕</button></td>' +
+        '</tr>';
+    }).join("");
+    Array.prototype.forEach.call(body.querySelectorAll("[data-visit-index]"), function(btn){
+      btn.addEventListener("click", async function(){
+        var index = btn.getAttribute("data-visit-index");
+        try{
+          await deleteVisitApi(currentSheet, index);
+          openDetail(currentSheet);
+        }catch(e){
+          alert("Could not delete visit: "+e.message);
+        }
+      });
+    });
+  }
+
+  $("backToListBtn").addEventListener("click", function(){
+    $("detailCard").style.display = "none";
+    document.getElementById("equipmentGrid").closest(".card").style.display = "block";
+    currentSheet = null;
+  });
+
+  $("listFilter").addEventListener("input", function(){ renderEquipmentGrid(this.value); });
+
+  // --- Add Equipment ---
+  var addEqModal = $("addEquipmentModal");
+  $("addEquipmentBtn").addEventListener("click", function(){ addEqModal.classList.add("open"); });
+  $("cancelAddEquipmentBtn").addEventListener("click", function(){ addEqModal.classList.remove("open"); });
+  $("equipmentForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var machine = $("eqMachine").value.trim();
+    if(!machine) return;
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      await addEquipmentApi({
+        machine: machine,
+        make: $("eqMake").value.trim(),
+        year: $("eqYear").value.trim(),
+        model: $("eqModel").value.trim(),
+        vin: $("eqVin").value.trim(),
+        ownerName: $("eqOwner").value.trim() || "Wesco Exteriors",
+        condition: $("eqCondition").value,
+        lastLocation: $("eqLocation").value.trim(),
+        licenseNo: $("eqLicense").value.trim()
+      });
+      await refreshEquipment();
+      this.reset();
+      $("eqOwner").value = "Wesco Exteriors";
+      addEqModal.classList.remove("open");
+    }catch(err){
+      alert("Could not add equipment: "+err.message);
+    }finally{
+      submitBtn.disabled = false;
+    }
+  });
+
+  // --- Add Service Visit ---
+  var addVisitModal = $("addVisitModal");
+  var taskSelect = $("vTask");
+  taskSelect.innerHTML = SERVICE_TASKS.map(function(t){ return '<option>'+t+'</option>'; }).join("") + '<option value="__other__">Other (type below)</option>';
+  taskSelect.addEventListener("change", function(){
+    $("vTaskOtherField").style.display = (this.value === "__other__") ? "flex" : "none";
+  });
+
+  $("addVisitBtn").addEventListener("click", function(){
+    var eq = equipment.find(function(e){ return e.sheet === currentSheet; });
+    $("visitForMachine").textContent = "Appends a row to \""+(eq?eq.machine:"")+"\"'s visit log";
+    addVisitModal.classList.add("open");
+  });
+  $("cancelAddVisitBtn").addEventListener("click", function(){ addVisitModal.classList.remove("open"); });
+  $("visitForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var task = taskSelect.value === "__other__" ? $("vTaskOther").value.trim() : taskSelect.value;
+    var visit = {
+      date: $("vDate").value,
+      hours: $("vHours").value,
+      task: task,
+      cost: $("vCost").value,
+      notes: $("vNotes").value.trim()
+    };
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      await addVisitApi(currentSheet, visit);
+      await openDetail(currentSheet);
+      this.reset();
+      $("vTaskOtherField").style.display = "none";
+      addVisitModal.classList.remove("open");
+    }catch(err){
+      alert("Could not add visit: "+err.message);
+    }finally{
+      submitBtn.disabled = false;
+    }
+  });
+
+  refreshEquipment();
+})();
+</script>
+</body>
+</html>
