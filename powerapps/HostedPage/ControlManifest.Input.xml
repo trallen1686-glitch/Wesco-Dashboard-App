@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control
+    namespace="Wesco"
+    constructor="HostedPage"
+    version="1.0.0"
+    display-name-key="Hosted Page"
+    description-key="Displays an Azure-hosted Wesco page"
+    control-type="standard">
+
+    <external-service-usage enabled="true">
+      <domain>wonderful-field-08b34ac0f.7.azurestaticapps.net</domain>
+    </external-service-usage>
+
+    <property
+      name="siteUrl"
+      display-name-key="Site URL"
+      description-key="Azure Static Web App URL"
+      of-type="SingleLine.Text"
+      usage="input"
+      required="true" />
+
+    <resources>
+      <code path="index.ts" order="1" />
+    </resources>
+  </control>
+</manifest>

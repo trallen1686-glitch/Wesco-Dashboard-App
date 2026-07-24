@@ -14,73 +14,81 @@
    the same way on every screen.
    ========================================================================== */
 :root{
-  --blue:        #106EBE;
-  --blue-bright: #0078D4;
-  --urgent:      #A80000;
-  --urgent-tint: #FBEAEA;
-  --success:     #2EC45A;
-  --success-tint:#E8F8ED;
-  --neutral:     #A19F9D;
-  --page-bg:     #F5F5F5;
-  --card-bg:     #FFFFFF;
-  --border:      #E1DFDD;
-  --ink:         #201F1E;
-  --ink-soft:    #605E5C;
-  --maroon:      #5C2B37;
-  --maroon-tint: #F3E7EC;
-  --font: 'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
-  --radius: 6px;
+  --blue:        #C65300;
+  --blue-bright: #F36A00;
+  --urgent:      #F36A00;
+  --urgent-tint: rgba(243,106,0,.16);
+  --success:     #F36A00;
+  --success-tint:rgba(243,106,0,.12);
+  --neutral:     #839097;
+  --page-bg:     #080D10;
+  --card-bg:     rgba(9, 14, 16, 0.74);
+  --border:      rgba(255,255,255,.14);
+  --ink:         #FFFFFF;
+  --ink-soft:    rgba(255, 255, 255, 0.82);
+  --maroon:      #F36A00;
+  --maroon-tint: rgba(243,106,0,.14);
+  --font: 'Open Sans', sans-serif;
+  --radius: 4px;
 }
 *{ box-sizing:border-box; }
+button,input,textarea,select,option{ font-family:var(--font); }
 html,body{
   margin:0; padding:0;
-  background: var(--page-bg);
+  min-height:100%;
+  background-color:var(--page-bg);
+  background-image:
+    linear-gradient(115deg, rgba(6,10,12,.96) 0%, rgba(9,14,16,.82) 42%, rgba(9,14,16,.94) 100%),
+    radial-gradient(circle at 72% 18%, rgba(243,106,0,.10), transparent 32%),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.018) 80px),
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(255,255,255,.014) 80px);
+  background-attachment:fixed;
   color: var(--ink);
   font-family: var(--font);
   font-size: 14.5px;
   line-height:1.45;
 }
-.widget{ max-width: 860px; margin: 0 auto; padding: 14px; }
+.widget{ width:100%; max-width:1280px; margin:0 auto; padding:18px; }
 .card{
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  box-shadow: 0 18px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  overflow:hidden;
 }
 
 /* ---------- Header ---------- */
-.header{ display:flex; align-items:center; gap:12px; padding: 14px 18px; border-bottom: 3px solid var(--maroon); }
+.header{ display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:2px solid var(--blue-bright); background:rgba(4,8,10,.62); }
 .header img.logo{ height:34px; display:block; flex-shrink:0; }
 .header .titles{ flex:1; min-width:0; }
-.header h1{ margin:0; font-size:16.5px; font-weight:700; color:var(--ink); }
-.header .subtitle{ margin:1px 0 0; font-size:12px; color:var(--ink-soft); }
+.header h1{ margin:0; font-size:17px; font-weight:700; color:var(--ink); letter-spacing:.04em; text-transform:uppercase; }
+.header .subtitle{ margin:2px 0 0; font-size:11px; color:var(--blue-bright); letter-spacing:.08em; text-transform:uppercase; }
 
 /* ---------- Role tags (copied from the To-Do widget) ---------- */
-.tag{ font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:10px; background:#EDEBE9; color:var(--ink-soft); display:inline-block; }
-.tag.role-estimator{ background:#E8F0FE; color:#1451A3; }
-.tag.role-pm{ background:#FDF2E3; color:#8A5A00; }
-.tag.role-super{ background:#EFEAF7; color:#5B3E9E; }
-.tag.role-management{ background:var(--maroon-tint); color:var(--maroon); }
+.tag{ font-size:10px; font-weight:700; padding:0; border-radius:0; background:transparent; color:var(--ink-soft); border:none; display:inline-block; text-transform:uppercase; letter-spacing:.05em; }
+.tag.role-estimator,.tag.role-pm,.tag.role-super,.tag.role-management{ background:transparent; color:#FF9A4D; border:none; }
 
 /* ---------- Person selector ---------- */
-.role-section{ padding: 16px 18px 4px; }
-.role-section-title{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--blue); margin-bottom:10px; }
+.role-section{ padding:18px 20px 6px; }
+.role-section-title{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--blue-bright); margin-bottom:10px; }
 .person-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:10px; margin-bottom:6px; }
 .person-card{
   display:flex; align-items:center; gap:10px; border:1px solid var(--border); border-radius:8px;
-  padding:12px 14px; cursor:pointer; background:#fff;
+  padding:12px 14px; cursor:pointer; background:rgba(5,10,12,.72);
   transition:border-color .12s ease, box-shadow .12s ease, transform .12s ease;
 }
-.person-card:hover{ border-color:var(--blue-bright); box-shadow:0 2px 8px rgba(0,0,0,.07); transform:translateY(-1px); }
+.person-card:hover{ border-color:var(--blue-bright); background:rgba(243,106,0,.08); box-shadow:0 7px 18px rgba(0,0,0,.28); transform:translateY(-1px); }
 .avatar{
-  width:38px; height:38px; border-radius:50%; background:var(--maroon-tint); color:var(--maroon);
+  width:38px; height:38px; border-radius:0; background:transparent; color:#FF8A32; border:none;
   display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13.5px; flex-shrink:0;
 }
 .person-info{ min-width:0; display:flex; flex-direction:column; gap:4px; }
 .person-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
 
 /* ---------- Starter view (after a name is selected) ---------- */
-.starter-header{ padding:18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.starter-header{ padding:18px 20px; border-bottom:1px solid var(--border); background:rgba(4,8,10,.42); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 .starter-header .avatar{ width:52px; height:52px; font-size:17px; }
 .starter-id{ min-width:0; }
 .starter-greeting{ font-size:11.5px; color:var(--ink-soft); }
@@ -89,47 +97,48 @@ html,body{
   font-size:12px; color:var(--blue-bright); cursor:pointer; font-weight:700; margin-left:auto;
   background:none; border:none; font-family:var(--font); padding:0;
 }
-.back-link:hover{ text-decoration:underline; }
+.back-link:hover{ color:#FF9A4D; text-decoration:none; }
 
 .section-heading{
   font-size:11.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;
-  padding:16px 18px 10px;
+  padding:18px 20px 10px; color:#FFFFFF;
 }
+.section-heading::after{ content:""; display:block; width:38px; height:2px; margin-top:7px; background:var(--blue-bright); }
 
-.tab-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap:12px; padding:0 18px 6px; }
+.tab-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; padding:0 20px 6px; }
 .tab-tile{
   position:relative;
   display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); border-radius:8px;
-  padding:16px; cursor:pointer; background:#fff; text-align:left; font-family:var(--font);
+  padding:16px; cursor:pointer; background:rgba(5,10,12,.76); text-align:left; font-family:var(--font);
   transition:border-color .12s ease, box-shadow .12s ease, transform .12s ease;
 }
-.tab-tile:hover{ border-color:var(--blue-bright); box-shadow:0 3px 10px rgba(0,0,0,.08); transform:translateY(-1px); }
-.tab-tile .tab-icon{ font-size:23px; }
+.tab-tile:hover{ border-color:var(--blue-bright); background:rgba(243,106,0,.08); box-shadow:0 8px 20px rgba(0,0,0,.32); transform:translateY(-1px); }
+.tab-tile .tab-icon{ font-size:23px; color:var(--blue-bright); }
 .tab-tile .tab-label{ font-size:13.5px; font-weight:700; color:var(--ink); }
-.tab-tile .tab-desc{ font-size:11px; color:var(--ink-soft); line-height:1.4; }
+.tab-tile .tab-desc{ font-size:11px; color:#FF8A32; line-height:1.4; }
 .tile-badge{
   position:absolute; top:10px; right:10px; background:var(--urgent); color:#fff;
   font-size:10.5px; font-weight:700; min-width:18px; height:18px; border-radius:9px;
   display:flex; align-items:center; justify-content:center; padding:0 5px;
 }
 
-.quick-tools-grid{ display:flex; flex-wrap:wrap; gap:8px; padding:0 18px 18px; }
+.quick-tools-grid{ display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 20px; }
 .quick-tool-chip{
   display:flex; align-items:center; gap:6px; border:1px solid var(--border); border-radius:20px;
-  padding:8px 14px; font-size:12.5px; font-weight:600; color:var(--ink); cursor:pointer; background:#fff;
+  padding:8px 14px; font-size:12.5px; font-weight:600; color:var(--ink); cursor:pointer; background:rgba(5,10,12,.76);
   font-family:var(--font);
 }
-.quick-tool-chip:hover{ border-color:var(--blue-bright); background:#EFF6FC; }
+.quick-tool-chip:hover{ border-color:var(--blue-bright); background:rgba(243,106,0,.10); }
 
 /* ---------- Messages ---------- */
-.messages-header{ display:flex; align-items:center; gap:12px; padding:18px; border-bottom:1px solid var(--border); }
+.messages-header{ display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid var(--border); background:rgba(4,8,10,.42); }
 .messages-title{ font-size:15px; font-weight:700; color:var(--ink); }
 
 .contact-row{
   display:flex; align-items:center; gap:10px; padding:12px 18px; border-bottom:1px solid var(--border);
   cursor:pointer; transition:background .12s ease;
 }
-.contact-row:hover{ background:#FAFAF9; }
+.contact-row:hover{ background:rgba(243,106,0,.08); }
 .contact-info{ flex:1; min-width:0; }
 .contact-name-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .contact-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
@@ -144,26 +153,30 @@ html,body{
 .thread-messages{ padding:16px 18px; display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto; }
 .msg-bubble{ max-width:75%; padding:9px 13px; border-radius:14px; font-size:13.5px; line-height:1.4; }
 .msg-bubble.sent{ align-self:flex-end; background:var(--blue-bright); color:#fff; border-bottom-right-radius:3px; }
-.msg-bubble.received{ align-self:flex-start; background:#EDEBE9; color:var(--ink); border-bottom-left-radius:3px; }
+.msg-bubble.received{ align-self:flex-start; background:rgba(255,255,255,.09); color:var(--ink); border:1px solid rgba(255,255,255,.08); border-bottom-left-radius:3px; }
 .msg-time{ font-size:10px; margin-top:3px; opacity:.75; }
 .thread-compose{ display:flex; gap:8px; padding:14px 18px; border-top:1px solid var(--border); align-items:flex-end; }
 .thread-compose textarea{
   flex:1; font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:6px;
-  padding:9px 10px; min-height:44px; max-height:120px; resize:vertical;
+  padding:9px 10px; min-height:44px; max-height:120px; resize:vertical; background:rgba(3,7,9,.72); color:#fff;
 }
+.thread-compose textarea::placeholder{ color:rgba(255,255,255,.48); }
+.btn{ border:1px solid var(--blue-bright); border-radius:3px; background:var(--blue-bright); color:#fff; font-family:var(--font); font-weight:700; cursor:pointer; }
+.btn-sm{ min-height:44px; padding:0 16px; }
+.btn:hover{ background:#FF7A14; }
 .empty-messages{ padding:26px 18px; text-align:center; color:var(--ink-soft); font-size:13px; }
 
 /* ---------- Footer / data notice ---------- */
-details.data-note{ font-family:var(--font); font-size:11.5px; color:var(--ink-soft); border-top:1px solid var(--border); padding:0; }
+details.data-note{ font-family:var(--font); font-size:11.5px; color:var(--ink-soft); border-top:1px solid var(--border); background:rgba(3,7,9,.44); padding:0; }
 details.data-note summary{ cursor:pointer; padding:10px 18px; font-weight:600; }
 details.data-note .body{ padding:0 18px 14px; line-height:1.6; }
 details.data-note .body p{ margin: 0 0 8px; }
 details.data-note .body p:last-child{ margin-bottom:0; }
-details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; }
+details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding:1px 5px; border-radius:3px; }
 
 .toast{
   position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
-  background:#201F1E; color:#fff; font-family:var(--font); font-size:13px;
+  background:#111A1E; color:#fff; border:1px solid rgba(243,106,0,.45); font-family:var(--font); font-size:13px;
   padding:9px 16px; border-radius:5px; box-shadow:0 4px 14px rgba(0,0,0,.25);
   opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:99; max-width:90vw; text-align:center;
 }
@@ -171,12 +184,12 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
 .toast.err{ background:var(--urgent); }
 
 @media (max-width:480px){
+  .widget{ padding:8px; }
   .tab-grid{ grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#102b3d;color:#fff;font:700 11px Arial,sans-serif;padding:7px 12px;border-radius:20px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)">&#8592; Wesco Hub</a>
 <div class="widget">
   <div class="card">
 
@@ -252,10 +265,9 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         Atkinson</code>) once Estimates, Takeoffs, and Material Sheets have somewhere similar to send their
         approvals — right now it's one link, so it'll need to point at wherever all four end up living, whether
         that's one combined list or a page of its own.</p>
-        <p><b>Assigned Projects</b> and <b>To Do List</b> are marked <code>personAware: true</code>, so once
-        their base URL is filled in, this page automatically appends <code>?person=NAME</code> to it — the same
-        convention the To-Do widget already uses — so each person lands on their own filtered view instead of
-        everyone's.</p>
+        <p>The connected employee tabs are marked <code>personAware: true</code>, so this page automatically
+        appends <code>?person=NAME</code> to each destination. That lets every destination's Back to Staff
+        Portal button return the employee to their own portal page.</p>
         <p>This page itself follows that same convention: opening it with <code>?person=Jesse Warren</code> (for
         example) in the URL goes straight to that person's starter view, skipping the name picker. That's the
         URL each person's own screen in the WE App should embed this control with.</p>
@@ -271,10 +283,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         polled or pushed to on an interval) behind <code>loadMessages()</code> / <code>saveMessages()</code>, or,
         more realistically, since Wesco already has Microsoft 365 — just point the Messages tile at Teams chat
         instead of building a custom inbox at all. Happy to wire up whichever direction makes more sense.</p>
-        <p><b>All Projects</b>, <b>Active Projects</b>, and <b>Pending Projects</b> are three separate views into
-        what's presumably one underlying project list, filtered by status — they're set up as plain company-wide
-        links (not <code>personAware</code>) since "active" and "pending" read as company-wide states rather than
-        something scoped to one person. <b>Forms</b> is a general company form library link; it's separate from
+        <p><b>All Projects</b>, <b>Active Projects</b>, and <b>Pending Projects</b> are separate live views of
+        the matching SharePoint folders. <b>Forms</b> is a general company form library link; it's separate from
         the Quick Tools chips below, which link straight to the individual form templates already built.</p>
       </div>
     </details>
@@ -315,14 +325,14 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
      up yet instead of opening a dead link.
      ------------------------------------------------------------------ */
   var TAB_LINKS = {
-    assignedProjects: { label: 'Assigned Projects',   icon: '🏗️', desc: 'Projects currently assigned to you',    url: '', personAware: true },
-    allProjects:      { label: 'All Projects',        icon: '📚', desc: 'Every project company-wide',             url: '', personAware: false },
-    activeProjects:   { label: 'Active Projects',     icon: '🟢', desc: 'Projects currently in progress',         url: '', personAware: false },
-    pendingProjects:  { label: 'Pending Projects',    icon: '🟡', desc: 'Projects not yet started',               url: '', personAware: false },
-    toDoList:         { label: 'To Do List',          icon: '✅', desc: 'Your task list',                         url: '', personAware: true },
-    calendar:         { label: 'Calendar',            icon: '📅', desc: 'Company and project calendar',           url: '', personAware: false },
-    subCalendar:      { label: 'Subcontractor Calendar', icon: '🗓️', desc: 'Subcontractor scheduling across all jobs', url: '', personAware: false },
-    documentUploads:  { label: 'Document Uploads',    icon: '📤', desc: 'Shared project document library',        url: '', personAware: false },
+    assignedProjects: { label: 'Assigned Projects',   icon: '🏗️', desc: 'Projects currently assigned to you',    url: 'PM-Assigned-Projects-Template.html', personAware: true },
+    allProjects:      { label: 'All Projects',        icon: '📚', desc: 'Every project company-wide',             url: 'Wesco-Hub-Files.html?library=all-projects', personAware: true },
+    activeProjects:   { label: 'Active Projects',     icon: '🟢', desc: 'Projects currently in progress',         url: 'Wesco-Hub-Files.html?library=active-projects', personAware: true },
+    pendingProjects:  { label: 'Pending Projects',    icon: '🟡', desc: 'Bidding projects awaiting award',        url: 'Wesco-Hub-Files.html?library=bidding-projects', personAware: true },
+    toDoList:         { label: 'To Do List',          icon: '✅', desc: 'Your task list',                         url: 'Wesco%20To-Do%20List.html', personAware: true },
+    calendar:         { label: 'Calendar',            icon: '📅', desc: 'Company and project calendar',           url: 'staff-team-calendar/index.html', personAware: true },
+    subCalendar:      { label: 'Subcontractor Calendar', icon: '🗓️', desc: 'Subcontractor scheduling across all jobs', url: 'master_subcontractor_calendar_final_signin_fixed.html', personAware: true },
+    documentUploads:  { label: 'Document Uploads',    icon: '📤', desc: 'Your private staff document folders',    url: 'Wesco-Hub-Files.html?library=document-upload', personAware: true },
     ccReceipts:       { label: 'CC Receipt Uploads',  icon: '💳', desc: 'Upload credit card purchase receipts',   url: '', personAware: false },
     deliveries:       { label: 'Deliveries',          icon: '🚚', desc: 'Material delivery tracker',              url: '', personAware: false },
     meetingNotes:     { label: 'Wesco Meeting Notes', icon: '📝', desc: 'Company and project meeting notes',      url: '', personAware: false },

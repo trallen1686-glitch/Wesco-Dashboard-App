@@ -6,6 +6,6 @@
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Content-Security-Policy": "frame-ancestors 'self' https://*.powerapps.com https://*.powerappsportals.com https://*.dynamics.com"
+    "Content-Security-Policy": "frame-ancestors 'self' https://*.powerapps.com https://*.powerplatform.com https://*.powerappsportals.com https://*.dynamics.com"
   }
 }
