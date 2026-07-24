@@ -24,6 +24,17 @@ Pages using Microsoft sign-in need their exact deployed URLs listed as Single-pa
 
 The Projects page requests the delegated Microsoft Graph permissions `User.Read`, `Sites.Read.All`, and `Files.ReadWrite.All`. The page uses the write permission only to upload files into the currently open folder under `Documents / We App / Projects`; it does not expose delete, rename, or move actions. An Entra administrator must grant consent before staff uploads will work.
 
+The staff portal's embedded file browser also needs both of these exact
+Single-page application redirect URIs:
+
+- `https://www.wescodashboardapp.com/Wesco-Hub-Files.html`
+- `https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco-Hub-Files.html`
+
+`Wesco-Hub-Files.html` uses the same delegated permissions. It can create a
+project or document subfolder in its configured SharePoint location and upload
+files into the folder currently open on screen. It does not expose delete,
+rename, or move actions.
+
 ## Deployment layout
 
 - App location: `/`

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wesco Hub Files</title>
+  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.1/lib/msal-browser.min.js"></script>
+  <style>
+    :root{
+      --orange:#f36a00;--orange-light:#ff9a4d;--bg:#080d10;
+      --panel:rgba(9,14,16,.82);--line:rgba(255,255,255,.14);
+      --text:#fff;--muted:rgba(255,255,255,.72);--danger:#ff6b6b;
+    }
+    *{box-sizing:border-box} html{color-scheme:dark}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Arial,Helvetica,sans-serif;
+      background-color:var(--bg);background-image:linear-gradient(115deg,rgba(6,10,12,.97),rgba(9,14,16,.82) 45%,rgba(9,14,16,.95)),radial-gradient(circle at 72% 18%,rgba(243,106,0,.12),transparent 34%)}
+    button,input{font:inherit}
+    header{position:sticky;top:0;z-index:10;background:rgba(4,8,10,.9);border-bottom:3px solid var(--orange);backdrop-filter:blur(10px)}
+    .header-inner{width:min(1500px,calc(100% - 32px));min-height:84px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    h1,h2,p{margin-top:0} h1{margin-bottom:4px;font-size:clamp(24px,4vw,36px)} .subtitle{margin:0;color:var(--orange-light)}
+    .account{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    button{min-height:42px;padding:10px 15px;border:1px solid var(--orange);border-radius:9px;color:#fff;background:var(--orange);font-weight:800;cursor:pointer}
+    button:hover{background:#ff7a14} button.secondary{background:rgba(255,255,255,.07);border-color:var(--line)}
+    button.secondary:hover{border-color:var(--orange);color:var(--orange-light)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    main{width:min(1500px,calc(100% - 32px));margin:24px auto 50px}
+    .signin{min-height:420px;display:flex;align-items:center;justify-content:center}
+    .signin-card{width:min(560px,100%);padding:30px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+    .signin-card p{color:var(--muted);line-height:1.6}
+    .workspace{display:none;grid-template-columns:minmax(270px,360px) minmax(0,1fr);min-height:620px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.42)}
+    .workspace.show{display:grid}
+    aside{min-width:0;border-right:1px solid var(--line);background:rgba(3,7,9,.55);display:flex;flex-direction:column}
+    .pane-head{padding:18px;border-bottom:1px solid var(--line)}
+    .pane-title{font-size:18px;font-weight:800;margin-bottom:5px}.pane-help{font-size:12px;color:var(--muted)}
+    .add-row{display:flex;gap:8px;margin-top:14px}.add-row button{width:100%}
+    .folder-list{padding:10px;overflow:auto;max-height:560px}
+    .folder-item,.file-item{width:100%;display:grid;align-items:center;text-align:left;border:1px solid transparent;background:transparent;color:#fff}
+    .folder-item{grid-template-columns:35px minmax(0,1fr) auto;gap:8px;padding:12px;border-radius:9px}
+    .folder-item:hover,.folder-item.active{background:rgba(243,106,0,.11);border-color:rgba(243,106,0,.45)}
+    .folder-name,.file-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+    .count,.file-meta{font-size:11px;color:var(--muted);font-weight:400}
+    .content{min-width:0;display:flex;flex-direction:column}
+    .content-head{padding:18px 20px;border-bottom:1px solid var(--line)}
+    .content-actions{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .breadcrumb{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-height:42px}
+    .breadcrumb button{min-height:0;padding:0;border:0;background:none;color:var(--orange-light)}
+    .search{width:min(320px,100%);padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:rgba(3,7,9,.78);color:#fff}
+    .file-list{padding:12px;overflow:auto}
+    .file-item{grid-template-columns:42px minmax(0,1fr) auto;gap:10px;padding:13px;border-radius:9px;border-bottom-color:var(--line)}
+    .file-item:hover{background:rgba(243,106,0,.08);border-color:rgba(243,106,0,.25)}
+    .icon{font-size:23px}.open{color:var(--orange-light);font-size:12px;font-weight:800}
+    .state{padding:42px 24px;text-align:center;color:var(--muted)}.state strong{display:block;color:#fff;font-size:18px;margin-bottom:7px}
+    .status{min-height:22px;padding:0 18px 14px;font-size:12px;color:var(--muted)}.status.ok{color:#68d391}.status.err{color:var(--danger)}
+    dialog{width:min(520px,calc(100% - 28px));padding:0;border:1px solid var(--line);border-radius:14px;color:#fff;background:#10181c}
+    dialog::backdrop{background:rgba(0,0,0,.75)}.dialog-head{padding:18px 20px;border-bottom:3px solid var(--orange)}
+    .dialog-body{padding:20px}.dialog-body label{display:block;margin-bottom:7px;font-weight:800}
+    .dialog-body input{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:#071014;color:#fff}
+    .dialog-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+    @media(max-width:800px){header{position:static}.header-inner{padding:15px 0;align-items:flex-start;flex-direction:column}.account{justify-content:flex-start}.workspace.show{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}.folder-list{max-height:280px}.content-actions{align-items:stretch;flex-direction:column}.search{width:100%;max-width:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div><h1 id="pageTitle">Wesco Hub Files</h1><p class="subtitle" id="pageSubtitle">Live files from Wesco SharePoint</p></div>
+      <div class="account">
+        <span id="accountName"></span>
+        <button id="signInTop" type="button">Sign in</button>
+        <button id="signOut" class="secondary" type="button" hidden>Sign out</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section id="signinGate" class="signin">
+      <div class="signin-card">
+        <h2>Sign in to Microsoft 365</h2>
+        <p>This page displays Wesco SharePoint folders inside the staff portal. Sign in with your Wesco account to browse files and add folders without navigating to SharePoint.</p>
+        <button id="signInGateBtn" type="button">Sign in with Microsoft</button>
+        <p id="signinStatus"></p>
+      </div>
+    </section>
+    <section id="workspace" class="workspace">
+      <aside>
+        <div class="pane-head">
+          <div class="pane-title" id="listTitle">Projects</div>
+          <div class="pane-help" id="listHelp">Select a folder to see its files.</div>
+          <div class="add-row"><button id="addFolderBtn" type="button">+ Add Project</button></div>
+        </div>
+        <div id="folderList" class="folder-list"></div>
+      </aside>
+      <div class="content">
+        <div class="content-head">
+          <div class="content-actions">
+            <div id="breadcrumb" class="breadcrumb"><strong>Select a folder</strong></div>
+            <div>
+              <button id="uploadBtn" type="button" disabled>+ Add Files</button>
+              <input id="uploadInput" type="file" multiple hidden>
+            </div>
+          </div>
+          <input id="search" class="search" type="search" placeholder="Search files and folders" disabled>
+        </div>
+        <div id="fileList" class="file-list"><div class="state"><strong>No folder selected</strong>Choose an item from the left.</div></div>
+        <div id="status" class="status"></div>
+      </div>
+    </section>
+  </main>
+  <dialog id="addDialog">
+    <form method="dialog" id="addFolderForm">
+      <div class="dialog-head"><h2 id="dialogTitle">Add Project</h2></div>
+      <div class="dialog-body">
+        <label for="folderName" id="folderNameLabel">Project name</label>
+        <input id="folderName" maxlength="120" required autocomplete="off">
+        <div class="dialog-actions">
+          <button value="cancel" class="secondary" type="button" id="cancelDialog">Cancel</button>
+          <button value="default" type="submit">Create Folder</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+  <script>
+  (function(){
+    'use strict';
+    var params=new URLSearchParams(location.search);
+    var library=params.get('library')||'all-projects';
+    var person=(params.get('person')||'').trim();
+    var PROJECTS={
+      'all-projects':{title:'All Projects',root:'We App/Projects/All Projects'},
+      'active-projects':{title:'Active Projects',root:'We App/Projects/Active Projects'},
+      'bidding-projects':{title:'Pending / Bidding Projects',root:'We App/Projects/Bidding Projects'}
+    };
+    var isDocuments=library==='document-upload';
+    var config=PROJECTS[library]||PROJECTS['all-projects'];
+    var rootPath=config.root;
+    var rootItems=[],currentItems=[],pathStack=[],selectedRootName='';
+    var msalInstance=null,activeAccount=null,siteIdCache=null;
+    var msalConfig={auth:{clientId:'945e4897-7055-4420-b5a8-ece83b8a96bf',authority:'https://login.microsoftonline.com/5bfae2d1-ca2b-45bc-850a-90de45c02287',redirectUri:location.protocol==='file:'?'https://www.wescodashboardapp.com/Wesco-Hub-Files.html':location.origin+location.pathname},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}};
+    var SCOPES=['User.Read','Sites.Read.All','Files.ReadWrite.All'];
+    var HOST='wesconc.sharepoint.com',SITE_PATH='/sites/Wesco';
+    function $(id){return document.getElementById(id)}
+    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+    function enc(path){return path.split('/').map(encodeURIComponent).join('/')}
+    function setStatus(text,state){$('status').textContent=text||'';$('status').className='status'+(state?' '+state:'')}
+    function signinStatus(text,error){$('signinStatus').textContent=text||'';$('signinStatus').style.color=error?'#ff6b6b':''}
+    function loadScript(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+    async function ensureMsal(){if(typeof msal!=='undefined')return;await loadScript('https://unpkg.com/@azure/msal-browser@2.38.1/lib/msal-browser.min.js');if(typeof msal==='undefined')throw new Error('Microsoft sign-in library did not load.')}
+    async function init(){
+      configurePage();
+      try{await ensureMsal();msalInstance=new msal.PublicClientApplication(msalConfig);await msalInstance.handleRedirectPromise().catch(function(){});var accounts=msalInstance.getAllAccounts();if(accounts.length){activeAccount=accounts[0];msalInstance.setActiveAccount(activeAccount);await onSignedIn()}}
+      catch(e){signinStatus(e.message||String(e),true)}
+    }
+    function configurePage(){
+      var title=isDocuments?(person?person+' — Document Uploads':'Staff Document Uploads'):config.title;
+      document.title=title+' | Wesco Exteriors';$('pageTitle').textContent=title;
+      $('pageSubtitle').textContent=isDocuments?'Documents / We App / Internal Staff':'Documents / We App / Projects';
+      $('listTitle').textContent=isDocuments?'Document Folders':config.title;
+      $('listHelp').textContent=isDocuments?'Select a document folder to view its contents.':'Select a project to view its files and folders.';
+      $('addFolderBtn').textContent=isDocuments?'+ Add Document Folder':'+ Add Project';
+      $('dialogTitle').textContent=isDocuments?'Add Document Folder':'Add Project';
+      $('folderNameLabel').textContent=isDocuments?'Document folder name':'Project name';
+    }
+    async function signIn(){
+      signinStatus('Opening Microsoft sign-in…',false);
+      try{var result=await msalInstance.loginPopup({scopes:SCOPES});activeAccount=result.account;msalInstance.setActiveAccount(activeAccount);await onSignedIn()}
+      catch(e){signinStatus('Sign-in did not complete: '+(e.message||String(e)),true)}
+    }
+    function signOut(){if(msalInstance)msalInstance.logoutPopup({account:activeAccount}).catch(function(){});location.reload()}
+    async function token(){try{return(await msalInstance.acquireTokenSilent({scopes:SCOPES,account:activeAccount})).accessToken}catch(e){var r=await msalInstance.acquireTokenPopup({scopes:SCOPES});activeAccount=r.account;return r.accessToken}}
+    async function graph(url,options){
+      options=options||{};options.headers=Object.assign({Authorization:'Bearer '+await token()},options.headers||{});
+      var res=await fetch(url,options);if(!res.ok){var t=await res.text().catch(function(){return''});throw new Error('Microsoft Graph '+res.status+(t?': '+t.slice(0,180):''))}
+      if(res.status===204)return{};return res.json();
+    }
+    async function siteId(){if(siteIdCache)return siteIdCache;siteIdCache=(await graph('https://graph.microsoft.com/v1.0/sites/'+HOST+':'+SITE_PATH)).id;return siteIdCache}
+    async function listChildren(path){
+      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path)+':/children?$select=id,name,webUrl,folder,file,lastModifiedDateTime&$top=400',items=[];
+      while(url){var data=await graph(url);items=items.concat(data.value||[]);url=data['@odata.nextLink']||null}
+      return items.sort(function(a,b){if(!!a.folder!==!!b.folder)return a.folder?-1:1;return a.name.localeCompare(b.name)})
+    }
+    async function resolveDocumentRoot(){
+      if(!person)throw new Error('The staff member name is missing from this link.');
+      var staff=await listChildren('We App/Internal Staff'),match=staff.find(function(item){return item.folder&&item.name.toLowerCase()===person.toLowerCase()});
+      if(!match)throw new Error('No Internal Staff folder was found for '+person+'.');
+      rootPath='We App/Internal Staff/'+match.name+'/Document Upload';
+    }
+    async function onSignedIn(){
+      $('accountName').textContent=activeAccount.name||activeAccount.username||'Signed in';$('signInTop').hidden=true;$('signOut').hidden=false;$('signinGate').style.display='none';$('workspace').classList.add('show');
+      try{if(isDocuments)await resolveDocumentRoot();await refreshRoot()}
+      catch(e){$('folderList').innerHTML='<div class="state"><strong>Could not load folders</strong>'+esc(e.message||String(e))+'</div>'}
+    }
+    async function refreshRoot(preselect){
+      $('folderList').innerHTML='<div class="state">Loading folders…</div>';rootItems=(await listChildren(rootPath)).filter(function(i){return !!i.folder});renderRoot();
+      if(preselect){var match=rootItems.find(function(i){return i.name===preselect});if(match)openRootFolder(match)}
+    }
+    function renderRoot(){
+      if(!rootItems.length){$('folderList').innerHTML='<div class="state"><strong>No folders yet</strong>Use the add button above to create one.</div>';return}
+      $('folderList').innerHTML=rootItems.map(function(item,i){return'<button type="button" class="folder-item'+(item.name===selectedRootName?' active':'')+'" data-index="'+i+'"><span class="icon">📁</span><span class="folder-name">'+esc(item.name)+'</span><span class="count">'+(item.folder.childCount||0)+'</span></button>'}).join('');
+      Array.prototype.forEach.call($('folderList').querySelectorAll('.folder-item'),function(btn){btn.addEventListener('click',function(){openRootFolder(rootItems[Number(btn.getAttribute('data-index'))])})})
+    }
+    function openRootFolder(item){selectedRootName=item.name;pathStack=[{label:item.name,path:rootPath+'/'+item.name}];renderRoot();loadCurrent()}
+    function renderBreadcrumb(){
+      $('breadcrumb').innerHTML=pathStack.map(function(node,i){if(i===pathStack.length-1)return'<strong>'+esc(node.label)+'</strong>';return'<button type="button" data-index="'+i+'">'+esc(node.label)+'</button><span>/</span>'}).join('');
+      Array.prototype.forEach.call($('breadcrumb').querySelectorAll('button'),function(btn){btn.addEventListener('click',function(){pathStack=pathStack.slice(0,Number(btn.getAttribute('data-index'))+1);loadCurrent()})})
+    }
+    async function loadCurrent(){
+      renderBreadcrumb();$('search').disabled=false;$('search').value='';$('uploadBtn').disabled=false;$('fileList').innerHTML='<div class="state">Loading files…</div>';
+      try{currentItems=await listChildren(pathStack[pathStack.length-1].path);renderFiles('')}catch(e){$('fileList').innerHTML='<div class="state"><strong>Could not load this folder</strong>'+esc(e.message||String(e))+'</div>'}
+    }
+    function renderFiles(term){
+      var items=currentItems.filter(function(i){return !term||i.name.toLowerCase().indexOf(term.toLowerCase())>=0});
+      if(!items.length){$('fileList').innerHTML='<div class="state"><strong>'+(currentItems.length?'No matches':'This folder is empty')+'</strong>'+(currentItems.length?'Try another search.':'Use Add Files to upload documents.')+'</div>';return}
+      $('fileList').innerHTML=items.map(function(item,i){var folder=!!item.folder;return'<button type="button" class="file-item" data-index="'+i+'"><span class="icon">'+(folder?'📁':'📄')+'</span><span><span class="file-name">'+esc(item.name)+'</span><span class="file-meta">'+(folder?(item.folder.childCount||0)+' items':'Updated '+new Date(item.lastModifiedDateTime).toLocaleDateString())+'</span></span><span class="open">'+(folder?'Open':'View file')+'</span></button>'}).join('');
+      Array.prototype.forEach.call($('fileList').querySelectorAll('.file-item'),function(btn){btn.addEventListener('click',function(){var item=items[Number(btn.getAttribute('data-index'))];if(item.folder){pathStack.push({label:item.name,path:pathStack[pathStack.length-1].path+'/'+item.name});loadCurrent()}else window.open(item.webUrl,'_blank','noopener')})})
+    }
+    async function createFolder(name){
+      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(rootPath)+':/children';
+      await graph(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,folder:{},'@microsoft.graph.conflictBehavior':'fail'})});
+    }
+    async function submitFolder(e){
+      e.preventDefault();var name=$('folderName').value.trim();if(!name)return;
+      try{setStatus('Creating '+name+'…','');await createFolder(name);$('addDialog').close();$('folderName').value='';await refreshRoot(name);setStatus(name+' was created in SharePoint.','ok')}
+      catch(err){setStatus(err.message||String(err),'err')}
+    }
+    async function uploadFile(path,file){
+      var url='https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path+'/'+file.name)+':/content?@microsoft.graph.conflictBehavior=rename';
+      if(file.size<=4000000){await graph(url,{method:'PUT',headers:{'Content-Type':file.type||'application/octet-stream'},body:file});return}
+      var session=await graph('https://graph.microsoft.com/v1.0/sites/'+await siteId()+'/drive/root:/'+enc(path+'/'+file.name)+':/createUploadSession',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item:{'@microsoft.graph.conflictBehavior':'rename',name:file.name}})});
+      var size=10*320*1024,start=0;while(start<file.size){var end=Math.min(start+size,file.size),res=await fetch(session.uploadUrl,{method:'PUT',headers:{'Content-Range':'bytes '+start+'-'+(end-1)+'/'+file.size},body:file.slice(start,end)});if(!(res.ok||res.status===202))throw new Error('Upload stopped for '+file.name);start=end}
+    }
+    async function uploadSelected(){
+      var files=Array.prototype.slice.call($('uploadInput').files||[]);if(!files.length||!pathStack.length)return;$('uploadBtn').disabled=true;
+      try{for(var i=0;i<files.length;i++){setStatus('Uploading '+files[i].name+'…','');await uploadFile(pathStack[pathStack.length-1].path,files[i])}await loadCurrent();setStatus(files.length+' file'+(files.length===1?'':'s')+' uploaded.','ok')}
+      catch(e){setStatus(e.message||String(e),'err')}finally{$('uploadInput').value='';$('uploadBtn').disabled=false}
+    }
+    document.addEventListener('DOMContentLoaded',function(){
+      init();$('signInTop').addEventListener('click',signIn);$('signInGateBtn').addEventListener('click',signIn);$('signOut').addEventListener('click',signOut);
+      $('addFolderBtn').addEventListener('click',function(){$('addDialog').showModal();$('folderName').focus()});$('cancelDialog').addEventListener('click',function(){$('addDialog').close()});
+      $('addFolderForm').addEventListener('submit',submitFolder);$('uploadBtn').addEventListener('click',function(){$('uploadInput').click()});$('uploadInput').addEventListener('change',uploadSelected);
+      $('search').addEventListener('input',function(){renderFiles(this.value.trim())});
+    });
+  })();
+  </script>
+</body>
+</html>
