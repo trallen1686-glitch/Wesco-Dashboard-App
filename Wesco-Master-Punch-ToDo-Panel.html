@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Punch List Tasks</title>
+  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.1/lib/msal-browser.min.js"></script>
+  <style>
+    :root{
+      color-scheme:dark;
+      --orange:#f36a00;
+      --orange-light:#ff9a4d;
+      --panel:rgba(9,14,16,.82);
+      --line:rgba(255,255,255,.14);
+      --text:#fff;
+      --muted:rgba(255,255,255,.68);
+      --danger:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden}
+    body{
+      color:var(--text);
+      font-family:"Open Sans",Arial,Helvetica,sans-serif;
+      background:var(--panel);
+    }
+    button,a{font:inherit}
+    .panel{height:100%;display:flex;flex-direction:column;border-top:1px solid rgba(243,106,0,.32)}
+    .bar{
+      min-height:34px;padding:6px 9px;display:flex;align-items:center;gap:7px;
+      border-bottom:1px solid var(--line);background:rgba(4,8,10,.62);
+    }
+    .title{min-width:0;flex:1;font-size:11px;font-weight:800;letter-spacing:.035em;text-transform:uppercase}
+    .count{color:var(--orange-light);font-size:10px;font-weight:800}
+    .action{
+      min-height:24px;padding:4px 7px;border:1px solid rgba(243,106,0,.62);border-radius:5px;
+      color:#fff;background:rgba(243,106,0,.18);font-size:10px;font-weight:800;text-decoration:none;cursor:pointer;
+    }
+    .action:hover,.action:focus{background:var(--orange);outline:none}
+    .tasks{min-height:0;flex:1;overflow-y:auto;scrollbar-color:var(--orange) rgba(255,255,255,.06)}
+    .task{
+      display:grid;grid-template-columns:17px minmax(0,1fr) auto;gap:7px;align-items:center;
+      min-height:38px;padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.08);
+      color:#fff;text-decoration:none;background:rgba(9,14,16,.28);
+    }
+    .task:hover,.task:focus{background:rgba(243,106,0,.12);outline:none}
+    .check{width:14px;height:14px;border:1px solid var(--orange);border-radius:50%}
+    .task-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700}
+    .meta{color:var(--muted);font-size:9px;white-space:nowrap}
+    .important .check{background:var(--orange);box-shadow:inset 0 0 0 3px #11191d}
+    .state{
+      min-height:0;flex:1;display:flex;align-items:center;justify-content:center;
+      padding:14px;text-align:center;color:var(--muted);font-size:11px;line-height:1.45;
+    }
+    .state.error{color:var(--danger)}
+    .signin{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .signin .action{min-height:30px;padding:6px 11px;background:var(--orange)}
+    @media print{body{display:none}}
+  </style>
+</head>
+<body>
+  <section class="panel" aria-label="Master Punch List Microsoft To Do tasks">
+    <header class="bar">
+        <span class="title">Microsoft To Do</span>
+      <span class="count" id="taskCount"></span>
+      <button class="action" id="refreshBtn" type="button" hidden>Refresh</button>
+      <a class="action" id="openTodo" target="_blank" rel="noopener">Open in To Do</a>
+    </header>
+    <div class="state" id="state">
+      <div class="signin">
+        <span>Sign in to load the Master Punch List.</span>
+        <button class="action" id="signInBtn" type="button">Sign in</button>
+      </div>
+    </div>
+    <div class="tasks" id="taskList" hidden></div>
+  </section>
+  <script>
+  (function(){
+    'use strict';
+    var TODO_URL='https://to-do.office.com/tasks/AQMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgAuAAADug1uys4PrEuQXED6qOMjzQEApFTVRWPTN0OAHHwFRbnXIAABDWwlRwAAAA==';
+    var LIST_ID='AQMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgAuAAADug1uys4PrEuQXED6qOMjzQEApFTVRWPTN0OAHHwFRbnXIAABDWwlRwAAAA==';
+    var SCOPES=['User.Read','Tasks.Read'];
+    var auth=null,account=null;
+    var config={auth:{
+      clientId:'945e4897-7055-4420-b5a8-ece83b8a96bf',
+      authority:'https://login.microsoftonline.com/5bfae2d1-ca2b-45bc-850a-90de45c02287',
+      redirectUri:location.protocol==='file:'
+        ? 'https://www.wescodashboardapp.com/Wesco-Master-Punch-ToDo-Panel.html'
+        : location.origin+location.pathname
+    },cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}};
+    function $(id){return document.getElementById(id)}
+    function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+    function showState(message,error,showSignin){
+      $('taskList').hidden=true;$('state').hidden=false;$('taskCount').textContent='';$('refreshBtn').hidden=true;
+      $('state').className='state'+(error?' error':'');
+      $('state').innerHTML=showSignin
+        ? '<div class="signin"><span>'+esc(message)+'</span><button class="action" id="dynamicSignIn" type="button">Sign in</button></div>'
+        : esc(message);
+      var button=$('dynamicSignIn');if(button)button.addEventListener('click',signIn);
+    }
+    function dueLabel(task){
+      if(!task.dueDateTime||!task.dueDateTime.dateTime)return'';
+      var date=new Date(task.dueDateTime.dateTime);
+      return isNaN(date.getTime())?'':date.toLocaleDateString([], {month:'short',day:'numeric'});
+    }
+    function render(tasks){
+      var open=tasks.filter(function(task){return task.status!=='completed'});
+      open.sort(function(a,b){
+        if(a.importance!==b.importance)return a.importance==='high'?-1:1;
+        var ad=a.dueDateTime&&a.dueDateTime.dateTime||'9999',bd=b.dueDateTime&&b.dueDateTime.dateTime||'9999';
+        return ad.localeCompare(bd)||a.title.localeCompare(b.title);
+      });
+      $('state').hidden=true;$('taskList').hidden=false;$('refreshBtn').hidden=false;
+      $('taskCount').textContent=open.length+' open';
+      $('taskList').innerHTML=open.length?open.map(function(task){
+        var important=task.importance==='high',due=dueLabel(task);
+        return '<a class="task'+(important?' important':'')+'" href="'+TODO_URL+'" target="_blank" rel="noopener">'+
+          '<span class="check" aria-hidden="true"></span>'+
+          '<span class="task-title">'+esc(task.title||'Untitled task')+'</span>'+
+          '<span class="meta">'+esc(due||(important?'Important':''))+'</span>'+
+        '</a>';
+      }).join(''):'<div class="state">No open punch-list tasks.</div>';
+    }
+    async function token(){
+      try{return(await auth.acquireTokenSilent({scopes:SCOPES,account:account})).accessToken}
+      catch(e){var result=await auth.acquireTokenPopup({scopes:SCOPES});account=result.account;return result.accessToken}
+    }
+    async function loadTasks(){
+      showState('Loading Microsoft To Do tasks...',false,false);
+      try{
+        var accessToken=await token();
+        var url='https://graph.microsoft.com/v1.0/me/todo/lists/'+encodeURIComponent(LIST_ID)+'/tasks?$top=100&$select=id,title,status,importance,dueDateTime';
+        var response=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+        if(!response.ok)throw new Error('Microsoft To Do returned '+response.status+'.');
+        render((await response.json()).value||[]);
+      }catch(e){showState(e.message||String(e),true,true)}
+    }
+    async function signIn(){
+      try{var result=await auth.loginPopup({scopes:SCOPES});account=result.account;auth.setActiveAccount(account);await loadTasks()}
+      catch(e){showState('Sign-in did not complete. Open the list in Microsoft To Do or try again.',true,true)}
+    }
+    async function init(){
+      $('openTodo').href=TODO_URL;$('signInBtn').addEventListener('click',signIn);$('refreshBtn').addEventListener('click',loadTasks);
+      try{
+        auth=new msal.PublicClientApplication(config);await auth.handleRedirectPromise().catch(function(){});
+        var accounts=auth.getAllAccounts();
+        if(accounts.length){account=accounts[0];auth.setActiveAccount(account);await loadTasks()}
+      }catch(e){showState('Microsoft sign-in could not start.',true,true)}
+    }
+    document.addEventListener('DOMContentLoaded',init);
+  })();
+  </script>
+</body>
+</html>
