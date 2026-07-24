@@ -10,9 +10,9 @@ function getMsalClient() {
   if (!msalClient) {
     msalClient = new ConfidentialClientApplication({
       auth: {
-        clientId: process.env.GRAPH_CLIENT_ID,
-        authority: `https://login.microsoftonline.com/${process.env.GRAPH_TENANT_ID}`,
-        clientSecret: process.env.GRAPH_CLIENT_SECRET,
+        clientId: process.env.EQUIPMENT_GRAPH_CLIENT_ID,
+        authority: `https://login.microsoftonline.com/${process.env.EQUIPMENT_GRAPH_TENANT_ID}`,
+        clientSecret: process.env.EQUIPMENT_GRAPH_CLIENT_SECRET,
       },
     });
   }

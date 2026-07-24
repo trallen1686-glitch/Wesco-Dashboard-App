@@ -3,9 +3,9 @@
   "Values": {
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "GRAPH_CLIENT_ID": "<app registration client id>",
-    "GRAPH_CLIENT_SECRET": "<app registration client secret - never commit the real value>",
-    "GRAPH_TENANT_ID": "<your Azure AD tenant id>",
+    "EQUIPMENT_GRAPH_CLIENT_ID": "<app registration client id>",
+    "EQUIPMENT_GRAPH_CLIENT_SECRET": "<app registration client secret - never commit the real value>",
+    "EQUIPMENT_GRAPH_TENANT_ID": "<your Azure AD tenant id>",
     "EXCEL_DRIVE_ID": "b!h9QHU6-BmEyZ2A-UpX9Mj3ugFNVf2RVFsGlXBkALgPm4W2vSwhvZRKs6Or0rMkyp",
     "EXCEL_ITEM_ID": "01JQO4HBRNQHWFD7YSVNAIBOZ4AWL2BOQD"
   }
