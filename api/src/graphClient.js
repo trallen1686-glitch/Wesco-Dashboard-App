@@ -7,6 +7,7 @@ const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 const WORKBOOKS = {
   equipment: { driveId: process.env.EXCEL_DRIVE_ID, itemId: process.env.EXCEL_ITEM_ID },
   trailer: { driveId: process.env.TRAILER_EXCEL_DRIVE_ID, itemId: process.env.TRAILER_EXCEL_ITEM_ID },
+  vehicle: { driveId: process.env.VEHICLE_EXCEL_DRIVE_ID, itemId: process.env.VEHICLE_EXCEL_ITEM_ID },
 };
 
 function workbookBase(workbookKey) {
