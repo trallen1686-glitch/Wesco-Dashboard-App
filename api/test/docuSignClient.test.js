@@ -132,4 +132,6 @@ test("browser payload sends the PO separately and removes the nested PDF preview
     /Purchase Order attached as a separate Docusign document:/
   );
   assert.match(source, /poPreview\.innerHTML = ''/);
+  assert.match(source, /Envelope: ' \+ docusignData\.envelopeId/);
+  assert.match(source, /docusignData\.code/);
 });

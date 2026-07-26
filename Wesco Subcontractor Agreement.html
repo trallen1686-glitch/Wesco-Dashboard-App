@@ -2127,12 +2127,17 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
             '" target="_blank" rel="noopener" style="color:#ff9d55;">Grant Docusign consent</a>, then submit again.';
           throw new Error('Docusign administrator consent is required.');
         }
-        throw new Error(docusignData.error || 'Docusign could not send the agreement.');
+        throw new Error(
+          (docusignData.error || 'Docusign could not send the agreement.') +
+          (docusignData.code ? ' [' + docusignData.code + ']' : '')
+        );
       }
       AppState.docusignEnvelopeId = docusignData.envelopeId;
       envelopeSent = true;
       saveCurrentState();
-      status.textContent = 'Docusign sent. Saving the sent agreement to SharePoint…';
+      status.textContent =
+        'Docusign sent. Envelope ' + docusignData.envelopeId +
+        '. Saving the sent agreement to SharePoint…';
       var sessionResponse = await fetch('/api/subcontractor-agreements', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
@@ -2144,12 +2149,20 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       }
       await uploadBlobInChunks(sessionData.uploadUrl, payload.blob, status);
       closeSubcontractorModal();
-      showToast('Sent through Docusign to ' + recipientLabel + ' for signature.', 'ok');
+      showToast(
+        'Sent through Docusign to ' + recipientLabel +
+        '. Envelope: ' + docusignData.envelopeId,
+        'ok'
+      );
     } catch(e){
       if(envelopeSent){
         saveCurrentState();
         closeSubcontractorModal();
-        showToast('Docusign sent the agreement, but the SharePoint sent copy needs attention.', 'err');
+        showToast(
+          'Docusign envelope ' + AppState.docusignEnvelopeId +
+          ' was sent, but the SharePoint sent copy needs attention.',
+          'err'
+        );
         return;
       }
       AppState.stage = previousStage;
