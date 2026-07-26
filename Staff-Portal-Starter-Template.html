@@ -564,6 +564,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     if(p.name === 'Wes Atkinson'){
       delete activeTabs.masterTaskList;
       delete activeTabs.executiveTaskList;
+      if(!signedInPerson || signedInPerson.name !== 'Wes Atkinson') delete activeTabs.masterToDoList;
     }
     var unreadTotal = getTotalUnreadFor(p.name);
 
