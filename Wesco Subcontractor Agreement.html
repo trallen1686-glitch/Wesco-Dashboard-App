@@ -1477,7 +1477,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 <div class="route-modal screen-only" id="subcontractorModal" hidden>
   <div class="route-dialog" role="dialog" aria-modal="true" aria-labelledby="routeDialogTitle">
     <h3 id="routeDialogTitle">Send for Subcontractor Review &amp; Signature</h3>
-    <p>Choose the subcontractor and confirm the Wesco signer. The subcontractor email comes directly from the agreement. Wesco signs first in Docusign; then Docusign emails the subcontractor to complete their information and signature.</p>
+    <p>Choose the subcontractor, confirm the Wesco signer, then type the subcontractor signer name and email. Both subcontractor signer boxes start blank for every submission. Wesco signs first in Docusign; then Docusign emails the subcontractor.</p>
     <label for="subcontractorFolderSelect">Subcontractor</label>
     <select id="subcontractorFolderSelect">
       <option value="">Loading subcontractors…</option>
@@ -1496,9 +1496,13 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         <label for="docusignContractorEmail">Wesco signer email</label>
         <input type="email" id="docusignContractorEmail" autocomplete="email">
       </div>
-      <div class="route-field-wide">
-        <label for="docusignSubcontractorEmail">Subcontractor signer email — from the agreement</label>
-        <input type="email" id="docusignSubcontractorEmail" autocomplete="email" readonly>
+      <div>
+        <label for="docusignSubcontractorName">Subcontractor signer name</label>
+        <input type="text" id="docusignSubcontractorName" autocomplete="off" placeholder="Type the signer’s full name">
+      </div>
+      <div>
+        <label for="docusignSubcontractorEmail">Subcontractor signer email</label>
+        <input type="email" id="docusignSubcontractorEmail" autocomplete="off" placeholder="Type the signer’s email">
       </div>
     </div>
     <div class="route-status" id="subcontractorRouteStatus" aria-live="polite"></div>
@@ -1986,7 +1990,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     $('otherSubcontractorName').value = '';
     $('docusignContractorName').value =
       $('contractorBy').value.trim() || $('contractorTypedSig').value.trim();
-    $('docusignSubcontractorEmail').value = $('prepSubEmail').value.trim();
+    $('docusignSubcontractorName').value = '';
+    $('docusignSubcontractorEmail').value = '';
     loadCurrentWescoSigner();
     loadSubcontractorFolders().then(function(){ $('subcontractorFolderSelect').focus(); });
   }
@@ -2016,6 +2021,14 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   }
 
   function onSubmitForSignature(){
+    if(location.hostname === '127.0.0.1' || location.hostname === 'localhost'){
+      var liveUrl = 'https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco%20Subcontractor%20Agreement.html';
+      if(window.confirm('This is the local preview and cannot send to Docusign. Open the live Wesco agreement now?')){
+        window.open(liveUrl, '_blank', 'noopener');
+      }
+      showToast('Use the live Wesco agreement to submit for signature.', 'err');
+      return;
+    }
     clearMissingHighlights();
     var missing = validateGroup(PREPARER_REQUIRED);
     if(!AppState.poFile) missing.push('Purchase order upload (Section 1.1)');
@@ -2046,12 +2059,19 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     }
     var destinationFolder = isOther ? 'Others' : selected;
     var recipientLabel = isOther ? otherName : selected;
-    var email = $('prepSubEmail').value.trim();
     var contractorName = $('docusignContractorName').value.trim();
     var contractorEmail = $('docusignContractorEmail').value.trim();
-    var subcontractorEmail = email;
-    if(!contractorName || !contractorEmail || !subcontractorEmail){
+    var subcontractorName = $('docusignSubcontractorName').value.trim();
+    var subcontractorEmail = $('docusignSubcontractorEmail').value.trim();
+    if(!contractorName || !contractorEmail || !subcontractorName || !subcontractorEmail){
       status.textContent = 'Confirm the Wesco signer and subcontractor signer name and email.';
+      if(!subcontractorName) $('docusignSubcontractorName').focus();
+      else if(!subcontractorEmail) $('docusignSubcontractorEmail').focus();
+      return;
+    }
+    if(!$('docusignSubcontractorEmail').checkValidity()){
+      status.textContent = 'Type a valid subcontractor signer email address.';
+      $('docusignSubcontractorEmail').focus();
       return;
     }
     if(contractorEmail.toLowerCase() === subcontractorEmail.toLowerCase()){
@@ -2060,7 +2080,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     }
     var confirmMsg = 'Send this agreement to ' + recipientLabel + '?\n\n' +
       'Wesco signer: ' + contractorName + ' <' + contractorEmail + '>\n' +
-      'Subcontractor signer: ' + subcontractorEmail + '\n' +
+      'Subcontractor signer: ' + subcontractorName + ' <' + subcontractorEmail + '>\n' +
       'Docusign: Wesco completes the left side first; the subcontractor then completes the right side\n' +
       'Sent copy: Documents/We App/Internal Staff/Rebecca Kirkman/Saved Subcontractors Agreements/Sent for Signature\n' +
       'Completed copy: Documents/We App/Subcontractors/' + destinationFolder;
@@ -2085,7 +2105,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         headers:{ 'Content-Type':'application/json' },
         body:JSON.stringify({
           subcontractor:destinationFolder,
-          subcontractorName:$('subLegalName').value.trim() || recipientLabel,
+          subcontractorName:subcontractorName,
           subcontractorEmail:subcontractorEmail,
           contractorName:contractorName,
           contractorEmail:contractorEmail,
