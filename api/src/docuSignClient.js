@@ -39,7 +39,12 @@ function getSecretClient() {
 
 async function getPrivateKey() {
   if (process.env.DOCUSIGN_PRIVATE_KEY) {
-    return process.env.DOCUSIGN_PRIVATE_KEY.replace(/\\n/g, "\n");
+    const configuredKey = process.env.DOCUSIGN_PRIVATE_KEY.trim();
+    if (/^[A-Za-z0-9+/=]+$/.test(configuredKey)) {
+      const decodedKey = Buffer.from(configuredKey, "base64").toString("utf8");
+      if (decodedKey.includes("PRIVATE KEY")) return decodedKey;
+    }
+    return configuredKey.replace(/\\n/g, "\n");
   }
   if (!cachedPrivateKey) {
     const secretName =
