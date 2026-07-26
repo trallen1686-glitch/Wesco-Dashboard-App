@@ -53,13 +53,76 @@ function cleanEmail(value, label) {
 
 function cleanBase64(value) {
   const documentBase64 = String(value || "").trim();
-  if (!documentBase64 || documentBase64.length > 20_000_000) {
+  if (
+    !documentBase64 ||
+    documentBase64.length > 20_000_000 ||
+    documentBase64.length % 4 !== 0 ||
+    !/^[A-Za-z0-9+/]+={0,2}$/.test(documentBase64)
+  ) {
     throw Object.assign(
       new Error("A valid agreement document is required for Docusign."),
       { status: 400 }
     );
   }
   return documentBase64;
+}
+
+function cleanPurchaseOrder(value) {
+  if (!value || typeof value !== "object") {
+    throw Object.assign(
+      new Error("A valid purchase order attachment is required for Docusign."),
+      { status: 400 }
+    );
+  }
+  const fileName = cleanName(value.fileName, "purchase order file name");
+  const contentType = String(value.contentType || "").trim().toLowerCase();
+  const allowedTypes = new Set([
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+  ]);
+  if (!allowedTypes.has(contentType)) {
+    throw Object.assign(
+      new Error("The purchase order must be a PDF, PNG, JPG, or JPEG file."),
+      { status: 400 }
+    );
+  }
+  const extension = fileName.split(".").pop().toLowerCase();
+  const validExtensions = {
+    "application/pdf": new Set(["pdf"]),
+    "image/png": new Set(["png"]),
+    "image/jpeg": new Set(["jpg", "jpeg"]),
+  };
+  if (!validExtensions[contentType].has(extension)) {
+    throw Object.assign(
+      new Error("The purchase order file extension does not match its content type."),
+      { status: 400 }
+    );
+  }
+  const documentBase64 = cleanBase64(value.documentBase64);
+  const header = Buffer.from(documentBase64.slice(0, 24), "base64");
+  const validHeader =
+    (contentType === "application/pdf" &&
+      header.subarray(0, 5).toString("ascii") === "%PDF-") ||
+    (contentType === "image/png" &&
+      header.subarray(0, 8).equals(
+        Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+      )) ||
+    (contentType === "image/jpeg" &&
+      header[0] === 0xff &&
+      header[1] === 0xd8 &&
+      header[2] === 0xff);
+  if (!validHeader) {
+    throw Object.assign(
+      new Error("The purchase order contents do not match the selected file type."),
+      { status: 400 }
+    );
+  }
+  return {
+    fileName,
+    contentType,
+    documentBase64,
+  };
 }
 
 async function getSiteId() {
@@ -207,6 +270,7 @@ app.http("subcontractorAgreementDocusign", {
         );
       }
       const documentBase64 = cleanBase64(body.documentBase64);
+      const purchaseOrder = cleanPurchaseOrder(body.purchaseOrder);
       const projectName = cleanName(body.projectName, "project name");
 
       if (!fileName.toLowerCase().endsWith(".html")) {
@@ -230,6 +294,7 @@ app.http("subcontractorAgreementDocusign", {
       const result = await sendAgreementForSignature({
         documentBase64,
         fileName,
+        purchaseOrder,
         projectName,
         subcontractorFolder: destination,
         subcontractorName,
@@ -254,6 +319,7 @@ app.http("subcontractorAgreementDocusign", {
             ? err.message
             : "Docusign could not send this agreement. Please try again.",
           code: err.code,
+          stage: err.stage,
           consentUrl: err.consentUrl,
           diagnostic: isHealthCheck
             ? `${err.name || "Error"}: ${err.message || "Unknown error"}`.slice(

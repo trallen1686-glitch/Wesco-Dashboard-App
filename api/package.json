@@ -4,7 +4,8 @@
   "private": true,
   "main": "src/functions/*.js",
   "scripts": {
-    "start": "func start"
+    "start": "func start",
+    "test": "node --test"
   },
   "dependencies": {
     "@azure/functions": "^4.5.1",

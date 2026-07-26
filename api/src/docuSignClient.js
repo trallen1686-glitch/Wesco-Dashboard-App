@@ -165,6 +165,71 @@ function anchorTab(anchorString, recipientId, tabLabel, options = {}) {
   };
 }
 
+function documentExtension(fileName, contentType) {
+  const extension = String(fileName || "")
+    .split(".")
+    .pop()
+    .toLowerCase();
+  if (["pdf", "png", "jpg", "jpeg"].includes(extension)) {
+    return extension === "jpeg" ? "jpg" : extension;
+  }
+  const byType = {
+    "application/pdf": "pdf",
+    "image/png": "png",
+    "image/jpeg": "jpg",
+  };
+  return byType[String(contentType || "").toLowerCase()] || "";
+}
+
+function docusignErrorDetails(error) {
+  let responseBody =
+    error?.response?.body ||
+    error?.response?.data ||
+    error?.body ||
+    {};
+  if (typeof responseBody === "string") {
+    try {
+      responseBody = JSON.parse(responseBody);
+    } catch {
+      responseBody = { message: responseBody };
+    }
+  }
+  const code =
+    responseBody.errorCode ||
+    responseBody.error ||
+    error?.code ||
+    "DOCUSIGN_REQUEST_FAILED";
+  const message =
+    responseBody.message ||
+    responseBody.error_description ||
+    error?.message ||
+    "Docusign rejected the request.";
+  const status =
+    Number(error?.response?.statusCode || error?.response?.status || error?.status) ||
+    502;
+  return {
+    status,
+    code: String(code).slice(0, 120),
+    message: String(message).slice(0, 700),
+  };
+}
+
+async function runDocusignStage(stage, operation) {
+  try {
+    return await operation();
+  } catch (error) {
+    const details = docusignErrorDetails(error);
+    throw Object.assign(
+      new Error(`${stage}: ${details.message}`),
+      {
+        status: details.status,
+        code: details.code,
+        stage,
+      }
+    );
+  }
+}
+
 function sectionTenTabs(recipient, subcontractorEmail) {
   const isContractor = recipient === "contractor";
   const recipientId = isContractor ? "1" : "2";
@@ -303,9 +368,10 @@ async function getConvertedPageCount(envelopesApi, envelopeId) {
   throw new Error("Docusign did not finish converting the agreement pages.");
 }
 
-async function sendAgreementForSignature({
+function buildEnvelopeDefinition({
   documentBase64,
   fileName,
+  purchaseOrder,
   projectName,
   subcontractorFolder,
   subcontractorName,
@@ -313,25 +379,41 @@ async function sendAgreementForSignature({
   contractorName,
   contractorEmail,
   completionFolder,
+  completionWebhookUrl,
 }) {
-  const envelopesApi = await getEnvelopesApi();
-  const accountId = requireSetting("DOCUSIGN_ACCOUNT_ID");
   const completedFileName = fileName.replace(/\.html$/i, ".pdf");
-  const completionWebhookUrl =
-    process.env.DOCUSIGN_COMPLETION_WEBHOOK_URL ||
-    "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/api/subcontractor-agreement-docusign-completed";
-  const envelopeDefinition = {
+  const documents = [
+    {
+      documentBase64,
+      name: fileName,
+      fileExtension: "html",
+      documentId: "1",
+    },
+  ];
+  if (purchaseOrder) {
+    const extension = documentExtension(
+      purchaseOrder.fileName,
+      purchaseOrder.contentType
+    );
+    if (!extension) {
+      throw Object.assign(
+        new Error("The purchase order must be a PDF, PNG, JPG, or JPEG file."),
+        { status: 400, code: "INVALID_PURCHASE_ORDER" }
+      );
+    }
+    documents.push({
+      documentBase64: purchaseOrder.documentBase64,
+      name: purchaseOrder.fileName,
+      fileExtension: extension,
+      documentId: "2",
+    });
+  }
+
+  return {
     emailSubject: `Wesco Subcontractor Agreement - ${projectName}`,
     emailBlurb:
       "Wesco Exteriors completes and signs first. After Wesco finishes, Docusign automatically emails the subcontractor to complete the right-side information, initials, and signatures.",
-    documents: [
-      {
-        documentBase64,
-        name: fileName,
-        fileExtension: "html",
-        documentId: "1",
-      },
-    ],
+    documents,
     recipients: {
       signers: [
         {
@@ -389,26 +471,54 @@ async function sendAgreementForSignature({
     },
     status: "created",
   };
+}
 
-  const created = await envelopesApi.createEnvelope(accountId, {
-    envelopeDefinition,
+async function sendAgreementForSignature(options) {
+  const envelopesApi = await getEnvelopesApi();
+  const accountId = requireSetting("DOCUSIGN_ACCOUNT_ID");
+  const completionWebhookUrl =
+    process.env.DOCUSIGN_COMPLETION_WEBHOOK_URL ||
+    "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/api/subcontractor-agreement-docusign-completed";
+  const envelopeDefinition = buildEnvelopeDefinition({
+    ...options,
+    completionWebhookUrl,
   });
+  const { subcontractorEmail } = options;
+
+  const created = await runDocusignStage(
+    "Create the Docusign draft envelope",
+    () =>
+      envelopesApi.createEnvelope(accountId, {
+        envelopeDefinition,
+      })
+  );
   const envelopeId = created.envelopeId;
-  const pageCount = await getConvertedPageCount(envelopesApi, envelopeId);
+  const pageCount = await runDocusignStage(
+    "Convert the agreement into signing pages",
+    () => getConvertedPageCount(envelopesApi, envelopeId)
+  );
 
   for (const recipient of ["contractor", "subcontractor"]) {
     const recipientId = recipient === "contractor" ? "1" : "2";
-    await envelopesApi.createTabs(accountId, envelopeId, recipientId, {
-      tabs: {
-        initialHereTabs: initialsForEveryPage(pageCount, recipient),
-        ...sectionTenTabs(recipient, subcontractorEmail),
-      },
-    });
+    await runDocusignStage(
+      recipient === "contractor"
+        ? "Place the Wesco signature and initials"
+        : "Place the subcontractor signature and initials",
+      () =>
+        envelopesApi.createTabs(accountId, envelopeId, recipientId, {
+          tabs: {
+            initialHereTabs: initialsForEveryPage(pageCount, recipient),
+            ...sectionTenTabs(recipient, subcontractorEmail),
+          },
+        })
+    );
   }
 
-  await envelopesApi.update(accountId, envelopeId, {
-    envelope: { status: "sent" },
-  });
+  await runDocusignStage("Send the Docusign envelope", () =>
+    envelopesApi.update(accountId, envelopeId, {
+      envelope: { status: "sent" },
+    })
+  );
 
   return {
     envelopeId,
@@ -471,4 +581,9 @@ module.exports = {
   downloadCompletedEnvelope,
   getEnvelopeStatus,
   verifyDocuSignConnection,
+  buildEnvelopeDefinition,
+  docusignErrorDetails,
+  documentExtension,
+  sectionTenTabs,
+  initialsForEveryPage,
 };

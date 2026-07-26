@@ -2111,7 +2111,12 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
           contractorEmail:contractorEmail,
           projectName:$('projectName').value.trim(),
           fileName:payload.filename,
-          documentBase64:await blobToBase64(new Blob([printableHtml], { type:'text/html' }))
+          documentBase64:await blobToBase64(new Blob([printableHtml], { type:'text/html' })),
+          purchaseOrder:{
+            fileName:AppState.poFile.name,
+            contentType:AppState.poFile.type,
+            documentBase64:String(AppState.poFile.dataUrl || '').split(',').pop()
+          }
         })
       });
       var docusignData = await docusignResponse.json();
@@ -2347,6 +2352,16 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         target.setAttribute('value', '');
       }
     });
+
+    var poPreview = clone.querySelector('#poPreview');
+    if(poPreview){
+      poPreview.innerHTML = '';
+      var poAttachmentNote = clone.ownerDocument.createElement('p');
+      poAttachmentNote.textContent =
+        'Purchase Order attached as a separate Docusign document: ' +
+        (AppState.poFile ? AppState.poFile.name : 'Not attached');
+      poPreview.appendChild(poAttachmentNote);
+    }
 
     var clonedCanvases = clone.querySelectorAll('canvas');
     Array.prototype.forEach.call(clonedCanvases, function(clonedCanvas){
