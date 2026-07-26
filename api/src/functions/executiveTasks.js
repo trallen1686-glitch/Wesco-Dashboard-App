@@ -49,6 +49,17 @@ function resolveStaffEmail(principal) {
     const email = STAFF_ALIASES.get(normalizeIdentity(candidate));
     if (email) return email;
   }
+  // Azure AD guest and federated accounts can arrive as
+  // tallen_wesconc.com#EXT#@tenant.onmicrosoft.com instead of the normal UPN.
+  // Match the compact company email embedded in that value without granting
+  // access to an unrelated account that merely shares a display name.
+  for (const candidate of candidates) {
+    const compactCandidate = normalizeIdentity(candidate).replace(/@/g, "");
+    for (const email of STAFF.keys()) {
+      const compactEmail = normalizeIdentity(email).replace(/@/g, "");
+      if (compactCandidate.includes(compactEmail)) return email;
+    }
+  }
   return "";
 }
 const SELECT = [
