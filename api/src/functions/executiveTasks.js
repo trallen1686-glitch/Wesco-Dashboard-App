@@ -101,7 +101,7 @@ function identityBody(user) {
     email: user.email,
     name: user.name,
     canViewAll: PORTAL_ADMINS.has(user.email),
-    canCreateTasks: user.email === WES_EMAIL,
+    canCreateTasks: PORTAL_ADMINS.has(user.email),
   };
 }
 
@@ -233,10 +233,10 @@ app.http("executiveTasks", {
         };
       }
 
-      if (user.email !== WES_EMAIL) {
+      if (!PORTAL_ADMINS.has(user.email)) {
         return {
           status: 403,
-          jsonBody: { error: "Only Wes Atkinson can create executive tasks." },
+          jsonBody: { error: "Only Wes Atkinson and Theo Allen can create executive tasks." },
         };
       }
 
@@ -334,10 +334,10 @@ app.http("executiveTaskRecord", {
       }
 
       if (request.method === "DELETE") {
-        if (user.email !== WES_EMAIL) {
+        if (!PORTAL_ADMINS.has(user.email)) {
           return {
             status: 403,
-            jsonBody: { error: "Only Wes Atkinson can delete executive tasks." },
+            jsonBody: { error: "Only Wes Atkinson and Theo Allen can delete executive tasks." },
           };
         }
         await dataverseFetch(`${ENTITY_SET}(${id})`, {
