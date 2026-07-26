@@ -48,10 +48,10 @@
 <div class="toast" id="toast"></div>
 <script>
 (()=>{'use strict';
-const KEY='wesco_issues_v2', $=id=>document.getElementById(id);
+const API='/api/urgent-items', $=id=>document.getElementById(id);
 let items=[];
-function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(items))items=[]}catch(e){items=[]}}
-function persist(){localStorage.setItem(KEY,JSON.stringify(items))}
+async function api(path='',options={}){const response=await fetch(API+path,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});if(response.status===401){location.href='/.auth/login/aad?post_login_redirect_uri='+encodeURIComponent(location.pathname);throw new Error('Sign in required.')}if(!response.ok){const body=await response.json().catch(()=>({}));throw new Error(body.error||'The shared list could not be updated.')}return response.status===204?null:response.json()}
+async function load(){const data=await api();items=Array.isArray(data.items)?data.items:[]}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(v){if(!v)return'';const [y,m,d]=v.split('-');return `${m}/${d}/${y}`}
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
@@ -63,13 +63,13 @@ $('issuedForTrigger').addEventListener('click',()=> $('issuedForMulti').classLis
 $('issuedForMenu').addEventListener('change',updateFor);$('otherName').addEventListener('input',updateFor);
 document.addEventListener('click',e=>{if(!$('issuedForMulti').contains(e.target))$('issuedForMulti').classList.remove('open')});
 $('itemForm').addEventListener('reset',()=>setTimeout(resetForm));
-$('itemForm').addEventListener('submit',e=>{e.preventDefault();const issuedFor=selectedFor();const type=document.querySelector('input[name=itemType]:checked');const otherChecked=[...$('issuedForMenu').querySelectorAll('input')].some(x=>x.value==='Other'&&x.checked);if(!issuedFor.length){toast(otherChecked?'Type the Other person’s name.':'Select at least one Issued For name.');return}if(!type){toast('Select Urgent or Issue.');return}items.push({id:'ui_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),issuer:$('issuer').value,dateIssued:$('dateIssued').value,dueDate:$('dueDate').value,issuedFor,type:type.value,description:$('description').value.trim(),resolved:false,resolvedAt:null,createdAt:new Date().toISOString()});persist();resetForm();render();toast('Item added to the list.')});
-$('openList').addEventListener('change',e=>{const id=e.target.dataset.resolve;if(!id)return;const x=items.find(v=>v.id===id);if(x){x.resolved=true;x.resolvedAt=new Date().toISOString();persist();render();toast('Item marked resolved.')}});
-$('openList').addEventListener('click',e=>{const id=e.target.dataset.delete;if(!id)return;if(confirm('Delete this item?')){items=items.filter(v=>v.id!==id);persist();render();toast('Item deleted.')}});
-$('auditList').addEventListener('click',e=>{const toggle=e.target.closest('[data-toggle]');if(toggle){toggle.closest('.audit-record').classList.toggle('open');return}const reopen=e.target.closest('[data-reopen]');if(reopen){const x=items.find(v=>v.id===reopen.dataset.reopen);if(x){x.resolved=false;x.resolvedAt=null;persist();render();toast('Item reopened.')}return}if(e.target.closest('[data-print-record]'))window.print()});
+$('itemForm').addEventListener('submit',async e=>{e.preventDefault();const issuedFor=selectedFor();const type=document.querySelector('input[name=itemType]:checked');const otherChecked=[...$('issuedForMenu').querySelectorAll('input')].some(x=>x.value==='Other'&&x.checked);if(!issuedFor.length){toast(otherChecked?'Type the Other person’s name.':'Select at least one Issued For name.');return}if(!type){toast('Select Urgent or Issue.');return}const submit=e.submitter;submit.disabled=true;try{const data=await api('',{method:'POST',body:JSON.stringify({issuer:$('issuer').value,dateIssued:$('dateIssued').value,dueDate:$('dueDate').value,issuedFor,type:type.value,description:$('description').value.trim()})});items.unshift(data.item);resetForm();render();toast('Item added to the shared list.')}catch(error){toast(error.message)}finally{submit.disabled=false}});
+$('openList').addEventListener('change',async e=>{const id=e.target.dataset.resolve;if(!id)return;const x=items.find(v=>v.id===id);if(!x)return;e.target.disabled=true;try{await api('/'+id,{method:'PATCH',body:JSON.stringify({resolved:true,createdAt:x.createdAt})});x.resolved=true;x.resolvedAt=new Date().toISOString();render();toast('Item marked resolved.')}catch(error){e.target.checked=false;e.target.disabled=false;toast(error.message)}});
+$('openList').addEventListener('click',async e=>{const id=e.target.dataset.delete;if(!id)return;if(confirm('Delete this item?')){try{await api('/'+id,{method:'DELETE'});items=items.filter(v=>v.id!==id);render();toast('Item deleted.')}catch(error){toast(error.message)}}});
+$('auditList').addEventListener('click',async e=>{const toggle=e.target.closest('[data-toggle]');if(toggle){toggle.closest('.audit-record').classList.toggle('open');return}const reopen=e.target.closest('[data-reopen]');if(reopen){const x=items.find(v=>v.id===reopen.dataset.reopen);if(x){try{await api('/'+x.id,{method:'PATCH',body:JSON.stringify({resolved:false,createdAt:x.createdAt})});x.resolved=false;x.resolvedAt=null;render();toast('Item reopened.')}catch(error){toast(error.message)}}return}if(e.target.closest('[data-print-record]'))window.print()});
 $('auditBtn').addEventListener('click',()=>$('auditLog').scrollIntoView({behavior:'smooth',block:'start'}));
-$('saveBtn').addEventListener('click',()=>{persist();toast('List saved.')});$('printTopBtn').addEventListener('click',()=>window.print());$('printListBtn').addEventListener('click',()=>window.print());$('printAuditBtn').addEventListener('click',()=>window.print());
-load();resetForm();render();
+$('saveBtn').addEventListener('click',async()=>{try{await load();render();toast('Shared list refreshed.')}catch(error){toast(error.message)}});$('printTopBtn').addEventListener('click',()=>window.print());$('printListBtn').addEventListener('click',()=>window.print());$('printAuditBtn').addEventListener('click',()=>window.print());
+resetForm();load().then(render).catch(error=>toast(error.message));
 })();
 </script>
 </body>
