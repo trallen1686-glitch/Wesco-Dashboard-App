@@ -257,6 +257,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     <div class="toolbar-row">
       <input type="text" class="filter-input" id="listFilter" placeholder="Filter by issuer or description…">
       <button type="button" class="btn btn-ghost btn-sm" id="printListBtn">🖨 Print List</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="auditLogBtn">✓ Resolved Audit Log</button>
     </div>
 
     <form id="issueForm" novalidate>
@@ -322,8 +323,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     <p style="margin:0 0 4px; padding:0 18px; font-size:11.5px; color:var(--ink-soft);">Check <b>Resolved</b> on any item to move it down into the Audit Log below.</p>
     <div class="active-wrap" id="activeListRoot"><!-- active issue rows rendered here --></div>
 
-    <div class="section-heading-row">
-      <span class="section-heading" id="resolvedHeading">Resolved — Audit Log (0)</span>
+    <div class="section-heading-row" id="resolvedAuditLog" tabindex="-1">
+      <button type="button" class="btn btn-ghost btn-sm" id="resolvedHeading" aria-controls="resolvedListRoot">Resolved — Audit Log (0)</button>
     </div>
     <p style="margin:0 0 4px; padding:0 18px; font-size:11.5px; color:var(--ink-soft);">Click any record below to view its full details.</p>
     <div id="resolvedListRoot"><!-- resolved issue cards rendered here --></div>
@@ -879,6 +880,10 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     });
     $('listFilter').addEventListener('input', renderLists);
     $('printListBtn').addEventListener('click', printIssueList);
+    $('auditLogBtn').addEventListener('click', function(){
+      $('resolvedAuditLog').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('resolvedAuditLog').focus({ preventScroll: true });
+    });
 
     ALL_FIELD_IDS.forEach(function(id){
       $(id).addEventListener('input', function(){ $('f_' + id).classList.remove('invalid'); });
