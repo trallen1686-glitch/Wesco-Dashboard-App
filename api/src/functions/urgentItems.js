@@ -107,7 +107,6 @@ app.http("urgentItems", {
   authLevel: "anonymous",
   route: "urgent-items",
   handler: async (request, context) => {
-    if (!currentUser(request)) return unauthorized();
     try {
       if (request.method === "GET") {
         const result = await dataverseJson(
@@ -169,7 +168,6 @@ app.http("urgentItemRecord", {
   authLevel: "anonymous",
   route: "urgent-items/{id}",
   handler: async (request, context) => {
-    if (!currentUser(request)) return unauthorized();
     const id = request.params.id;
     if (!validId(id)) return { status: 400, jsonBody: { error: "Invalid item ID." } };
     try {
