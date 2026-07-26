@@ -55,6 +55,39 @@ test("envelope contains the agreement and PO as separate ordered documents", () 
   assert.equal(envelope.status, "created");
 });
 
+test("Docusign envelope custom-field values never exceed 100 characters", () => {
+  const longFileName =
+    "Wesco Subcontractor Agreement - " +
+    "DOCUSIGN TEST ONLY - NOT A PROJECT ".repeat(4) +
+    "- Oossie Mae - TEST ONLY - 2026-07-26.html";
+  const longFolder = "Documents/We App/Subcontractors/" + "Others/".repeat(20);
+  const envelope = buildEnvelopeDefinition({
+    documentBase64: "PGh0bWw+PC9odG1sPg==",
+    fileName: longFileName,
+    projectName: "DOCUSIGN TEST ONLY",
+    subcontractorFolder: longFolder,
+    subcontractorName: "Oossie Mae",
+    subcontractorEmail: "tantaneiarountree@gmail.com",
+    contractorName: "Theo Allen",
+    contractorEmail: "tallen@wesconc.com",
+    completionFolder: "Others",
+    completionWebhookUrl: "https://example.com/completed",
+  });
+
+  assert.equal(envelope.documents[0].name, longFileName);
+  assert.ok(
+    envelope.customFields.textCustomFields.every(
+      (field) => field.value.length <= 100
+    )
+  );
+  assert.equal(
+    envelope.customFields.textCustomFields.find(
+      (field) => field.name === "Wesco Source File"
+    ).value,
+    longFileName.slice(0, 100)
+  );
+});
+
 test("purchase order file extensions are normalized for Docusign", () => {
   assert.equal(documentExtension("purchase-order.PDF", "application/pdf"), "pdf");
   assert.equal(documentExtension("photo.jpeg", "image/jpeg"), "jpg");

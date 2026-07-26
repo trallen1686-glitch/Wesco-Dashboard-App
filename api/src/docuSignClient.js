@@ -381,6 +381,10 @@ function buildEnvelopeDefinition({
   completionFolder,
   completionWebhookUrl,
 }) {
+  // DocuSign limits envelope text custom-field values to 100 characters.
+  // Keep the full document name on the document and completion webhook, while
+  // constraining only the hidden audit metadata sent as envelope custom fields.
+  const customFieldValue = (value) => String(value || "").slice(0, 100);
   const completedFileName = fileName.replace(/\.html$/i, ".pdf");
   const documents = [
     {
@@ -434,13 +438,13 @@ function buildEnvelopeDefinition({
       textCustomFields: [
         {
           name: "Wesco SharePoint Folder",
-          value: subcontractorFolder,
+          value: customFieldValue(subcontractorFolder),
           show: "false",
           required: "false",
         },
         {
           name: "Wesco Source File",
-          value: fileName,
+          value: customFieldValue(fileName),
           show: "false",
           required: "false",
         },
