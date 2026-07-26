@@ -2496,6 +2496,17 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
      13. Wire everything up on load
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', function(){
+    if(
+      (location.hostname === '127.0.0.1' || location.hostname === 'localhost') &&
+      new URLSearchParams(location.search).get('localPreview') !== '1'
+    ){
+      location.replace(
+        'https://wonderful-field-08b34ac0f.7.azurestaticapps.net/' +
+        'Wesco%20Subcontractor%20Agreement.html?source=local-redirect'
+      );
+      return;
+    }
+
     initSigPad('contractorSigPad', 'contractor');
     initSigPad('subSigPad', 'sub');
     initSigPad('equipSigPad', 'equip');
