@@ -301,14 +301,14 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      spelling stay identical across every WE App screen.
      ------------------------------------------------------------------ */
   var PEOPLE = [
-    { name: 'Oscar Centeno',   role: 'Estimator',      tagClass: 'role-estimator' },
-    { name: 'Joseph St. John', role: 'PM',              tagClass: 'role-pm' },
-    { name: "Chris O'Keefe",   role: 'PM',              tagClass: 'role-pm' },
-    { name: 'Theo Allen',      role: 'PM',              tagClass: 'role-pm' },
-    { name: 'Jesse Warren',    role: 'Superintendent',  tagClass: 'role-super' },
-    { name: 'Wes Atkinson',       role: 'Management',  tagClass: 'role-management' },
-    { name: 'Stephanie Atkinson', role: 'Management',  tagClass: 'role-management' },
-    { name: 'Rebecca Kirkman',    role: 'Management',  tagClass: 'role-management' }
+    { name: 'Oscar Centeno',   email: 'ocenteno@wesconc.com',   role: 'Estimator',      tagClass: 'role-estimator' },
+    { name: 'Joseph St. John', email: 'jstjohn@wesconc.com',    role: 'PM',              tagClass: 'role-pm' },
+    { name: "Chris O'Keefe",   email: 'cokeefe@wesconc.com',    role: 'PM',              tagClass: 'role-pm' },
+    { name: 'Theo Allen',      email: 'tallen@wesconc.com',     role: 'PM',              tagClass: 'role-pm' },
+    { name: 'Jesse Warren',    email: 'jwarren@wesconc.com',    role: 'Superintendent',  tagClass: 'role-super' },
+    { name: 'Wes Atkinson',       email: 'watkinson@wesconc.com', role: 'Management',  tagClass: 'role-management' },
+    { name: 'Stephanie Atkinson', email: 'satkinson@wesconc.com', role: 'Management',  tagClass: 'role-management' },
+    { name: 'Rebecca Kirkman',    email: 'rkirkman@wesconc.com',  role: 'Management',  tagClass: 'role-management' }
   ];
 
   /* ------------------------------------------------------------------
@@ -324,6 +324,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     activeProjects:   { label: 'Active Projects',     icon: '🟢', desc: 'Projects currently in progress',         url: 'Wesco-Hub-Files.html?library=active-projects', personAware: true },
     pendingProjects:  { label: 'Pending Projects',    icon: '🟡', desc: 'Bidding projects awaiting award',        url: 'Wesco-Hub-Files.html?library=bidding-projects', personAware: true },
     toDoList:         { label: 'To Do List',          icon: '✅', desc: 'Your task list',                         url: 'Wesco%20To-Do%20List.html', personAware: true },
+    executiveTaskList:{ label: 'Executive Task List', icon: '📋', desc: 'Tasks assigned to you by Wes',           url: 'WesConnect_Executive_Task_List.html', personAware: true },
     calendar:         { label: 'Calendar',            icon: '📅', desc: 'Company and project calendar',           url: 'staff-team-calendar/index.html', personAware: true },
     subCalendar:      { label: 'Subcontractor Calendar', icon: '🗓️', desc: 'Subcontractor scheduling across all jobs', url: 'master_subcontractor_calendar_final_signin_fixed.html', personAware: true },
     documentUploads:  { label: 'Document Uploads',    icon: '📤', desc: 'Your private staff document folders',    url: 'Wesco-Hub-Files.html?library=document-upload', personAware: true },
@@ -343,7 +344,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   var PERSON_EXTRA_TABS = {
     'Wes Atkinson': {
       approvals:      { label: 'Approvals',              icon: '✅', desc: 'Estimates, Change Orders, Takeoffs & Material Sheets awaiting your approval', url: '', personAware: false },
-      masterToDoList: { label: 'Wes Connect Executive Center', icon: '📌', desc: 'Executive center for company-wide tasks', url: 'Wesco%20Staff%20To%20Do%20Dashboard.html', personAware: false },
+      masterToDoList: { label: 'WesConnect Executive Task Center', icon: '📌', desc: 'Create and manage executive tasks for staff', url: 'WesConnect_Executive_Task_Center_FIXED.html', personAware: true },
       masterUrgent:   { label: 'Master Urgent List',      icon: '🚨', desc: 'Company-wide urgent items needing attention',     url: '', personAware: false }
     }
   };
@@ -473,11 +474,12 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   }
 
   function renderSelectorView(){
+    var visiblePeople = canViewAllPeople ? PEOPLE : (signedInPerson ? [signedInPerson] : []);
     var groups = [
-      { title: 'Estimator', people: PEOPLE.filter(function(p){ return p.role === 'Estimator'; }) },
-      { title: 'Project Managers', people: PEOPLE.filter(function(p){ return p.role === 'PM'; }) },
-      { title: 'Superintendent', people: PEOPLE.filter(function(p){ return p.role === 'Superintendent'; }) },
-      { title: 'Management', people: PEOPLE.filter(function(p){ return p.role === 'Management'; }) }
+      { title: 'Estimator', people: visiblePeople.filter(function(p){ return p.role === 'Estimator'; }) },
+      { title: 'Project Managers', people: visiblePeople.filter(function(p){ return p.role === 'PM'; }) },
+      { title: 'Superintendent', people: visiblePeople.filter(function(p){ return p.role === 'Superintendent'; }) },
+      { title: 'Management', people: visiblePeople.filter(function(p){ return p.role === 'Management'; }) }
     ];
     var html = groups.map(function(g){
       if(!g.people.length) return '';
@@ -496,6 +498,10 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   }
 
   function goToPerson(name){
+    if(!canViewAllPeople && (!signedInPerson || signedInPerson.name !== name)){
+      showToast('You can only open your own Staff Portal.', true);
+      return;
+    }
     var url = new URL(window.location.href);
     url.searchParams.set('person', name);
     window.location.href = url.toString();
@@ -506,6 +512,19 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      ------------------------------------------------------------------ */
   var activeTabs = {};
   var currentPersonObj = null;
+  var signedInPerson = null;
+  var canViewAllPeople = false;
+
+  async function loadSignedInPerson(){
+    var response = await fetch('/api/executive-tasks/me');
+    var data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Sign in with your Wesco account.');
+    canViewAllPeople = !!data.canViewAll;
+    signedInPerson = PEOPLE.find(function(p){
+      return p.email.toLowerCase() === String(data.email || '').toLowerCase();
+    }) || null;
+    if(!signedInPerson) throw new Error('Your Wesco login is not assigned to a Staff Portal name.');
+  }
 
   function openTab(key, personName){
     var t = activeTabs[key];
@@ -542,7 +561,10 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     $('starterRoleTag').innerHTML = '<span class="tag ' + p.tagClass + '">' + escapeHtml(p.role) + '</span>';
 
     activeTabs = Object.assign({}, PERSON_EXTRA_TABS[p.name] || {}, TAB_LINKS);
-    if(p.name === 'Wes Atkinson') delete activeTabs.masterTaskList;
+    if(p.name === 'Wes Atkinson'){
+      delete activeTabs.masterTaskList;
+      delete activeTabs.executiveTaskList;
+    }
     var unreadTotal = getTotalUnreadFor(p.name);
 
     $('tabGrid').innerHTML = Object.keys(activeTabs).map(function(key){
@@ -680,9 +702,20 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      Wire up
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', async function(){
+    try{
+      await loadSignedInPerson();
+    } catch(e){
+      $('starterView').style.display = 'none';
+      $('selectorView').style.display = '';
+      $('selectorRoot').innerHTML = '<div class="empty-messages">' + escapeHtml(e.message) + '</div>';
+      showToast(e.message, true);
+      return;
+    }
+
     var params = new URLSearchParams(window.location.search);
     var personParam = (params.get('person') || '').trim().toLowerCase();
-    var match = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
+    var requested = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
+    var match = canViewAllPeople ? requested : signedInPerson;
 
     if(match){
       $('selectorView').style.display = 'none';
@@ -699,7 +732,12 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     $('backLink').addEventListener('click', function(){
       var url = new URL(window.location.href);
       url.searchParams.delete('person');
-      window.location.href = url.toString();
+      if(canViewAllPeople){
+        window.location.href = url.toString();
+      } else {
+        url.searchParams.set('person', signedInPerson.name);
+        window.location.href = url.toString();
+      }
     });
 
     $('messagesBackLink').addEventListener('click', closeMessagesView);

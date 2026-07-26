@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WesConnect Executive Task List</title>
+  <style>
+    :root{
+      --orange:#f36a00;--orange-light:#ff9a4d;--bg:#080d10;
+      --panel:rgba(9,14,16,.76);--panel-strong:rgba(5,10,12,.92);
+      --line:rgba(255,255,255,.14);--text:#fff;--muted:rgba(255,255,255,.74);
+      --green:#2e9d67;--red:#d84a4a;--amber:#d98a12;--shadow:0 18px 50px rgba(0,0,0,.42)
+    }
+    *{box-sizing:border-box}
+    html{color-scheme:dark}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Arial,Helvetica,sans-serif;background-color:var(--bg);background-image:linear-gradient(115deg,rgba(6,10,12,.96),rgba(9,14,16,.82) 42%,rgba(9,14,16,.94)),radial-gradient(circle at 72% 18%,rgba(243,106,0,.10),transparent 32%),repeating-linear-gradient(90deg,transparent 0 79px,rgba(255,255,255,.018) 80px),repeating-linear-gradient(0deg,transparent 0 79px,rgba(255,255,255,.014) 80px);background-attachment:fixed}
+    button,input{font:inherit}
+    header{position:sticky;top:0;z-index:20;border-bottom:3px solid var(--orange);background:rgba(4,8,10,.76);backdrop-filter:blur(10px)}
+    .header-inner,main{width:min(1500px,calc(100% - 32px));margin:auto}
+    .header-inner{min-height:98px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:18px}
+    .logo-mark{min-width:150px;padding:10px 12px;border-radius:8px;color:#fff;background:#12181b;font-weight:900;font-size:20px;letter-spacing:.07em;text-align:center;box-shadow:inset 0 -3px 0 var(--orange)}
+    .logo-mark small{display:block;margin-top:3px;color:var(--orange-light);font-size:9px;letter-spacing:.18em}
+    h1,h2,p{margin-top:0}h1{margin-bottom:4px;font-size:clamp(24px,4vw,36px)}.subtitle{margin:0;color:var(--orange-light)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .portal-back{min-height:42px;padding:10px 16px;border:1px solid var(--line);border-radius:10px;color:#fff;background:rgba(255,255,255,.08);font-weight:800;text-decoration:none;display:inline-flex;align-items:center}.portal-back:hover{border-color:var(--orange);color:var(--orange-light);background:rgba(243,106,0,.08)}
+    button{min-height:42px;padding:10px 16px;border:1px solid var(--orange);border-radius:10px;color:#fff;background:var(--orange);font-weight:800;cursor:pointer}
+    button:hover{background:#ff7a14}.secondary{background:rgba(255,255,255,.08);border-color:var(--line)}.secondary:hover{border-color:var(--orange);color:var(--orange-light)}
+    main{padding:24px 0 50px}
+    .welcome,.card{padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+    .welcome{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;border-left:4px solid var(--orange)}
+    .welcome h2{margin-bottom:6px}.welcome p{margin:0;color:var(--muted)}.person-pill{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:rgba(3,7,9,.62);white-space:nowrap}.person-pill strong{color:var(--orange-light)}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:22px}.stat{padding:16px;border:1px solid var(--line);border-top:4px solid var(--orange);border-radius:12px;background:rgba(3,7,9,.62)}.stat span{color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.stat b{display:block;margin-top:5px;color:var(--orange-light);font-size:28px}
+    .card{padding:0;overflow:hidden;margin-bottom:22px}.head{min-height:68px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:3px solid var(--orange);background:rgba(3,7,9,.62)}.head h2{margin:0;font-size:20px}.head p{margin:4px 0 0;color:var(--muted)}
+    input{width:min(320px,100%);padding:11px 12px;border:1px solid var(--line);border-radius:10px;outline:none;color:#fff;background:rgba(3,7,9,.72)}input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(243,106,0,.16)}
+    .table-wrap{overflow:auto}.task-table{width:100%;min-width:1220px;border-collapse:collapse}.task-table th{position:sticky;top:0;z-index:1;padding:12px 10px;border-bottom:1px solid var(--line);color:#fff;background:var(--orange);font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.04em}.task-table td{padding:12px 10px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}.task-table tbody tr:hover{background:rgba(243,106,0,.07)}.assignee{color:var(--orange-light);font-weight:800}
+    .badge{display:inline-block;padding:5px 8px;border:1px solid transparent;border-radius:999px;font-size:10px;font-weight:800}.open{border-color:rgba(255,154,77,.42);color:#ffc08f;background:rgba(243,106,0,.16)}.done{border-color:rgba(46,157,103,.35);color:#b8f0d2;background:rgba(46,157,103,.17)}.high{border-color:rgba(216,74,74,.45);color:#ffb4b4;background:rgba(216,74,74,.18)}.medium{border-color:rgba(217,138,18,.42);color:#ffd895;background:rgba(217,138,18,.16)}.low{border-color:rgba(46,157,103,.35);color:#b8f0d2;background:rgba(46,157,103,.17)}
+    .done-btn,.reopen-btn{min-height:34px;padding:7px 11px;font-size:11px}.reopen-btn{background:rgba(255,255,255,.08);border-color:var(--line)}.task-photo{display:block;width:58px;height:44px;object-fit:cover;border:1px solid var(--line);border-radius:7px;cursor:pointer}.document-link{color:var(--orange-light);font-weight:800;text-decoration:underline;text-underline-offset:3px}.empty{padding:34px;text-align:center;color:var(--muted)}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:40;display:none;padding:13px 16px;border-radius:10px;color:#fff;background:var(--orange);box-shadow:var(--shadow);font-weight:800}
+    @media(max-width:700px){header{position:static}.header-inner,.welcome{align-items:stretch;flex-direction:column}.brand{align-items:flex-start;flex-direction:column}.toolbar{justify-content:stretch}.toolbar button{flex:1}.logo-mark{width:150px}.stats{grid-template-columns:1fr}.person-pill{white-space:normal}}
+    @media print{body{background:#fff;color:#000}header,.toolbar,.search-wrap,.done-btn,.reopen-btn,.toast{display:none!important}main{width:100%;padding:0}.welcome,.card,.stat{border-color:#777;box-shadow:none;background:#fff}.welcome{margin-bottom:10px}.welcome p,.head p,.stat span{color:#333}.stats{margin-bottom:10px}.card{break-inside:avoid}.task-table{min-width:0;color:#000}.task-table th{position:static;color:#000;background:#ddd}.task-table th,.task-table td{border-color:#aaa;font-size:8px;padding:5px}.task-photo{width:38px;height:30px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-mark">WESCO<small>EXTERIORS INC.</small></div>
+      <div><h1>Executive Task List</h1><p class="subtitle">Employee and subcontractor assignments from Wes Atkinson</p></div>
+    </div>
+    <div class="toolbar">
+      <a id="portalBackLink" class="portal-back" href="Staff-Portal-Starter-Template.html">← Back to Staff Portal</a>
+      <button id="saveBtn" type="button">Save</button>
+      <button id="printBtn" class="secondary" type="button">Print</button>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="welcome">
+    <div><h2>Staff Task Center</h2><p>Review assignments, attached task photos, due dates, and instructions. Select Done when an assignment is finished.</p></div>
+    <div class="person-pill">Showing tasks for: <strong id="staffName">Select a person</strong></div>
+  </section>
+  <section class="stats">
+    <div class="stat"><span>Open Tasks</span><b id="openCount">0</b></div>
+    <div class="stat"><span>Urgent Tasks</span><b id="urgentCount">0</b></div>
+    <div class="stat"><span>Completed Items</span><b id="doneCount">0</b></div>
+  </section>
+  <section class="card">
+    <div class="head">
+      <div><h2>Task List</h2><p>Current assignments received from the Executive Task Center.</p></div>
+      <div class="search-wrap"><input id="search" type="search" placeholder="Search tasks"></div>
+    </div>
+    <div class="table-wrap">
+      <table class="task-table">
+        <thead><tr><th>Status</th><th>Assigned To</th><th>Task</th><th>Project #</th><th>Location</th><th>Assigned</th><th>Due</th><th>Urgency</th><th>Send By</th><th>Photo</th><th>Document</th><th>Instructions</th><th>Action</th></tr></thead>
+        <tbody id="openBody"></tbody>
+      </table>
+      <div id="openEmpty" class="empty">No open tasks have been assigned.</div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="head"><div><h2>Completed Items</h2><p>Tasks move here automatically after Done is selected.</p></div></div>
+    <div class="table-wrap">
+      <table class="task-table">
+        <thead><tr><th>Status</th><th>Assigned To</th><th>Task</th><th>Project #</th><th>Location</th><th>Assigned</th><th>Due</th><th>Urgency</th><th>Completed</th><th>Photo</th><th>Document</th><th>Instructions</th><th>Action</th></tr></thead>
+        <tbody id="doneBody"></tbody>
+      </table>
+      <div id="doneEmpty" class="empty">No completed items yet.</div>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast"></div>
+<script type="application/x-disabled">
+(function(){
+'use strict';
+var STORAGE_KEY='wescoExecutiveTasksV2';
+var ATTACHMENT_KEY='wescoExecutiveTaskAttachmentsV1';
+function el(id){return document.getElementById(id)}
+function safe(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function niceDate(v){if(!v)return '—';var d=new Date(v.length===10?v+'T12:00:00':v);return isNaN(d.getTime())?safe(v):d.toLocaleDateString()}
+function loadTasks(){try{var raw=localStorage.getItem(STORAGE_KEY);return raw?JSON.parse(raw):[]}catch(e){return []}}
+function loadAttachments(){try{var raw=localStorage.getItem(ATTACHMENT_KEY);return raw?JSON.parse(raw):{}}catch(e){return {}}}
+function saveTasks(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));return true}catch(e){return false}}
+function toast(message){var t=el('toast');t.textContent=message;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(function(){t.style.display='none'},2200)}
+var params=new URLSearchParams(location.search);
+var staff=(params.get('person')||params.get('staff')||'').trim();
+var tasks=loadTasks();
+var attachments=loadAttachments();
+el('staffName').textContent=staff||'Select a person';
+function forStaff(t){return !!staff&&String(t.assignee||'').toLowerCase()===staff.toLowerCase()}
+function getAttachment(t){return t.attachmentId&&attachments[t.attachmentId]?attachments[t.attachmentId]:{}}
+function photoCell(t){var photo=t.photo||getAttachment(t).photo;return photo?'<img class="task-photo" src="'+safe(photo)+'" alt="Task photo" onclick="window.open(this.src,\'_blank\')">':'—'}
+function documentCell(t){var doc=t.document||getAttachment(t).document;return doc&&doc.data?'<a class="document-link" href="'+safe(doc.data)+'" download="'+safe(doc.name||'task-document')+'">'+safe(doc.name||'Open document')+'</a>':'—'}
+function priority(t){var p=String(t.priority||'Medium');return '<span class="badge '+safe(p.toLowerCase())+'">'+(p==='High'?'Urgent':safe(p))+'</span>'}
+function row(t,isDone){
+  return '<tr><td><span class="badge '+(isDone?'done':'open')+'">'+(isDone?'Completed':'Open')+'</span></td><td class="assignee">'+safe(t.assignee)+'</td><td><b>'+safe(t.title)+'</b></td><td>'+safe(t.projectNumber||'—')+'</td><td>'+safe(t.location)+'</td><td>'+niceDate(t.taskDate)+'</td><td>'+niceDate(t.dueDate)+'</td><td>'+priority(t)+'</td><td>'+(isDone?niceDate(t.completedAt):safe(t.channel))+'</td><td>'+photoCell(t)+'</td><td>'+documentCell(t)+'</td><td>'+safe(t.notes)+'</td><td><button class="'+(isDone?'reopen-btn':'done-btn')+'" data-action="'+(isDone?'reopen':'done')+'" data-id="'+safe(t.id)+'">'+(isDone?'Reopen':'Done')+'</button></td></tr>'
+}
+function render(){
+  tasks=loadTasks();
+  attachments=loadAttachments();
+  var q=el('search').value.toLowerCase();
+  var visible=tasks.filter(function(t){var text=[t.assignee,t.title,t.projectNumber,t.location,t.notes,t.channel].join(' ').toLowerCase();return forStaff(t)&&text.indexOf(q)>-1});
+  var open=visible.filter(function(t){return t.status!=='Completed'});
+  var done=visible.filter(function(t){return t.status==='Completed'});
+  el('openBody').innerHTML=open.map(function(t){return row(t,false)}).join('');
+  el('doneBody').innerHTML=done.map(function(t){return row(t,true)}).join('');
+  el('openEmpty').textContent=staff?'No open tasks have been assigned.':'Open this page with a staff or subcontractor name, for example: ?person=Rebecca';
+  el('openEmpty').style.display=open.length?'none':'block';
+  el('doneEmpty').style.display=done.length?'none':'block';
+  el('openCount').textContent=open.length;
+  el('urgentCount').textContent=open.filter(function(t){return t.priority==='High'}).length;
+  el('doneCount').textContent=done.length
+}
+function changeStatus(id,completed){
+  tasks=loadTasks();
+  tasks.forEach(function(t){if(t.id===id){t.status=completed?'Completed':'Open';t.completedAt=completed?new Date().toISOString():''}});
+  if(saveTasks()){render();toast(completed?'Task moved to Completed Items.':'Task returned to the open list.')}else{toast('The task could not be saved in this browser.')}
+}
+document.addEventListener('click',function(e){var b=e.target.closest('button[data-action]');if(!b)return;changeStatus(b.getAttribute('data-id'),b.getAttribute('data-action')==='done')});
+el('search').addEventListener('input',render);
+el('saveBtn').addEventListener('click',function(){tasks=loadTasks();toast(saveTasks()?'Task sheet saved.':'The task sheet could not be saved.')});
+el('printBtn').addEventListener('click',function(){window.print()});
+window.addEventListener('storage',function(e){if(e.key===STORAGE_KEY||e.key===ATTACHMENT_KEY)render()});
+render();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+var tasks=[],viewer=null;
+function el(id){return document.getElementById(id)}
+var requestedPerson=(new URLSearchParams(location.search).get('person')||'').trim();
+el('portalBackLink').href='Staff-Portal-Starter-Template.html'+(requestedPerson?'?person='+encodeURIComponent(requestedPerson):'');
+function safe(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function niceDate(v){if(!v)return '—';var d=new Date(v.length===10?v+'T12:00:00':v);return isNaN(d.getTime())?safe(v):d.toLocaleDateString()}
+function toast(message){var t=el('toast');t.textContent=message;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(function(){t.style.display='none'},2600)}
+async function api(path,options){var response=await fetch('/api/executive-tasks'+(path||''),options||{}),body={};try{body=await response.json()}catch(e){}if(!response.ok)throw new Error(body.error||'The task service could not complete the request.');return body}
+function photoCell(t){return t.photoUrl?'<a href="'+safe(t.photoUrl)+'" target="_blank" rel="noopener"><img class="task-photo" src="'+safe(t.photoUrl)+'" alt="Task photo"></a>':'—'}
+function documentCell(t){return t.documentUrl?'<a class="document-link" href="'+safe(t.documentUrl)+'">'+safe(t.documentName||'Open document')+'</a>':'—'}
+function priority(t){var p=String(t.priority||'Medium');return '<span class="badge '+safe(p.toLowerCase())+'">'+(p==='High'?'Urgent':safe(p))+'</span>'}
+function row(t,isDone){return '<tr><td><span class="badge '+(isDone?'done':'open')+'">'+(isDone?'Completed':'Open')+'</span></td><td class="assignee">'+safe(t.assignee)+'</td><td><b>'+safe(t.title)+'</b></td><td>'+safe(t.projectNumber||'—')+'</td><td>'+safe(t.location||'—')+'</td><td>'+niceDate(t.taskDate)+'</td><td>'+niceDate(t.dueDate)+'</td><td>'+priority(t)+'</td><td>'+(isDone?niceDate(t.completedAt):safe(t.channel||'—'))+'</td><td>'+photoCell(t)+'</td><td>'+documentCell(t)+'</td><td>'+safe(t.notes||'')+'</td><td><button class="'+(isDone?'reopen-btn':'done-btn')+'" data-action="'+(isDone?'reopen':'done')+'" data-id="'+safe(t.id)+'">'+(isDone?'Reopen':'Done')+'</button></td></tr>'}
+function render(){
+  var q=el('search').value.toLowerCase(),visible=tasks.filter(function(t){return [t.assignee,t.title,t.projectNumber,t.location,t.notes,t.channel].join(' ').toLowerCase().indexOf(q)>-1}),open=visible.filter(function(t){return t.status!=='Completed'}),done=visible.filter(function(t){return t.status==='Completed'});
+  el('openBody').innerHTML=open.map(function(t){return row(t,false)}).join('');
+  el('doneBody').innerHTML=done.map(function(t){return row(t,true)}).join('');
+  el('openEmpty').style.display=open.length?'none':'block';el('doneEmpty').style.display=done.length?'none':'block';
+  el('openCount').textContent=open.length;el('urgentCount').textContent=open.filter(function(t){return t.priority==='High'}).length;el('doneCount').textContent=done.length
+}
+async function refresh(){
+  var suffix=requestedPerson?'?person='+encodeURIComponent(requestedPerson):'';
+  try{var data=await api(suffix);tasks=data.tasks||[];viewer=data.viewer;el('staffName').textContent=viewer.canViewAll&&requestedPerson?requestedPerson:viewer.name;render()}catch(err){toast(err.message)}
+}
+async function changeStatus(id,completed){try{await api('/'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:completed?'Completed':'Open'})});await refresh();toast(completed?'Task moved to Completed Items.':'Task returned to the open list.')}catch(err){toast(err.message)}}
+document.addEventListener('click',function(e){var b=e.target.closest('button[data-action]');if(!b)return;changeStatus(b.getAttribute('data-id'),b.getAttribute('data-action')==='done')});
+el('search').addEventListener('input',render);
+el('saveBtn').addEventListener('click',function(){toast('Tasks are saved automatically in Dataverse.')});
+el('printBtn').addEventListener('click',function(){window.print()});
+refresh();
+})();
+</script>
+</body>
+</html>
