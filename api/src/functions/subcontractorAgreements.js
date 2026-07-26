@@ -138,6 +138,8 @@ app.http("subcontractorAgreements", {
       };
     } catch (err) {
       context.error(err);
+      const isHealthCheck =
+        request.method === "GET" && request.query.get("health") === "1";
       return {
         status: err.status || 500,
         jsonBody: {
@@ -241,6 +243,12 @@ app.http("subcontractorAgreementDocusign", {
             : "Docusign could not send this agreement. Please try again.",
           code: err.code,
           consentUrl: err.consentUrl,
+          diagnostic: isHealthCheck
+            ? `${err.name || "Error"}: ${err.message || "Unknown error"}`.slice(
+                0,
+                700
+              )
+            : undefined,
         },
       };
     }
