@@ -2129,7 +2129,10 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         }
         throw new Error(
           (docusignData.error || 'Docusign could not send the agreement.') +
-          (docusignData.code ? ' [' + docusignData.code + ']' : '')
+          (docusignData.code ? ' [' + docusignData.code + ']' : '') +
+          (docusignData.envelopeId
+            ? ' Draft envelope: ' + docusignData.envelopeId + '.'
+            : '')
         );
       }
       AppState.docusignEnvelopeId = docusignData.envelopeId;
@@ -2388,6 +2391,22 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     Array.prototype.forEach.call(
       clone.querySelectorAll('.screen-only,.sig-mode-toggle,.sig-controls,.field-tag'),
       function(element){ element.remove(); }
+    );
+    Array.prototype.forEach.call(
+      clone.querySelectorAll('.docusign-anchor'),
+      function(anchor){
+        /*
+         * DocuSign must be able to read these markers after HTML-to-PDF
+         * conversion. Inline !important rules override the normal print rule
+         * that hides anchors from paper copies, without changing this page's
+         * on-screen or printed appearance.
+         */
+        anchor.style.cssText =
+          'display:inline!important;position:static!important;width:auto!important;' +
+          'height:auto!important;overflow:visible!important;white-space:nowrap!important;' +
+          'color:#fff!important;font-size:2px!important;line-height:2px!important;' +
+          'letter-spacing:0!important;';
+      }
     );
 
     var previewStyle = clone.ownerDocument.createElement('style');

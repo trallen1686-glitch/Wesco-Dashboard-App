@@ -320,6 +320,7 @@ app.http("subcontractorAgreementDocusign", {
             : "Docusign could not send this agreement. Please try again.",
           code: err.code,
           stage: err.stage,
+          envelopeId: err.envelopeId,
           consentUrl: err.consentUrl,
           diagnostic: isHealthCheck
             ? `${err.name || "Error"}: ${err.message || "Unknown error"}`.slice(

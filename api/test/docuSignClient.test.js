@@ -131,6 +131,38 @@ test("Section 10 assigns Wesco left-side fields and subcontractor right-side fie
   assert.equal(subcontractorEmail.locked, "false");
 });
 
+test("every Docusign AutoPlace anchor exists in the agreement template", () => {
+  const agreementPath = path.resolve(
+    __dirname,
+    "..",
+    "..",
+    "Wesco Subcontractor Agreement.html"
+  );
+  const source = fs.readFileSync(agreementPath, "utf8");
+  const tabGroups = [
+    sectionTenTabs("contractor"),
+    sectionTenTabs("subcontractor", "subcontractor@example.com"),
+  ];
+  const anchors = tabGroups.flatMap((tabs) =>
+    [
+      ...(tabs.signHereTabs || []),
+      ...(tabs.textTabs || []),
+      ...(tabs.dateSignedTabs || []),
+    ].map((tab) => tab.anchorString)
+  );
+
+  assert.ok(anchors.length > 0);
+  assert.equal(new Set(anchors).size, anchors.length);
+  anchors.forEach((anchor) => {
+    assert.match(source, new RegExp(`>${anchor}<`));
+  });
+  assert.match(source, /clone\.querySelectorAll\('\.docusign-anchor'\)/);
+  assert.match(
+    source,
+    /display:inline!important;position:static!important/
+  );
+});
+
 test("Docusign API error body is preserved for a useful diagnosis", () => {
   const details = docusignErrorDetails({
     message: "Request failed with status code 400",
@@ -165,6 +197,11 @@ test("browser payload sends the PO separately and removes the nested PDF preview
     /Purchase Order attached as a separate Docusign document:/
   );
   assert.match(source, /poPreview\.innerHTML = ''/);
+  assert.match(source, /position:static!important/);
+  assert.match(
+    source,
+    /clone\.querySelectorAll\('\.docusign-anchor'\)/
+  );
   assert.match(source, /Envelope: ' \+ docusignData\.envelopeId/);
   assert.match(source, /docusignData\.code/);
 });

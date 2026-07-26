@@ -497,38 +497,43 @@ async function sendAgreementForSignature(options) {
       })
   );
   const envelopeId = created.envelopeId;
-  const pageCount = await runDocusignStage(
-    "Convert the agreement into signing pages",
-    () => getConvertedPageCount(envelopesApi, envelopeId)
-  );
-
-  for (const recipient of ["contractor", "subcontractor"]) {
-    const recipientId = recipient === "contractor" ? "1" : "2";
-    await runDocusignStage(
-      recipient === "contractor"
-        ? "Place the Wesco signature and initials"
-        : "Place the subcontractor signature and initials",
-      () =>
-        envelopesApi.createTabs(accountId, envelopeId, recipientId, {
-          tabs: {
-            initialHereTabs: initialsForEveryPage(pageCount, recipient),
-            ...sectionTenTabs(recipient, subcontractorEmail),
-          },
-        })
+  try {
+    const pageCount = await runDocusignStage(
+      "Convert the agreement into signing pages",
+      () => getConvertedPageCount(envelopesApi, envelopeId)
     );
+
+    for (const recipient of ["contractor", "subcontractor"]) {
+      const recipientId = recipient === "contractor" ? "1" : "2";
+      await runDocusignStage(
+        recipient === "contractor"
+          ? "Place the Wesco signature and initials"
+          : "Place the subcontractor signature and initials",
+        () =>
+          envelopesApi.createTabs(accountId, envelopeId, recipientId, {
+            tabs: {
+              initialHereTabs: initialsForEveryPage(pageCount, recipient),
+              ...sectionTenTabs(recipient, subcontractorEmail),
+            },
+          })
+      );
+    }
+
+    await runDocusignStage("Send the Docusign envelope", () =>
+      envelopesApi.update(accountId, envelopeId, {
+        envelope: { status: "sent" },
+      })
+    );
+
+    return {
+      envelopeId,
+      pageCount,
+      status: "sent",
+    };
+  } catch (error) {
+    error.envelopeId = envelopeId;
+    throw error;
   }
-
-  await runDocusignStage("Send the Docusign envelope", () =>
-    envelopesApi.update(accountId, envelopeId, {
-      envelope: { status: "sent" },
-    })
-  );
-
-  return {
-    envelopeId,
-    pageCount,
-    status: "sent",
-  };
 }
 
 async function downloadCompletedEnvelope(envelopeId) {
