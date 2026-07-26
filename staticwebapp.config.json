@@ -9,6 +9,14 @@
       "allowedRoles": ["authenticated"]
     },
     {
+      "route": "/Urgent_Items_Issues_Template.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/Urgent_Items_and_Issues_List.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
       "route": "/WesConnect_Executive_Task_Center_FIXED.html",
       "allowedRoles": ["authenticated"]
     },
