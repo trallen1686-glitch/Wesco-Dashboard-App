@@ -18,6 +18,39 @@ const STAFF = new Map([
 const NAME_TO_EMAIL = new Map(
   Array.from(STAFF.entries()).map(([email, name]) => [name.toLowerCase(), email])
 );
+const STAFF_OBJECT_IDS = new Map([
+  ["3461c317-ee66-49f4-b8e7-3ffd19773981", "cokeefe@wesconc.com"],
+  ["b2eefa79-939f-4320-a303-de39516c3940", "jwarren@wesconc.com"],
+  ["968d9e2e-6f07-4caa-8692-a498cad822b4", "jstjohn@wesconc.com"],
+  ["94547ecd-135d-47bf-9ee7-081cc79fd0d4", "ocenteno@wesconc.com"],
+  ["c2416b7e-20c3-4c8b-9b3b-9b14654de70a", "rkirkman@wesconc.com"],
+  ["8e711b0a-77d9-4b29-a304-8dfecb1f5c75", "satkinson@wesconc.com"],
+  ["129c350e-b8ef-4d57-beed-17f9a1e05f3e", "tallen@wesconc.com"],
+  ["e64a8120-b2b4-4ee0-9f6d-b5e7b110c4d2", WES_EMAIL],
+]);
+function normalizeIdentity(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9@]/g, "");
+}
+const STAFF_ALIASES = new Map();
+for (const [email, name] of STAFF) {
+  STAFF_ALIASES.set(normalizeIdentity(email), email);
+  STAFF_ALIASES.set(normalizeIdentity(email.split("@")[0]), email);
+  STAFF_ALIASES.set(normalizeIdentity(name), email);
+}
+for (const [objectId, email] of STAFF_OBJECT_IDS) {
+  STAFF_ALIASES.set(normalizeIdentity(objectId), email);
+}
+function resolveStaffEmail(principal) {
+  const candidates = [principal.userDetails, principal.userId];
+  for (const claim of principal.claims || []) {
+    candidates.push(claim && (claim.val || claim.value));
+  }
+  for (const candidate of candidates) {
+    const email = STAFF_ALIASES.get(normalizeIdentity(candidate));
+    if (email) return email;
+  }
+  return "";
+}
 const SELECT = [
   "new_executivetaskid",
   "new_taskkey",
@@ -44,9 +77,9 @@ function currentUser(request) {
   try {
     const principal = JSON.parse(Buffer.from(encoded, "base64").toString("utf8"));
     const roles = (principal.userRoles || []).map((role) => String(role).toLowerCase());
-    const email = String(principal.userDetails || "").trim().toLowerCase();
+    const email = resolveStaffEmail(principal);
     if (!email || !roles.includes("authenticated")) return null;
-    return { email, name: STAFF.get(email) || email };
+    return { email, name: STAFF.get(email) };
   } catch {
     return null;
   }
@@ -379,6 +412,7 @@ app.http("executiveTaskFile", {
 module.exports = {
   STAFF,
   PORTAL_ADMINS,
+  resolveStaffEmail,
   currentUser,
   identityBody,
   canAccess,
