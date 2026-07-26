@@ -157,9 +157,11 @@ app.http("subcontractorAgreementDocusign", {
   authLevel: "anonymous",
   route: "subcontractor-agreement-docusign",
   handler: async (request, context) => {
+    const isHealthCheck =
+      request.method === "GET" && request.query.get("health") === "1";
     try {
       if (request.method === "GET") {
-        if (request.query.get("health") === "1") {
+        if (isHealthCheck) {
           return {
             headers: { "Cache-Control": "no-store" },
             jsonBody: await verifyDocuSignConnection(),
