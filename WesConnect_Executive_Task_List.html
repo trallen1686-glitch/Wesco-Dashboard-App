@@ -49,7 +49,7 @@
       <div><h1>Executive Task List</h1><p class="subtitle">Employee and subcontractor assignments from Wes Atkinson</p></div>
     </div>
     <div class="toolbar">
-      <a class="portal-back" href="Staff-Portal-Starter-Template.html">← Back to Staff Portals</a>
+      <a id="portalBackLink" class="portal-back" href="Staff-Portal-Starter-Template.html">← Back to Staff Portal</a>
       <button id="saveBtn" type="button">Save</button>
       <button id="printBtn" class="secondary" type="button">Print</button>
     </div>
@@ -149,6 +149,8 @@ render();
 'use strict';
 var tasks=[],viewer=null;
 function el(id){return document.getElementById(id)}
+var requestedPerson=(new URLSearchParams(location.search).get('person')||'').trim();
+el('portalBackLink').href='Staff-Portal-Starter-Template.html'+(requestedPerson?'?person='+encodeURIComponent(requestedPerson):'');
 function safe(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function niceDate(v){if(!v)return '—';var d=new Date(v.length===10?v+'T12:00:00':v);return isNaN(d.getTime())?safe(v):d.toLocaleDateString()}
 function toast(message){var t=el('toast');t.textContent=message;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(function(){t.style.display='none'},2600)}
@@ -165,8 +167,8 @@ function render(){
   el('openCount').textContent=open.length;el('urgentCount').textContent=open.filter(function(t){return t.priority==='High'}).length;el('doneCount').textContent=done.length
 }
 async function refresh(){
-  var requested=(new URLSearchParams(location.search).get('person')||'').trim(),suffix=requested?'?person='+encodeURIComponent(requested):'';
-  try{var data=await api(suffix);tasks=data.tasks||[];viewer=data.viewer;el('staffName').textContent=viewer.canViewAll&&requested?requested:viewer.name;render()}catch(err){toast(err.message)}
+  var suffix=requestedPerson?'?person='+encodeURIComponent(requestedPerson):'';
+  try{var data=await api(suffix);tasks=data.tasks||[];viewer=data.viewer;el('staffName').textContent=viewer.canViewAll&&requestedPerson?requestedPerson:viewer.name;render()}catch(err){toast(err.message)}
 }
 async function changeStatus(id,completed){try{await api('/'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:completed?'Completed':'Open'})});await refresh();toast(completed?'Task moved to Completed Items.':'Task returned to the open list.')}catch(err){toast(err.message)}}
 document.addEventListener('click',function(e){var b=e.target.closest('button[data-action]');if(!b)return;changeStatus(b.getAttribute('data-id'),b.getAttribute('data-action')==='done')});

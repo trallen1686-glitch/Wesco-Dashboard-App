@@ -344,7 +344,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   var PERSON_EXTRA_TABS = {
     'Wes Atkinson': {
       approvals:      { label: 'Approvals',              icon: '✅', desc: 'Estimates, Change Orders, Takeoffs & Material Sheets awaiting your approval', url: '', personAware: false },
-      masterToDoList: { label: 'Wes Connect Executive Center', icon: '📌', desc: 'Create and manage executive tasks for staff', url: 'WesConnect_Executive_Task_Center_FIXED.html', personAware: false },
+      masterToDoList: { label: 'WesConnect Executive Task Center', icon: '📌', desc: 'Create and manage executive tasks for staff', url: 'WesConnect_Executive_Task_Center_FIXED.html', personAware: true },
       masterUrgent:   { label: 'Master Urgent List',      icon: '🚨', desc: 'Company-wide urgent items needing attention',     url: '', personAware: false }
     }
   };
@@ -561,7 +561,10 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     $('starterRoleTag').innerHTML = '<span class="tag ' + p.tagClass + '">' + escapeHtml(p.role) + '</span>';
 
     activeTabs = Object.assign({}, PERSON_EXTRA_TABS[p.name] || {}, TAB_LINKS);
-    if(p.name === 'Wes Atkinson') delete activeTabs.masterTaskList;
+    if(p.name === 'Wes Atkinson'){
+      delete activeTabs.masterTaskList;
+      delete activeTabs.executiveTaskList;
+    }
     var unreadTotal = getTotalUnreadFor(p.name);
 
     $('tabGrid').innerHTML = Object.keys(activeTabs).map(function(key){
