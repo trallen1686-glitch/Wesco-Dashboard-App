@@ -1957,7 +1957,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       await uploadBlobInChunks(sessionData.uploadUrl, payload.blob, status);
       status.textContent = 'Creating the Docusign envelope and signature fields…';
       var printableHtml = buildPrintableHtml();
-      var docusignResponse = await fetch('/api/subcontractor-agreements/docusign', {
+      var docusignResponse = await fetch('/api/subcontractor-agreement-docusign', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body:JSON.stringify({

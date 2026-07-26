@@ -155,7 +155,7 @@ app.http("subcontractorAgreements", {
 app.http("subcontractorAgreementDocusign", {
   methods: ["GET", "POST"],
   authLevel: "anonymous",
-  route: "subcontractor-agreements/docusign",
+  route: "subcontractor-agreement-docusign",
   handler: async (request, context) => {
     try {
       if (request.method === "GET") {
