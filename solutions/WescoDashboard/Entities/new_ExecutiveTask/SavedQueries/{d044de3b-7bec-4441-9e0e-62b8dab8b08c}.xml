@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{d044de3b-7bec-4441-9e0e-62b8dab8b08c}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="new_tasktitle" select="1" icon="1" preview="1">
+        <row name="result" id="new_executivetaskid">
+          <cell name="new_tasktitle" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>1</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="new_executivetask">
+          <attribute name="new_executivetaskid" />
+          <attribute name="new_tasktitle" />
+          <attribute name="createdon" />
+          <order attribute="new_tasktitle" descending="false" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Executive Task Advanced Find View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>
