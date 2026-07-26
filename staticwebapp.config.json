@@ -5,6 +5,10 @@
       "allowedRoles": ["authenticated"]
     },
     {
+      "route": "/api/urgent-items*",
+      "allowedRoles": ["authenticated"]
+    },
+    {
       "route": "/WesConnect_Executive_Task_Center_FIXED.html",
       "allowedRoles": ["authenticated"]
     },
