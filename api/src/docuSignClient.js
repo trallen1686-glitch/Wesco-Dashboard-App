@@ -222,6 +222,10 @@ async function sendAgreementForSignature({
 }) {
   const envelopesApi = await getEnvelopesApi();
   const accountId = requireSetting("DOCUSIGN_ACCOUNT_ID");
+  const completedFileName = fileName.replace(/\.html$/i, ".pdf");
+  const completionWebhookUrl =
+    process.env.DOCUSIGN_COMPLETION_WEBHOOK_URL ||
+    "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/api/subcontractor-agreement-docusign-completed";
   const envelopeDefinition = {
     emailSubject: `Wesco Subcontractor Agreement - ${projectName}`,
     emailBlurb:
@@ -266,6 +270,27 @@ async function sendAgreementForSignature({
         },
       ],
     },
+    eventNotification: {
+      url:
+        `${completionWebhookUrl}?fileName=` +
+        encodeURIComponent(completedFileName),
+      loggingEnabled: "true",
+      requireAcknowledgment: "true",
+      useSoapInterface: "false",
+      includeDocuments: "false",
+      includeCertificateOfCompletion: "false",
+      eventData: {
+        version: "restv2.1",
+        format: "json",
+        includeData: [],
+      },
+      envelopeEvents: [
+        {
+          envelopeEventStatusCode: "completed",
+          includeDocuments: "false",
+        },
+      ],
+    },
     status: "created",
   };
 
@@ -297,6 +322,31 @@ async function sendAgreementForSignature({
   };
 }
 
+async function downloadCompletedEnvelope(envelopeId) {
+  const envelopesApi = await getEnvelopesApi();
+  const accountId = requireSetting("DOCUSIGN_ACCOUNT_ID");
+  const envelope = await envelopesApi.getEnvelope(accountId, envelopeId);
+  if (String(envelope.status || "").toLowerCase() !== "completed") {
+    throw Object.assign(
+      new Error("The Docusign envelope is not completed yet."),
+      { status: 409 }
+    );
+  }
+
+  const document = await envelopesApi.getDocument(
+    accountId,
+    envelopeId,
+    "combined",
+    { certificate: "true" }
+  );
+  if (Buffer.isBuffer(document)) return document;
+  if (document instanceof ArrayBuffer) return Buffer.from(document);
+  if (Buffer.isBuffer(document?.data)) return document.data;
+  if (document?.data instanceof ArrayBuffer) return Buffer.from(document.data);
+  if (typeof document === "string") return Buffer.from(document, "binary");
+  throw new Error("Docusign returned an unsupported completed-document format.");
+}
+
 async function getEnvelopeStatus(envelopeId) {
   const envelopesApi = await getEnvelopesApi();
   const envelope = await envelopesApi.getEnvelope(
@@ -323,6 +373,7 @@ async function verifyDocuSignConnection() {
 
 module.exports = {
   sendAgreementForSignature,
+  downloadCompletedEnvelope,
   getEnvelopeStatus,
   verifyDocuSignConnection,
 };

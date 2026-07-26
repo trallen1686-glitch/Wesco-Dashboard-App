@@ -1,7 +1,8 @@
 const { app } = require("@azure/functions");
-const { graphFetch } = require("../graphClient");
+const { graphFetch, graphUploadContent } = require("../graphClient");
 const {
   sendAgreementForSignature,
+  downloadCompletedEnvelope,
   getEnvelopeStatus,
   verifyDocuSignConnection,
 } = require("../docuSignClient");
@@ -9,7 +10,12 @@ const {
 const SITE_HOSTNAME = "wesconc.sharepoint.com";
 const SITE_PATH = "/sites/Wesco";
 const SUBCONTRACTOR_ROOT = "We App/Subcontractors";
-const SIGNATURE_FOLDER = "Review & Signature Needed";
+const AGREEMENT_ARCHIVE_ROOT =
+  "We App/Internal Staff/Rebecca Kirkman/Saved Subcontractors Agreements";
+const SENT_FOR_SIGNATURE_FOLDER =
+  `${AGREEMENT_ARCHIVE_ROOT}/Sent for Signature`;
+const SIGNED_AGREEMENTS_FOLDER =
+  `${AGREEMENT_ARCHIVE_ROOT}/Signed Agreements`;
 
 let siteIdPromise = null;
 
@@ -114,8 +120,7 @@ app.http("subcontractorAgreements", {
       }
 
       const siteId = await getSiteId();
-      const destination =
-        `${SUBCONTRACTOR_ROOT}/${matched.name}/${SIGNATURE_FOLDER}/${fileName}`;
+      const destination = `${SENT_FOR_SIGNATURE_FOLDER}/${fileName}`;
       const session = await graphFetch(
         `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/` +
           `${encodeGraphPath(destination)}:/createUploadSession`,
@@ -132,8 +137,7 @@ app.http("subcontractorAgreements", {
       return {
         jsonBody: {
           uploadUrl: session.uploadUrl,
-          destination:
-            `${SUBCONTRACTOR_ROOT}/${matched.name}/${SIGNATURE_FOLDER}`,
+          destination: SENT_FOR_SIGNATURE_FOLDER,
         },
       };
     } catch (err) {
@@ -216,8 +220,7 @@ app.http("subcontractorAgreementDocusign", {
         );
       }
 
-      const destination =
-        `${SUBCONTRACTOR_ROOT}/${matched.name}/${SIGNATURE_FOLDER}`;
+      const destination = SENT_FOR_SIGNATURE_FOLDER;
       const result = await sendAgreementForSignature({
         documentBase64,
         fileName,
@@ -251,6 +254,68 @@ app.http("subcontractorAgreementDocusign", {
                 700
               )
             : undefined,
+        },
+      };
+    }
+  },
+});
+
+app.http("subcontractorAgreementDocusignCompleted", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "subcontractor-agreement-docusign-completed",
+  handler: async (request, context) => {
+    try {
+      const body = await request.json();
+      const eventName = String(body.event || body.Event || "").toLowerCase();
+      if (eventName && eventName !== "envelope-completed") {
+        return { status: 202, jsonBody: { accepted: true } };
+      }
+
+      const envelopeId = cleanName(
+        body.data?.envelopeId ||
+          body.envelopeId ||
+          body.EnvelopeStatus?.EnvelopeID,
+        "Docusign envelope ID"
+      );
+      const fileName = cleanName(
+        request.query.get("fileName") ||
+          `Wesco-Subcontractor-Agreement-${envelopeId}.pdf`,
+        "completed agreement file name"
+      );
+      if (!fileName.toLowerCase().endsWith(".pdf")) {
+        throw Object.assign(
+          new Error("The completed agreement must be a PDF file."),
+          { status: 400 }
+        );
+      }
+
+      const completedPdf = await downloadCompletedEnvelope(envelopeId);
+      const siteId = await getSiteId();
+      const destination = `${SIGNED_AGREEMENTS_FOLDER}/${fileName}`;
+      const uploaded = await graphUploadContent(
+        `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/` +
+          `${encodeGraphPath(destination)}:/content`,
+        completedPdf,
+        "application/pdf"
+      );
+
+      return {
+        jsonBody: {
+          archived: true,
+          envelopeId,
+          destination: SIGNED_AGREEMENTS_FOLDER,
+          itemId: uploaded.id,
+        },
+      };
+    } catch (err) {
+      context.error(err);
+      return {
+        status: err.status || 500,
+        jsonBody: {
+          error: err.status
+            ? err.message
+            : "The completed Docusign agreement could not be archived.",
         },
       };
     }

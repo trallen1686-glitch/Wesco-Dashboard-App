@@ -28,6 +28,7 @@
     "DOCUSIGN_BASE_PATH": "https://demo.docusign.net/restapi",
     "DOCUSIGN_KEY_VAULT_URL": "https://wesco-dashboard-secrets.vault.azure.net",
     "DOCUSIGN_PRIVATE_KEY_SECRET": "Docusign-PrivateKey",
-    "DOCUSIGN_CONSENT_REDIRECT_URI": "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/"
+    "DOCUSIGN_CONSENT_REDIRECT_URI": "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/",
+    "DOCUSIGN_COMPLETION_WEBHOOK_URL": "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/api/subcontractor-agreement-docusign-completed"
   }
 }

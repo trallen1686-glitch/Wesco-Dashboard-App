@@ -67,6 +67,25 @@ async function rawFetch(url, options = {}) {
   return res.json();
 }
 
+async function graphUploadContent(url, content, contentType = "application/octet-stream") {
+  const token = await getAccessToken();
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": contentType,
+    },
+    body: content,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    const err = new Error(`Graph PUT ${url} failed: ${res.status} ${text}`);
+    err.status = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
 // Original signature: relative path against the "equipment" workbook.
 // Kept as-is so equipment.js/visits.js don't need to change.
 async function graphFetch(path, options = {}) {
@@ -101,6 +120,7 @@ function sanitizeForSheetName(name) {
 module.exports = {
   graphFetch,
   graphFetchFor,
+  graphUploadContent,
   workbookBase,
   visitsTableName,
   sanitizeForTableName,
