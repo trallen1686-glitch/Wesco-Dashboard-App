@@ -145,45 +145,138 @@ function initialsForEveryPage(pageCount, recipient) {
   }));
 }
 
-function finalPageTabs(pageCount, recipient) {
+function anchorTab(anchorString, recipientId, tabLabel, options = {}) {
+  return {
+    documentId: "1",
+    recipientId,
+    anchorString,
+    anchorUnits: "pixels",
+    anchorXOffset: String(options.xOffset ?? 0),
+    anchorYOffset: String(options.yOffset ?? 14),
+    anchorIgnoreIfNotPresent: "false",
+    tabLabel,
+    optional: options.optional ? "true" : "false",
+    ...(options.width ? { width: String(options.width) } : {}),
+    ...(options.height ? { height: String(options.height) } : {}),
+    ...(options.value ? { value: options.value } : {}),
+    ...(options.locked !== undefined
+      ? { locked: options.locked ? "true" : "false" }
+      : {}),
+  };
+}
+
+function sectionTenTabs(recipient, subcontractorEmail) {
   const isContractor = recipient === "contractor";
   const recipientId = isContractor ? "1" : "2";
-  const xPosition = isContractor ? "82" : "355";
+  if (isContractor) {
+    return {
+      signHereTabs: [
+        anchorTab(
+          "WESCO_SIGNATURE_ANCHOR",
+          recipientId,
+          "Wesco Signature",
+          { yOffset: 4 }
+        ),
+      ],
+      textTabs: [
+        anchorTab("WESCO_NAME_ANCHOR", recipientId, "Wesco Name", {
+          width: 220,
+          height: 22,
+        }),
+        anchorTab("WESCO_TITLE_ANCHOR", recipientId, "Wesco Title", {
+          width: 220,
+          height: 22,
+        }),
+      ],
+      dateSignedTabs: [
+        anchorTab("WESCO_DATE_ANCHOR", recipientId, "Wesco Date Signed", {
+          width: 110,
+          height: 22,
+        }),
+      ],
+    };
+  }
+
   return {
     signHereTabs: [
-      {
-        documentId: "1",
-        pageNumber: String(pageCount),
+      anchorTab(
+        "SUB_SIGNATURE_ANCHOR",
         recipientId,
-        xPosition,
-        yPosition: "640",
-        tabLabel: `${isContractor ? "Wesco" : "Subcontractor"} Signature`,
-        optional: "false",
-      },
+        "Subcontractor Signature",
+        { yOffset: 4 }
+      ),
+      anchorTab(
+        "EQUIP_SIGNATURE_ANCHOR",
+        recipientId,
+        "Equipment Agreement Signature",
+        { yOffset: 4 }
+      ),
+    ],
+    textTabs: [
+      anchorTab(
+        "SUB_COMPANY_ANCHOR",
+        recipientId,
+        "Subcontractor Company",
+        { width: 220, height: 22 }
+      ),
+      anchorTab("SUB_NAME_ANCHOR", recipientId, "Subcontractor Name", {
+        width: 220,
+        height: 22,
+      }),
+      anchorTab("SUB_TITLE_ANCHOR", recipientId, "Subcontractor Title", {
+        width: 220,
+        height: 22,
+        optional: true,
+      }),
+      anchorTab("SUB_ADDRESS_ANCHOR", recipientId, "Subcontractor Address", {
+        width: 220,
+        height: 42,
+      }),
+      anchorTab("SUB_PHONE_ANCHOR", recipientId, "Subcontractor Telephone", {
+        width: 220,
+        height: 22,
+      }),
+      anchorTab("SUB_FAX_ANCHOR", recipientId, "Subcontractor Facsimile", {
+        width: 220,
+        height: 22,
+        optional: true,
+      }),
+      anchorTab("SUB_EMAIL_ANCHOR", recipientId, "Subcontractor Email", {
+        width: 220,
+        height: 22,
+        value: subcontractorEmail,
+        locked: false,
+      }),
+      anchorTab(
+        "SUB_CONTACT_ANCHOR",
+        recipientId,
+        "Subcontractor Project Contact",
+        { width: 220, height: 22, optional: true }
+      ),
+      anchorTab("EQUIP_NAME_ANCHOR", recipientId, "Equipment Employee Name", {
+        width: 220,
+        height: 22,
+      }),
+      anchorTab(
+        "EQUIP_COMPANY_ANCHOR",
+        recipientId,
+        "Equipment Company Name",
+        { width: 220, height: 22 }
+      ),
     ],
     dateSignedTabs: [
-      {
-        documentId: "1",
-        pageNumber: String(pageCount),
+      anchorTab(
+        "SUB_DATE_ANCHOR",
         recipientId,
-        xPosition,
-        yPosition: "700",
-        width: "88",
-        height: "16",
-        tabLabel: `${isContractor ? "Wesco" : "Subcontractor"} Date Signed`,
-      },
-    ],
-    fullNameTabs: [
-      {
-        documentId: "1",
-        pageNumber: String(pageCount),
+        "Subcontractor Date Signed",
+        { width: 110, height: 22 }
+      ),
+      anchorTab(
+        "EQUIP_DATE_ANCHOR",
         recipientId,
-        xPosition,
-        yPosition: "675",
-        width: "170",
-        height: "16",
-        tabLabel: `${isContractor ? "Wesco" : "Subcontractor"} Full Name`,
-      },
+        "Equipment Agreement Date Signed",
+        { width: 110, height: 22 }
+      ),
     ],
   };
 }
@@ -219,6 +312,7 @@ async function sendAgreementForSignature({
   subcontractorEmail,
   contractorName,
   contractorEmail,
+  completionFolder,
 }) {
   const envelopesApi = await getEnvelopesApi();
   const accountId = requireSetting("DOCUSIGN_ACCOUNT_ID");
@@ -229,7 +323,7 @@ async function sendAgreementForSignature({
   const envelopeDefinition = {
     emailSubject: `Wesco Subcontractor Agreement - ${projectName}`,
     emailBlurb:
-      "Please review and complete the required initials and signature fields in this Wesco subcontractor agreement.",
+      "Wesco Exteriors completes and signs first. After Wesco finishes, Docusign automatically emails the subcontractor to complete the right-side information, initials, and signatures.",
     documents: [
       {
         documentBase64,
@@ -273,7 +367,9 @@ async function sendAgreementForSignature({
     eventNotification: {
       url:
         `${completionWebhookUrl}?fileName=` +
-        encodeURIComponent(completedFileName),
+        encodeURIComponent(completedFileName) +
+        "&folder=" +
+        encodeURIComponent(completionFolder),
       loggingEnabled: "true",
       requireAcknowledgment: "true",
       useSoapInterface: "false",
@@ -302,11 +398,10 @@ async function sendAgreementForSignature({
 
   for (const recipient of ["contractor", "subcontractor"]) {
     const recipientId = recipient === "contractor" ? "1" : "2";
-    const finalTabs = finalPageTabs(pageCount, recipient);
     await envelopesApi.createTabs(accountId, envelopeId, recipientId, {
       tabs: {
         initialHereTabs: initialsForEveryPage(pageCount, recipient),
-        ...finalTabs,
+        ...sectionTenTabs(recipient, subcontractorEmail),
       },
     });
   }

@@ -14,8 +14,6 @@ const AGREEMENT_ARCHIVE_ROOT =
   "We App/Internal Staff/Rebecca Kirkman/Saved Subcontractors Agreements";
 const SENT_FOR_SIGNATURE_FOLDER =
   `${AGREEMENT_ARCHIVE_ROOT}/Sent for Signature`;
-const SIGNED_AGREEMENTS_FOLDER =
-  `${AGREEMENT_ARCHIVE_ROOT}/Signed Agreements`;
 
 let siteIdPromise = null;
 
@@ -200,6 +198,14 @@ app.http("subcontractorAgreementDocusign", {
         body.contractorEmail,
         "Wesco signer email"
       );
+      if (contractorEmail.toLowerCase() === subcontractorEmail.toLowerCase()) {
+        throw Object.assign(
+          new Error(
+            "The subcontractor email must be different from the Wesco signer email."
+          ),
+          { status: 400 }
+        );
+      }
       const documentBase64 = cleanBase64(body.documentBase64);
       const projectName = cleanName(body.projectName, "project name");
 
@@ -230,6 +236,7 @@ app.http("subcontractorAgreementDocusign", {
         subcontractorEmail,
         contractorName,
         contractorEmail,
+        completionFolder: matched.name,
       });
 
       return {
@@ -290,9 +297,27 @@ app.http("subcontractorAgreementDocusignCompleted", {
         );
       }
 
+      const requestedFolder = cleanName(
+        request.query.get("folder"),
+        "subcontractor completion folder"
+      );
+      const subcontractors = await listSubcontractors();
+      const matched = subcontractors.find(
+        (item) => item.name.toLowerCase() === requestedFolder.toLowerCase()
+      );
+      if (!matched) {
+        throw Object.assign(
+          new Error(
+            "The subcontractor completion folder does not exist in SharePoint."
+          ),
+          { status: 404 }
+        );
+      }
+
       const completedPdf = await downloadCompletedEnvelope(envelopeId);
       const siteId = await getSiteId();
-      const destination = `${SIGNED_AGREEMENTS_FOLDER}/${fileName}`;
+      const destinationFolder = `${SUBCONTRACTOR_ROOT}/${matched.name}`;
+      const destination = `${destinationFolder}/${fileName}`;
       const uploaded = await graphUploadContent(
         `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/` +
           `${encodeGraphPath(destination)}:/content`,
@@ -304,7 +329,7 @@ app.http("subcontractorAgreementDocusignCompleted", {
         jsonBody: {
           archived: true,
           envelopeId,
-          destination: SIGNED_AGREEMENTS_FOLDER,
+          destination: destinationFolder,
           itemId: uploaded.id,
         },
       };
