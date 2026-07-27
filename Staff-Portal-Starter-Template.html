@@ -516,7 +516,9 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   var canViewAllPeople = false;
 
   async function loadSignedInPerson(){
-    var response = await fetch('/api/executive-tasks/me');
+    var signedInEmail = (new URLSearchParams(window.location.search).get('email') || '').trim();
+    var identityUrl = '/api/executive-tasks/me' + (signedInEmail ? '?email=' + encodeURIComponent(signedInEmail) : '');
+    var response = await fetch(identityUrl);
     var data = await response.json();
     if(!response.ok) throw new Error(data.error || 'Sign in with your Wesco account.');
     canViewAllPeople = !!data.canViewAll;
