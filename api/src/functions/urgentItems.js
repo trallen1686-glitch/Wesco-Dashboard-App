@@ -16,7 +16,6 @@ const SELECT = [
   "cre09_urgentid",
   "cre09_urgentissuetitle",
   "cre09_reportedby",
-  "wes_urgentissues_startdate",
   "cre09_duedate",
   "cre09_assignedto",
   "cre09_issuedescription",
@@ -84,7 +83,7 @@ function mapRecord(record) {
   return {
     id: record.cre09_urgentid,
     issuer: record.cre09_reportedby || "",
-    dateIssued: record.wes_urgentissues_startdate || "",
+    dateIssued: meta.dateIssued || String(record.createdon || "").slice(0, 10),
     dueDate: record.cre09_duedate || "",
     issuedFor: String(record.cre09_assignedto || "")
       .split(",")
@@ -134,7 +133,6 @@ app.http("urgentItems", {
       const payload = {
         cre09_urgentissuetitle: type,
         cre09_reportedby: cleanText(body.issuer, 100),
-        wes_urgentissues_startdate: cleanText(body.dateIssued, 10),
         cre09_duedate: cleanText(body.dueDate, 10),
         cre09_assignedto: issuedFor.join(", ").slice(0, 100),
         cre09_issuedescription: cleanText(body.description, 1500),
@@ -142,6 +140,7 @@ app.http("urgentItems", {
           resolved: false,
           resolvedAt: null,
           createdAt,
+          dateIssued: cleanText(body.dateIssued, 10),
         })}`,
       };
       const created = await dataverseJson(
@@ -177,13 +176,22 @@ app.http("urgentItemRecord", {
       }
       const body = await request.json();
       const resolved = Boolean(body.resolved);
+      const current = await dataverseJson(
+        `${ENTITY_SET}(${id})?$select=cre09_notes,createdon`
+      );
+      const currentMeta = metaFrom(current);
       await dataverseJson(`${ENTITY_SET}(${id})`, {
         method: "PATCH",
         body: JSON.stringify({
           cre09_notes: `WESCO_URGENT_META:${JSON.stringify({
             resolved,
             resolvedAt: resolved ? new Date().toISOString() : null,
-            createdAt: cleanText(body.createdAt, 50) || new Date().toISOString(),
+            createdAt:
+              currentMeta.createdAt ||
+              cleanText(body.createdAt, 50) ||
+              current.createdon ||
+              new Date().toISOString(),
+            dateIssued: currentMeta.dateIssued || String(current.createdon || "").slice(0, 10),
           })}`,
         }),
       });
