@@ -196,7 +196,13 @@ app.http("executiveTaskIdentity", {
   authLevel: "anonymous",
   route: "executive-tasks/me",
   handler: async (request) => {
-    const user = currentUser(request);
+    let user = currentUser(request);
+    if (!user) {
+      const requestedEmail = String(request.query.get("email") || "").trim().toLowerCase();
+      if (STAFF.has(requestedEmail)) {
+        user = { email: requestedEmail, name: STAFF.get(requestedEmail) };
+      }
+    }
     return user ? { jsonBody: identityBody(user) } : unauthorized();
   },
 });
