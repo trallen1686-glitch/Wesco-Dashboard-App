@@ -1,16 +1,28 @@
 {
   "routes": [
     {
+      "route": "/api/executive-tasks/me",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/api/executive-tasks*",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": [
+        "authenticated"
+      ]
     },
     {
       "route": "/WesConnect_Executive_Task_Center_FIXED.html",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": [
+        "authenticated"
+      ]
     },
     {
       "route": "/WesConnect_Executive_Task_List.html",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": [
+        "authenticated"
+      ]
     }
   ],
   "responseOverrides": {
@@ -21,7 +33,14 @@
   },
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["*.css", "*.js", "*.png", "*.jpg", "*.svg", "*.ico"]
+    "exclude": [
+      "*.css",
+      "*.js",
+      "*.png",
+      "*.jpg",
+      "*.svg",
+      "*.ico"
+    ]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
