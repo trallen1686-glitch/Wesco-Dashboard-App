@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco – Employee Hardware Log</title>
+<style>
+:root{
+  --blue:        #106EBE;
+  --blue-bright: #0078D4;
+  --urgent:      #A80000;
+  --urgent-tint: #FBEAEA;
+  --success:     #2EC45A;
+  --success-tint:#E8F8ED;
+  --neutral:     #A19F9D;
+  --page-bg:     #F5F5F5;
+  --card-bg:     #FFFFFF;
+  --border:      #E1DFDD;
+  --ink:         #201F1E;
+  --ink-soft:    #605E5C;
+  --maroon:      #5C2B37;
+  --maroon-tint: #F3E7EC;
+  --amber:       #8A5A00;
+  --amber-tint:  #FDF2E3;
+  --font: 'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  --radius: 6px;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; background:var(--page-bg); color:var(--ink); font-family:var(--font); font-size:14.5px; line-height:1.45; }
+.widget{ max-width:1080px; margin:0 auto; padding:14px; }
+.card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom:16px; }
+
+.backlink{ position:fixed; top:10px; left:10px; z-index:9999; background:#102b3d; color:#fff; font:700 11px Arial,sans-serif; padding:7px 12px; border-radius:20px; text-decoration:none; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+
+.header{ display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:3px solid var(--maroon); }
+.header img.logo{ height:34px; display:block; flex-shrink:0; }
+.header .titles{ flex:1; min-width:0; }
+.header h1{ margin:0; font-size:16.5px; font-weight:700; color:var(--ink); }
+.header .subtitle{ margin:1px 0 0; font-size:12px; color:var(--ink-soft); }
+
+.btn{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font); font-weight:700; font-size:13.5px; padding:10px 16px; border-radius:var(--radius); border:none; cursor:pointer; background:var(--blue); color:#fff; }
+.btn:hover{ filter:brightness(1.08); }
+.btn:active{ transform:translateY(1px); }
+.btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--border); font-weight:600; }
+.btn-ghost:hover{ background:#F3F2F1; }
+.btn-sm{ padding:7px 12px; font-size:12.5px; }
+.btn-icon{ background:transparent; border:none; cursor:pointer; font-size:14px; color:var(--ink-soft); padding:4px 6px; line-height:1; }
+.btn-icon:hover{ color:var(--ink); }
+.btn-icon.delete:hover{ color:var(--urgent); }
+
+.toolbar{ display:flex; align-items:center; gap:10px; padding:14px 18px; flex-wrap:wrap; }
+.toolbar .filter-input{ flex:1; min-width:180px; font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:4px; padding:9px 10px; }
+
+.section-label{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--blue); padding:18px 18px 8px; border-top:1px solid var(--border); margin-top:6px; }
+.section-label:first-of-type{ border-top:none; margin-top:0; }
+
+.field-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 16px; padding:0 18px 18px; }
+.field{ display:flex; flex-direction:column; gap:5px; min-width:0; }
+.field.full{ grid-column:1 / -1; }
+.field label{ font-size:12.5px; font-weight:700; color:var(--ink); }
+.field label .req{ color:var(--urgent); font-weight:700; margin-left:2px; }
+.field label .hint{ font-weight:400; color:var(--ink-soft); font-size:11.5px; margin-left:4px; }
+.field input, .field select, .field textarea{ font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:4px; padding:9px 10px; background:#fff; color:var(--ink); width:100%; }
+.field textarea{ resize:vertical; min-height:60px; }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; padding:0 18px 18px; }
+.eq-card{ text-align:left; display:flex; flex-direction:column; gap:6px; padding:14px 16px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; }
+.eq-card:hover{ box-shadow:0 6px 16px rgba(24,48,65,.1); }
+.eq-card b{ color:var(--maroon); font-size:13.5px; }
+.eq-card span{ color:var(--ink-soft); font-size:11.5px; }
+.pill{ display:inline-block; align-self:flex-start; font-size:11px; font-weight:700; padding:3px 9px; border-radius:12px; background:var(--success-tint); color:#1a7d3a; }
+.pill.zero{ background:#F3F2F1; color:var(--ink-soft); }
+
+.detail-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px; flex-wrap:wrap; }
+.detail-header h2{ margin:0; font-size:17px; color:var(--maroon); }
+
+table.visits{ width:100%; border-collapse:collapse; margin:0 18px 18px; width:calc(100% - 36px); }
+table.visits th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); border-bottom:2px solid var(--border); padding:8px 8px; }
+table.visits td{ padding:9px 8px; border-bottom:1px solid var(--border); font-size:13px; }
+table.visits tr:last-child td{ border-bottom:none; }
+.empty-row td{ color:var(--ink-soft); font-style:italic; text-align:center; padding:18px 8px; }
+
+.data-note{ margin:16px 0 0; border-top:1px solid var(--border); }
+.data-note summary{ cursor:pointer; padding:12px 18px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+.data-note .body{ padding:0 18px 16px; font-size:12.5px; color:var(--ink-soft); }
+.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; }
+
+.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto; z-index:1000; }
+.modal-backdrop.open{ display:flex; }
+.modal{ background:#fff; border-radius:8px; max-width:640px; width:100%; }
+.modal .header{ padding:14px 18px; }
+
+.actions-row{ display:flex; gap:10px; padding:0 18px 18px; flex-wrap:wrap; }
+
+@media print{ .no-print{ display:none !important; } }
+@media (max-width:640px){ .field-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<a href="index.html" class="backlink">&#8592; Wesco Hub</a>
+<div class="widget">
+
+  <div class="card">
+    <div class="header">
+      <img class="logo" src="Wesco%20Logo%202.png" alt="Wesco Exteriors, Inc.">
+      <div class="titles">
+        <h1>Employee Hardware Log</h1>
+        <p class="subtitle">Devices and equipment assigned to each employee</p>
+      </div>
+    </div>
+    <div class="toolbar no-print">
+      <input type="text" class="filter-input" id="listFilter" placeholder="Filter by employee name…">
+      <button type="button" class="btn" id="addEquipmentBtn">+ Add Employee</button>
+    </div>
+    <div class="grid" id="equipmentGrid"><!-- employee cards rendered here --></div>
+  </div>
+
+  <div class="card" id="detailCard" style="display:none;">
+    <div class="detail-header">
+      <div>
+        <button type="button" class="btn btn-ghost btn-sm no-print" id="backToListBtn">&#8592; All Employees</button>
+      </div>
+    </div>
+    <div class="detail-header" style="padding-top:0;">
+      <h2 id="detailMachineName">Employee</h2>
+      <div id="detailCostPill"></div>
+    </div>
+
+    <div class="detail-header" style="padding-top:0;">
+      <span class="section-label" style="padding-left:0;border-top:none;">Hardware Items</span>
+      <button type="button" class="btn btn-sm no-print" id="addVisitBtn">+ Add Hardware Item</button>
+    </div>
+    <table class="visits">
+      <thead>
+        <tr><th>#</th><th>Device Name</th><th>Model</th><th>Model #/ID</th><th>Serial #</th><th>Purchased</th><th>Warranty</th><th>Used</th><th>Notes</th><th class="no-print"></th></tr>
+      </thead>
+      <tbody id="visitsBody"><!-- item rows rendered here --></tbody>
+    </table>
+  </div>
+
+  <details class="data-note">
+    <summary>ℹ How this template works right now</summary>
+    <div class="body">
+      <p>This page reads and writes <code>Employee Hardware Log.xlsx</code> directly through the
+      <code>/api/employees</code> and <code>/api/employees/{sheet}/hardware</code> endpoints (Azure Functions calling
+      Microsoft Graph). "Add Employee" copies the TEMPLATE sheet in the real workbook; "Add Hardware Item" appends a
+      row to that employee's table. Whatever you see here is the actual file — and whatever's in the file shows up
+      here on refresh.</p>
+    </div>
+  </details>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal-backdrop" id="addEquipmentModal">
+  <div class="modal card">
+    <div class="header">
+      <div class="titles"><h1>Add Employee</h1><p class="subtitle">Creates a new employee sheet from the Template</p></div>
+    </div>
+    <form id="equipmentForm">
+      <div class="section-label" style="border-top:none;">Employee Info</div>
+      <div class="field-grid">
+        <div class="field full"><label for="eqMachine">Employee Name<span class="req">*</span></label><input type="text" id="eqMachine" placeholder="e.g. Jesse Warren" required></div>
+      </div>
+      <div class="actions-row">
+        <button type="button" class="btn btn-ghost" id="cancelAddEquipmentBtn">Cancel</button>
+        <button type="submit" class="btn">Add Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Hardware Item Modal -->
+<div class="modal-backdrop" id="addVisitModal">
+  <div class="modal card">
+    <div class="header">
+      <div class="titles"><h1>Add Hardware Item</h1><p class="subtitle" id="visitForMachine">Appends a row to this employee's hardware list</p></div>
+    </div>
+    <form id="visitForm">
+      <div class="section-label" style="border-top:none;">Item Details</div>
+      <div class="field-grid">
+        <div class="field full"><label for="vDevice">Hardware Device Name<span class="req">*</span></label><input type="text" id="vDevice" placeholder="e.g. Work iPhone" required></div>
+        <div class="field"><label for="vModel">Model Name</label><input type="text" id="vModel" placeholder="e.g. iPhone 17 Pro"></div>
+        <div class="field"><label for="vModelNo">Model Number/Device ID</label><input type="text" id="vModelNo"></div>
+        <div class="field"><label for="vSerial">Serial Number/Product ID</label><input type="text" id="vSerial"></div>
+        <div class="field"><label for="vDate">Date Purchased <span class="hint">(optional)</span></label><input type="date" id="vDate"></div>
+        <div class="field"><label for="vWarranty">Warranty (Y/N)</label>
+          <select id="vWarranty"><option value="">—</option><option value="Y">Y</option><option value="N">N</option></select>
+        </div>
+        <div class="field"><label for="vUsed">Used (Y/N)</label>
+          <select id="vUsed"><option value="">—</option><option value="Y">Y</option><option value="N">N</option></select>
+        </div>
+        <div class="field full"><label for="vNotes">Notes <span class="hint">(optional)</span></label><textarea id="vNotes"></textarea></div>
+      </div>
+      <div class="actions-row">
+        <button type="button" class="btn btn-ghost" id="cancelAddVisitBtn">Cancel</button>
+        <button type="submit" class="btn">Add Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var API_BASE = "/api";
+
+  async function apiGet(path){
+    var res = await fetch(API_BASE + path);
+    if(!res.ok) throw new Error("Request failed ("+res.status+")");
+    return res.json();
+  }
+  async function apiSend(path, method, body){
+    var res = await fetch(API_BASE + path, {
+      method: method,
+      headers: {"Content-Type":"application/json"},
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if(!res.ok) throw new Error("Request failed ("+res.status+")");
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  function loadEquipment(){ return apiGet("/employees"); }
+  function addEquipmentApi(data){ return apiSend("/employees", "POST", data); }
+  function loadVisits(sheet){ return apiGet("/employees/"+encodeURIComponent(sheet)+"/hardware"); }
+  function addVisitApi(sheet, item){ return apiSend("/employees/"+encodeURIComponent(sheet)+"/hardware", "POST", item); }
+  function deleteVisitApi(sheet, index){ return apiSend("/employees/"+encodeURIComponent(sheet)+"/hardware/"+index, "DELETE"); }
+
+  function $(id){ return document.getElementById(id); }
+
+  var equipment = [];
+  var currentSheet = null;
+
+  function renderEquipmentGrid(filterText){
+    var grid = $("equipmentGrid");
+    grid.innerHTML = "";
+    var f = (filterText||"").toLowerCase();
+    var shown = equipment.filter(function(eq){
+      if(!f) return true;
+      return (eq.name||"").toLowerCase().indexOf(f) > -1;
+    });
+    if(shown.length === 0){
+      grid.innerHTML = '<p style="color:var(--ink-soft);font-size:13px;">No employees match that filter.</p>';
+      return;
+    }
+    shown.forEach(function(eq){
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "eq-card";
+      var pillClass = eq.itemCount > 0 ? "pill" : "pill zero";
+      card.innerHTML =
+        '<b>'+escapeHtml(eq.name)+'</b>' +
+        '<span class="'+pillClass+'">'+eq.itemCount+' hardware item'+(eq.itemCount===1?'':'s')+'</span>';
+      card.addEventListener("click", function(){ openDetail(eq.sheet); });
+      grid.appendChild(card);
+    });
+  }
+
+  async function refreshEquipment(){
+    var grid = $("equipmentGrid");
+    grid.innerHTML = '<p style="color:var(--ink-soft);font-size:13px;">Loading employees…</p>';
+    try{
+      equipment = await loadEquipment();
+      renderEquipmentGrid($("listFilter").value);
+    }catch(e){
+      grid.innerHTML = '<p style="color:var(--urgent);font-size:13px;">Could not load employees from the API ('+escapeHtml(e.message)+'). The Azure Function may not be deployed/configured yet.</p>';
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  async function openDetail(sheet){
+    currentSheet = sheet;
+    var eq = equipment.find(function(e){ return e.sheet === sheet; });
+    if(!eq) return;
+    $("detailMachineName").textContent = eq.name;
+    document.getElementById("equipmentGrid").closest(".card").style.display = "none";
+    $("detailCard").style.display = "block";
+    $("detailCostPill").innerHTML = "";
+
+    $("visitsBody").innerHTML = '<tr class="empty-row"><td colspan="10">Loading hardware items…</td></tr>';
+    try{
+      var items = await loadVisits(sheet);
+      $("detailCostPill").innerHTML = '<span class="pill">'+items.length+' item'+(items.length===1?'':'s')+'</span>';
+      renderVisits(items);
+    }catch(e){
+      $("visitsBody").innerHTML = '<tr class="empty-row"><td colspan="10" style="color:var(--urgent);">Could not load hardware items ('+escapeHtml(e.message)+').</td></tr>';
+    }
+  }
+
+  function renderVisits(items){
+    var body = $("visitsBody");
+    if(items.length === 0){
+      body.innerHTML = '<tr class="empty-row"><td colspan="10">No hardware items logged yet. Click "+ Add Hardware Item" to add the first one.</td></tr>';
+      return;
+    }
+    var sorted = items.slice().sort(function(a,b){ return (Number(a.num)||0) - (Number(b.num)||0); });
+    body.innerHTML = sorted.map(function(v){
+      return '<tr>' +
+        '<td>'+escapeHtml(v.num)+'</td>' +
+        '<td>'+escapeHtml(v.device)+'</td>' +
+        '<td>'+escapeHtml(v.model)+'</td>' +
+        '<td>'+escapeHtml(v.modelNo)+'</td>' +
+        '<td>'+escapeHtml(v.serial)+'</td>' +
+        '<td>'+escapeHtml(v.datePurchased)+'</td>' +
+        '<td>'+escapeHtml(v.warranty)+'</td>' +
+        '<td>'+escapeHtml(v.used)+'</td>' +
+        '<td>'+escapeHtml(v.notes)+'</td>' +
+        '<td class="no-print"><button type="button" class="btn-icon delete" data-visit-index="'+v.index+'" title="Delete">✕</button></td>' +
+        '</tr>';
+    }).join("");
+    Array.prototype.forEach.call(body.querySelectorAll("[data-visit-index]"), function(btn){
+      btn.addEventListener("click", async function(){
+        var index = btn.getAttribute("data-visit-index");
+        try{
+          await deleteVisitApi(currentSheet, index);
+          openDetail(currentSheet);
+        }catch(e){
+          alert("Could not delete item: "+e.message);
+        }
+      });
+    });
+  }
+
+  $("backToListBtn").addEventListener("click", function(){
+    $("detailCard").style.display = "none";
+    document.getElementById("equipmentGrid").closest(".card").style.display = "block";
+    currentSheet = null;
+  });
+
+  $("listFilter").addEventListener("input", function(){ renderEquipmentGrid(this.value); });
+
+  // --- Add Employee ---
+  var addEqModal = $("addEquipmentModal");
+  $("addEquipmentBtn").addEventListener("click", function(){ addEqModal.classList.add("open"); });
+  $("cancelAddEquipmentBtn").addEventListener("click", function(){ addEqModal.classList.remove("open"); });
+  $("equipmentForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var name = $("eqMachine").value.trim();
+    if(!name) return;
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      await addEquipmentApi({ name: name });
+      await refreshEquipment();
+      this.reset();
+      addEqModal.classList.remove("open");
+    }catch(err){
+      alert("Could not add employee: "+err.message);
+    }finally{
+      submitBtn.disabled = false;
+    }
+  });
+
+  // --- Add Hardware Item ---
+  var addVisitModal = $("addVisitModal");
+  $("addVisitBtn").addEventListener("click", function(){
+    var eq = equipment.find(function(e){ return e.sheet === currentSheet; });
+    $("visitForMachine").textContent = "Appends a row to \""+(eq?eq.name:"")+"\"'s hardware list";
+    addVisitModal.classList.add("open");
+  });
+  $("cancelAddVisitBtn").addEventListener("click", function(){ addVisitModal.classList.remove("open"); });
+  $("visitForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var item = {
+      device: $("vDevice").value.trim(),
+      model: $("vModel").value.trim(),
+      modelNo: $("vModelNo").value.trim(),
+      serial: $("vSerial").value.trim(),
+      datePurchased: $("vDate").value,
+      warranty: $("vWarranty").value,
+      used: $("vUsed").value,
+      notes: $("vNotes").value.trim()
+    };
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      await addVisitApi(currentSheet, item);
+      await openDetail(currentSheet);
+      this.reset();
+      addVisitModal.classList.remove("open");
+    }catch(err){
+      alert("Could not add item: "+err.message);
+    }finally{
+      submitBtn.disabled = false;
+    }
+  });
+
+  refreshEquipment();
+})();
+</script>
+</body>
+</html>
