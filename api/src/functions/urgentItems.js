@@ -159,9 +159,17 @@ app.http("urgentItems", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
+      const diagnosticCode = Number.isInteger(error && error.status)
+        ? `DATAVERSE_HTTP_${error.status}`
+        : "DATAVERSE_AUTH_FAILED";
       return {
         status: 500,
-        jsonBody: { error: "The urgent items service is temporarily unavailable." },
+        jsonBody: {
+          error: "The urgent items service is temporarily unavailable.",
+          ...(new URL(request.url).searchParams.get("diagnostic") === "status"
+            ? { diagnosticCode }
+            : {}),
+        },
       };
     }
   },
