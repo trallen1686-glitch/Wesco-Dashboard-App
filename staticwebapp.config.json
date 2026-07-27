@@ -1,4 +1,28 @@
 {
+  "routes": [
+    {
+      "route": "/api/executive-tasks*",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/WesConnect_Executive_Task_Center_FIXED.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/WesConnect_Executive_Task_List.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/Staff-Portal-Starter-Template.html",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer",
+      "statusCode": 302
+    }
+  },
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["*.css", "*.js", "*.png", "*.jpg", "*.svg", "*.ico"]

@@ -53,6 +53,13 @@
     dialog::backdrop{background:rgba(0,0,0,.75)}
     .dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px;border-bottom:3px solid var(--orange)}
     .dialog-body{padding:20px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}.detail-grid div{padding:10px;border-bottom:1px solid var(--line);color:var(--muted)}.detail-grid strong{display:block;color:#fff;margin-bottom:4px}
+    .list-options{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .list-options input{max-width:260px}
+    .project-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:18px}
+    .project-chip{padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(3,7,9,.58)}
+    .project-chip strong{display:block;color:var(--orange-light);margin-bottom:5px}
+    .project-chip span{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+    .status-active{color:#ffd0ad;font-weight:800}.status-delivered{color:#b8f0d2;font-weight:800}
     @media(max-width:900px){.grid,.project-summary{grid-template-columns:1fr 1fr}}
     @media(max-width:650px){header{position:static}.header-inner,.section-top{align-items:stretch;flex-direction:column}.brand{align-items:flex-start;flex-direction:column}.toolbar{justify-content:stretch}.toolbar button{flex:1}.grid,.project-summary{grid-template-columns:1fr}.card{padding:16px}.brand img{width:135px}}
     @media print{body{background:#fff;color:#000}header,.toolbar,.actions,.icon-btn,.delivered-check,.toast{display:none!important}main{width:100%}.page{display:block!important}.card{border:0;box-shadow:none;background:#fff;padding:0}.table-wrap{overflow:visible;border-color:#777}table{min-width:0;color:#000}thead{background:#ddd}th{color:#000}th,td{border-color:#aaa;font-size:9px;padding:6px}.subtitle,.section-top p{color:#333}}
@@ -68,6 +75,7 @@
     <div class="toolbar">
       <button id="showActiveBtn" type="button">Active Deliveries</button>
       <button id="showDeliveredBtn" class="secondary" type="button">Delivered Items</button>
+      <button id="showDeliveryListBtn" class="secondary" type="button">Delivery List</button>
       <button id="saveBtn" class="secondary" type="button">Save</button>
       <button id="printBtn" class="secondary" type="button">Print</button>
       <button id="sendBtn" class="secondary" type="button">Send</button>
@@ -94,6 +102,26 @@
       <div class="section-top"><div><h2>Delivered Items</h2><p>Completed delivery records automatically appear here.</p></div><input id="deliveredSearch" type="search" placeholder="Search delivered items" style="max-width:320px"></div>
       <div id="deliveredProjectSummary" class="project-summary"></div>
       <div class="table-wrap"><table><thead><tr><th>Status</th><th>PO Number</th><th>Item</th><th>Vendor</th><th>Date Ordered</th><th>Delivery / Pickup Date</th><th>Ordered By</th><th>Delivered On</th><th>Restore</th><th>Delete</th></tr></thead><tbody id="deliveredRows"></tbody></table><div id="deliveredEmpty" class="empty">No delivered items yet.</div></div>
+    </div>
+  </section>
+  <section id="deliveryListPage" class="page">
+    <div class="card">
+      <div class="section-top">
+        <div><h2>Delivery List</h2><p>View every delivery together or search by project number.</p></div>
+      </div>
+      <div class="list-options">
+        <button id="listAllBtn" type="button">All Deliveries</button>
+        <button id="listProjectBtn" class="secondary" type="button">By Project Number</button>
+        <input id="projectNumberFilter" type="search" placeholder="Type project number" style="display:none">
+      </div>
+      <div id="projectGroups" class="project-groups"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Project Number</th><th>Project Name</th><th>Project Manager</th><th>Status</th><th>PO Number</th><th>Item</th><th>Vendor</th><th>Date Ordered</th><th>Delivery / Pickup Date</th><th>Ordered By</th><th>Delivered On</th></tr></thead>
+          <tbody id="deliveryListRows"></tbody>
+        </table>
+        <div id="deliveryListEmpty" class="empty">No deliveries match this view.</div>
+      </div>
     </div>
   </section>
 </main>
@@ -150,7 +178,7 @@ function itemInput(item,key,type='text',placeholder=''){
 }
 function addItem(){
   const data=load(); captureProject(data);
-  data.items.unshift({id:uid(),poNumber:'',item:'',vendor:'',dateOrdered:'',deliveryDate:'',orderedBy:'',delivered:false,deliveredAt:null});
+  data.items.unshift({id:uid(),poNumber:'',item:'',vendor:'',dateOrdered:'',deliveryDate:'',orderedBy:'',delivered:false,deliveredAt:null,project:{...data.project}});
   save(data); render();
   const first=byId('activeRows').querySelector('input[data-key="poNumber"]'); if(first) first.focus();
   notify('New delivery item added.');
@@ -182,9 +210,10 @@ function openItem(id){
   selectedItemId=id;
   byId('itemDialogTitle').textContent=item.item || 'Delivery Item';
   byId('itemDialogSubtitle').textContent=(item.poNumber ? 'PO ' + item.poNumber : 'No PO number entered');
+  const itemProject=item.project || data.project;
   const details=[
-    ['Job Number',data.project.jobNumber || 'Not entered'],['Job Name',data.project.jobName || 'Not entered'],
-    ['Project Manager',data.project.projectManager || 'Not entered'],['PO Number',item.poNumber || 'Not entered'],
+    ['Job Number',itemProject.jobNumber || 'Not entered'],['Job Name',itemProject.jobName || 'Not entered'],
+    ['Project Manager',itemProject.projectManager || 'Not entered'],['PO Number',item.poNumber || 'Not entered'],
     ['Item',item.item || 'Not entered'],['Vendor',item.vendor || 'Not entered'],
     ['Date Ordered',fmtDate(item.dateOrdered) || 'Not entered'],['Delivery / Pickup Date',fmtDate(item.deliveryDate) || 'Not entered'],
     ['Ordered By',item.orderedBy || 'Not entered'],['Status',item.delivered ? 'Delivered' : 'Active']
@@ -222,12 +251,39 @@ function render(){
   </tr>`).join('');
   byId('deliveredEmpty').style.display=delivered.length?'none':'block';
   byId('deliveredProjectSummary').innerHTML=`<div class="summary-item"><strong>Job Number</strong>${esc(data.project.jobNumber||'Not entered')}</div><div class="summary-item"><strong>Job Name</strong>${esc(data.project.jobName||'Not entered')}</div><div class="summary-item"><strong>Project Manager</strong>${esc(data.project.projectManager||'Not entered')}</div>`;
+  renderDeliveryList(data);
+}
+let deliveryListMode='all';
+function projectFor(item,data){ return item.project || data.project || {jobNumber:'',jobName:'',projectManager:''}; }
+function renderDeliveryList(data=load()){
+  const filter=byId('projectNumberFilter').value.trim().toLowerCase();
+  const all=data.items.map(item=>({item,project:projectFor(item,data)}));
+  const shown=deliveryListMode==='project'
+    ? all.filter(row=>row.project.jobNumber.toLowerCase().includes(filter))
+    : all;
+  const groups=new Map();
+  all.forEach(({project})=>{
+    const key=project.jobNumber || 'No project number';
+    if(!groups.has(key)) groups.set(key,{...project,count:0});
+    groups.get(key).count++;
+  });
+  byId('projectGroups').innerHTML=[...groups.entries()].map(([number,project])=>`<div class="project-chip"><strong>${esc(number)}</strong><span>${esc(project.jobName||'Project name not entered')}</span><span>${esc(project.projectManager||'Project manager not entered')} · ${project.count} delivery item${project.count===1?'':'s'}</span></div>`).join('');
+  byId('deliveryListRows').innerHTML=shown.map(({item,project})=>`<tr>
+    <td>${esc(project.jobNumber||'')}</td><td>${esc(project.jobName||'')}</td><td>${esc(project.projectManager||'')}</td>
+    <td class="${item.delivered?'status-delivered':'status-active'}">${item.delivered?'Delivered':'Active'}</td>
+    <td>${esc(item.poNumber||'')}</td><td><span class="item-link" data-list-open="${esc(item.id)}">${esc(item.item||'View item')}</span></td>
+    <td>${esc(item.vendor||'')}</td><td>${fmtDate(item.dateOrdered)}</td><td>${fmtDate(item.deliveryDate)}</td><td>${esc(item.orderedBy||'')}</td>
+    <td>${item.deliveredAt?new Date(item.deliveredAt).toLocaleString():''}</td>
+  </tr>`).join('');
+  byId('deliveryListEmpty').style.display=shown.length?'none':'block';
 }
 function showPage(name){
   byId('activePage').classList.toggle('active',name==='active');
   byId('deliveredPage').classList.toggle('active',name==='delivered');
+  byId('deliveryListPage').classList.toggle('active',name==='list');
   byId('showActiveBtn').classList.toggle('secondary',name!=='active');
   byId('showDeliveredBtn').classList.toggle('secondary',name!=='delivered');
+  byId('showDeliveryListBtn').classList.toggle('secondary',name!=='list');
   render(); window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -249,7 +305,20 @@ byId('deliveredRows').addEventListener('click',event=>{
 byId('deliveredSearch').addEventListener('input',render);
 byId('showActiveBtn').addEventListener('click',()=>showPage('active'));
 byId('showDeliveredBtn').addEventListener('click',()=>showPage('delivered'));
-byId('saveBtn').addEventListener('click',()=>{const data=load();captureProject(data);save(data);notify('Delivery tracker saved.');});
+byId('showDeliveryListBtn').addEventListener('click',()=>showPage('list'));
+byId('listAllBtn').addEventListener('click',()=>{
+  deliveryListMode='all';
+  byId('listAllBtn').classList.remove('secondary'); byId('listProjectBtn').classList.add('secondary');
+  byId('projectNumberFilter').style.display='none'; renderDeliveryList();
+});
+byId('listProjectBtn').addEventListener('click',()=>{
+  deliveryListMode='project';
+  byId('listProjectBtn').classList.remove('secondary'); byId('listAllBtn').classList.add('secondary');
+  byId('projectNumberFilter').style.display='block'; byId('projectNumberFilter').focus(); renderDeliveryList();
+});
+byId('projectNumberFilter').addEventListener('input',()=>renderDeliveryList());
+byId('deliveryListRows').addEventListener('click',event=>{const link=event.target.closest('[data-list-open]');if(link)openItem(link.dataset.listOpen);});
+byId('saveBtn').addEventListener('click',()=>{const data=load();captureProject(data);save(data);renderDeliveryList(data);notify('Delivery tracker saved.');});
 byId('printBtn').addEventListener('click',()=>window.print());
 byId('sendBtn').addEventListener('click',()=>{
   const data=load(); captureProject(data); save(data);

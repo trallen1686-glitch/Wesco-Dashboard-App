@@ -9,6 +9,10 @@
     "GRAPH_CLIENT_ID": "<app registration client id>",
     "GRAPH_CLIENT_SECRET": "<app registration client secret - never commit the real value>",
     "GRAPH_TENANT_ID": "<your Azure AD tenant id>",
+    "DATAVERSE_URL": "https://<your-environment>.crm.dynamics.com",
+    "DATAVERSE_CLIENT_ID": "<Dataverse application user client id>",
+    "DATAVERSE_CLIENT_SECRET": "<client secret - never commit the real value>",
+    "DATAVERSE_TENANT_ID": "<your Azure AD tenant id>",
     "TODO_OWNER_USER": "tallen@wesconc.com",
     "TODO_LIST_ID": "AQMkADYzOTRjM2FiLTNmOGMtNDE4ZS1hOTJiLWNhN2U5ZGEwZTg5YgAuAAADug1uys4PrEuQXED6qOMjzQEApFTVRWPTN0OAHHwFRbnXIAABDWwlRwAAAA==",
     "EXCEL_DRIVE_ID": "b!h9QHU6-BmEyZ2A-UpX9Mj3ugFNVf2RVFsGlXBkALgPm4W2vSwhvZRKs6Or0rMkyp",
@@ -18,6 +22,15 @@
     "VEHICLE_EXCEL_DRIVE_ID": "b!h9QHU6-BmEyZ2A-UpX9Mj3ugFNVf2RVFsGlXBkALgPm4W2vSwhvZRKs6Or0rMkyp",
     "VEHICLE_EXCEL_ITEM_ID": "01JQO4HBTSJO3DEUNKZFBZ4MEFUFQPYF57",
     "HARDWARE_EXCEL_DRIVE_ID": "b!h9QHU6-BmEyZ2A-UpX9Mj3ugFNVf2RVFsGlXBkALgPm4W2vSwhvZRKs6Or0rMkyp",
-    "HARDWARE_EXCEL_ITEM_ID": "01JQO4HBQMMUKODDJLAJBL266RENTSEOEU"
+    "HARDWARE_EXCEL_ITEM_ID": "01JQO4HBQMMUKODDJLAJBL266RENTSEOEU",
+    "DOCUSIGN_INTEGRATION_KEY": "253aeb96-08fd-477f-868e-8eaf384d76cc",
+    "DOCUSIGN_USER_ID": "0600edc2-86e1-4041-a729-3d5469291eda",
+    "DOCUSIGN_ACCOUNT_ID": "60c4da98-6f55-4564-99d5-fe0af0b8d80e",
+    "DOCUSIGN_OAUTH_HOST": "account-d.docusign.com",
+    "DOCUSIGN_BASE_PATH": "https://demo.docusign.net/restapi",
+    "DOCUSIGN_KEY_VAULT_URL": "https://wesco-dashboard-secrets.vault.azure.net",
+    "DOCUSIGN_PRIVATE_KEY_SECRET": "Docusign-PrivateKey",
+    "DOCUSIGN_CONSENT_REDIRECT_URI": "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/",
+    "DOCUSIGN_COMPLETION_WEBHOOK_URL": "https://wonderful-field-08b34ac0f.7.azurestaticapps.net/api/subcontractor-agreement-docusign-completed"
   }
 }

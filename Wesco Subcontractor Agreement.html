@@ -206,7 +206,7 @@ p.clause{ margin: 0 0 12px; text-align:justify; }
 input.f[type="date"]{ font-weight:500; }
 select.f{ font-weight:600; }
 
-.field-block{ margin: 10px 0 16px; }
+.field-block{ margin: 10px 0 16px; position:relative; }
 .field-block label{
   display:block;
   font-family: var(--sans);
@@ -258,6 +258,46 @@ input.f[type="tel"], input.f[type="date"]{
   box-shadow: 0 0 0 3px rgba(178,58,46,.12);
 }
 .field-hint{ font-family: var(--sans); font-size:11px; color:var(--ink-soft); margin-top:3px; }
+.date-with-button{ display:flex; align-items:center; gap:6px; }
+.date-with-button input{ flex:1; }
+.calendar-button{
+  flex:0 0 38px;
+  min-height:36px;
+  border:1.5px solid var(--field-border);
+  border-radius:var(--radius);
+  background:#fff;
+  color:var(--wesco-maroon-dark);
+  cursor:pointer;
+  font-size:18px;
+}
+.calendar-button:hover{ border-color:var(--field-focus); }
+.large-entry{ min-height:92px !important; }
+.equipment-choice-panel{
+  border:1.5px solid var(--field-border);
+  border-radius:var(--radius);
+  padding:8px 10px;
+  margin-bottom:8px;
+  background:#fff;
+  font-family:var(--sans);
+}
+.equipment-choice-panel summary{ cursor:pointer; font-weight:700; }
+.equipment-choice-list{ display:flex; gap:16px; flex-wrap:wrap; padding-top:10px; }
+.equipment-choice-list label{ display:flex; align-items:center; gap:6px; margin:0; }
+.equipment-choice-list input{ width:auto; }
+.docusign-anchor{
+  display:none;
+  position:absolute;
+  left:0;
+  width:auto;
+  height:2px;
+  overflow:visible;
+  white-space:nowrap;
+  color:#fff !important;
+  font-size:2px !important;
+  line-height:2px !important;
+  letter-spacing:0 !important;
+  vertical-align:top;
+}
 
 /* Locked / read-only state once a stage is submitted */
 .locked input.f, .locked textarea.f, .locked select.f{
@@ -322,7 +362,7 @@ input[type="file"].hidden-file{ position:absolute; width:1px; height:1px; opacit
   color:var(--wesco-maroon); margin: 0 0 12px;
 }
 .static-line{ margin: 2px 0; font-size:14px; }
-.sig-pad-wrap{ margin: 6px 0 14px; }
+.sig-pad-wrap{ margin: 6px 0 14px; position:relative; }
 .sig-pad{
   border:1.5px solid var(--field-border);
   border-radius: 4px;
@@ -417,16 +457,277 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   /* Hide on-screen-only helper chrome so the printed copy reads like a finished legal document */
   .field-hint{ display:none !important; }
   .field-tag{ display:none !important; }
+  .calendar-button,.equipment-choice-panel{ display:none !important; }
   .locked .field-block label::after{ content:"" !important; }
   .sig-controls{ display:none !important; }
   .sig-mode-toggle{ display:none !important; }
   #poUploadBtn, #poReplaceBtn, #poRemoveBtn{ display:none !important; }
   .po-filename{ font-style:italic; }
 }
+
+/* ---------- Assigned PM screen theme / standard office print ---------- */
+:root{
+  --portal-orange:#F36A00;
+  --portal-orange-light:#FF9A4D;
+  --portal-bg:#080D10;
+  --portal-panel:rgba(9,14,16,.82);
+  --portal-panel-strong:rgba(4,8,10,.92);
+  --portal-line:rgba(255,255,255,.14);
+  --portal-text:#FFFFFF;
+  --portal-muted:rgba(255,255,255,.72);
+  --portal-font:'Lucida Sans Unicode','Lucida Grande','Lucida Sans',Arial,sans-serif;
+  --serif:var(--portal-font);
+  --sans:var(--portal-font);
+}
+
+@media screen{
+  html,body{
+    background-color:var(--portal-bg);
+    background-image:
+      linear-gradient(115deg,rgba(6,10,12,.97),rgba(9,14,16,.82) 45%,rgba(9,14,16,.95)),
+      radial-gradient(circle at 72% 18%,rgba(243,106,0,.12),transparent 34%);
+    background-attachment:fixed;
+    color:var(--portal-text);
+    font-family:var(--portal-font);
+    font-size:12pt;
+  }
+  .app-topbar{
+    background:rgba(4,8,10,.90);
+    border-bottom:3px solid var(--portal-orange);
+    box-shadow:0 12px 32px rgba(0,0,0,.40);
+  }
+  .app-topbar .brand span{ color:#fff; }
+  .btn-maroon{ background:var(--portal-orange); }
+  .btn-outline{ border-color:var(--portal-line); color:#fff; background:rgba(255,255,255,.06); }
+  .btn-outline:hover{ border-color:var(--portal-orange); color:var(--portal-orange-light); background:rgba(243,106,0,.10); }
+  .bottom-bar .btn-outline{ color:#fff !important; border-color:var(--portal-line) !important; }
+  .status-pill{ border-color:rgba(243,106,0,.55); background:rgba(243,106,0,.12); color:var(--portal-orange-light); }
+  .role-banner{ background:rgba(4,8,10,.78) !important; color:#fff !important; border-bottom:1px solid var(--portal-line) !important; }
+  .role-switch select{ background:#071014; color:#fff; border-color:var(--portal-line); }
+  .page-shell,.bottom-bar{ max-width:1100px; }
+  .paper p,.paper li,.paper input,.paper textarea,.paper select,.paper label,
+  .paper .boxed-verbiage,.paper .static-line,.paper .equip-para{
+    font-family:var(--portal-font);
+    font-size:12pt;
+  }
+  .paper{
+    background:var(--portal-panel);
+    color:#fff;
+    border-color:var(--portal-line);
+    box-shadow:0 18px 50px rgba(0,0,0,.42);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  .doc-title,.equip-title{ color:#fff; }
+  .section-heading,.sig-col h4{ color:var(--portal-orange-light); border-color:var(--portal-orange); }
+  .section-heading .num,.field-block label,.field-hint,.po-filename,.sig-caption,.doc-footer-tag{ color:var(--portal-muted); }
+  .f,
+  input.f[type="text"],input.f[type="number"],input.f[type="email"],
+  input.f[type="tel"],input.f[type="date"],textarea.f,select.f{
+    background:rgba(3,7,9,.78);
+    color:#fff;
+    border-color:var(--portal-line);
+  }
+  .f:focus,input.f:focus,textarea.f:focus,select.f:focus{
+    background:#071014;
+    border-color:var(--portal-orange);
+    box-shadow:0 0 0 3px rgba(243,106,0,.16);
+  }
+  .f::placeholder{ color:rgba(255,255,255,.48); }
+  .boxed-verbiage,.po-box,.sig-pad,.typed-sig,details.config-panel{
+    background:rgba(3,7,9,.68);
+    color:#fff;
+    border-color:var(--portal-line);
+  }
+  .equipment-choice-panel{ background:rgba(3,7,9,.68); color:#fff; border-color:var(--portal-line); }
+  .calendar-button{ background:#071014; color:var(--portal-orange-light); border-color:var(--portal-line); }
+  .typed-sig{ color:#fff; }
+  .sig-col{ border-color:var(--portal-line); }
+  details.config-panel summary,details.config-panel label{ color:#fff; }
+  details.config-panel .config-body{ color:var(--portal-muted); }
+  details.config-panel input[type=text],details.config-panel select{ background:#071014; color:#fff; border-color:var(--portal-line); }
+  .validation-summary{ background:rgba(178,58,46,.16); border-color:rgba(255,107,107,.45); color:#ffaaa2; }
+  p.clause,.preamble,.equip-para{
+    margin-top:0;
+    margin-right:.12in;
+    margin-bottom:0;
+    margin-left:.08in;
+    line-height:1;
+    text-align:left;
+  }
+  .clause-list>li{
+    margin-bottom:0;
+    line-height:1;
+    text-align:left;
+  }
+}
+
+.agreement-date-line{
+  display:inline-flex;
+  align-items:baseline;
+  gap:6px;
+  white-space:nowrap;
+}
+.agreement-date-line input[type="date"]{
+  width:155px;
+}
+
+.route-modal[hidden]{ display:none; }
+.route-modal{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  font-family:var(--portal-font);
+}
+.route-dialog{
+  width:min(560px,100%);
+  border:1px solid var(--portal-line);
+  border-top:4px solid var(--portal-orange);
+  border-radius:8px;
+  background:#0A1115;
+  color:#fff;
+  box-shadow:0 24px 70px rgba(0,0,0,.65);
+  padding:24px;
+}
+.route-dialog h3{ margin:0 0 8px; color:#fff; font-size:18px; }
+.route-dialog p{ margin:0 0 16px; color:var(--portal-muted); line-height:1.45; }
+.route-dialog label{ display:block; margin-bottom:6px; font-weight:700; }
+.route-dialog select,
+.route-dialog input{
+  width:100%;
+  min-height:44px;
+  padding:8px 10px;
+  border:1px solid var(--portal-line);
+  border-radius:4px;
+  background:#050A0D;
+  color:#fff;
+  font:inherit;
+}
+.route-dialog select:focus,
+.route-dialog input:focus{ outline:3px solid rgba(243,106,0,.24); border-color:var(--portal-orange); }
+.route-field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.route-field-grid label{ margin-top:0; }
+.route-field-wide{ grid-column:1 / -1; }
+.route-status{ min-height:20px; margin-top:8px; color:var(--portal-muted); font-size:12px; }
+.route-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+@media(max-width:620px){ .route-field-grid{ grid-template-columns:1fr; } .route-field-wide{ grid-column:auto; } }
+
+.print-preview-toolbar[hidden]{ display:none; }
+.print-preview-toolbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:10px 16px;
+  background:#080D10;
+  color:#fff;
+  font:700 13px var(--portal-font);
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.print-preview-toolbar .btn{ min-width:120px; justify-content:center; }
+
+@media screen{
+  body.print-preview-active{
+    background:#fff !important;
+    color:#000 !important;
+    padding-top:54px;
+  }
+  body.print-preview-active .screen-only{ display:none !important; }
+  body.print-preview-active #printPreviewToolbar{ display:flex !important; }
+  body.print-preview-active .page-shell{
+    max-width:8.5in !important;
+    margin:0 auto 30px !important;
+    padding:.5in !important;
+    background:#fff !important;
+  }
+  body.print-preview-active .paper{
+    background:#fff !important;
+    color:#000 !important;
+    border:0 !important;
+    box-shadow:none !important;
+    padding:0 !important;
+  }
+  body.print-preview-active .paper *{ color:#000 !important; }
+  body.print-preview-active .section-heading,
+  body.print-preview-active .sig-col{ border-color:#000 !important; }
+  body.print-preview-active .f,
+  body.print-preview-active input.f,
+  body.print-preview-active textarea.f,
+  body.print-preview-active select.f,
+  body.print-preview-active .boxed-verbiage,
+  body.print-preview-active .po-box,
+  body.print-preview-active .sig-pad,
+  body.print-preview-active .typed-sig{
+    background:#fff !important;
+    color:#000 !important;
+    border-color:#000 !important;
+    box-shadow:none !important;
+  }
+}
+
+@media print{
+  @page{ size:letter; margin:.5in; }
+  html,body{
+    background:#fff !important;
+    color:#000 !important;
+    font-family:'Lucida Sans Unicode','Lucida Grande','Lucida Sans',Arial,sans-serif !important;
+    font-size:12pt !important;
+    line-height:1 !important;
+  }
+  .page-shell{ max-width:none !important; margin:0 !important; padding:0 !important; }
+  .paper{
+    background:#fff !important;
+    color:#000 !important;
+    border:0 !important;
+    box-shadow:none !important;
+    padding:0 !important;
+  }
+  .doc-title,.equip-title,.section-heading,.section-heading .num,.sig-col h4,
+  .field-block label,.field-hint,.po-filename,.sig-caption,.doc-footer-tag,
+  p,li,strong,span,label{ color:#000 !important; }
+  .docusign-anchor{ display:none !important; }
+  .section-heading,.sig-col{ border-color:#000 !important; }
+  .paper p,.paper li,.paper input,.paper textarea,.paper select,.paper label,
+  .paper .boxed-verbiage,.paper .static-line,.paper .equip-para{
+    font-family:'Lucida Sans Unicode','Lucida Grande','Lucida Sans',Arial,sans-serif !important;
+    font-size:12pt !important;
+  }
+  p.clause,.preamble,.equip-para{
+    margin-top:0 !important;
+    margin-right:.12in !important;
+    margin-bottom:0 !important;
+    margin-left:.08in !important;
+    line-height:1 !important;
+  }
+  .clause-list>li{ margin-bottom:0 !important; line-height:1 !important; }
+  .f,input.f,textarea.f,select.f,.boxed-verbiage,.po-box,.sig-pad,.typed-sig{
+    background:#fff !important;
+    color:#000 !important;
+    border-color:#000 !important;
+    box-shadow:none !important;
+  }
+  .boxed-verbiage,.po-box{ border:1px solid #000 !important; }
+  .typed-sig{ border-left:0 !important; border-right:0 !important; border-top:0 !important; }
+}
 </style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#102b3d;color:#fff;font:700 11px Arial,sans-serif;padding:7px 12px;border-radius:20px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)">&#8592; Wesco Hub</a>
+<div class="print-preview-toolbar" id="printPreviewToolbar" hidden>
+  <button type="button" class="btn btn-maroon" id="printNowBtn">🖨️ Print Now</button>
+  <button type="button" class="btn btn-outline" id="exitPrintPreviewBtn">← Return to Agreement</button>
+  <span>If the dialog does not open, press Ctrl+P.</span>
+</div>
+<a class="screen-only" href="index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#f36a00;color:#fff;font:700 11px 'Lucida Sans Unicode','Lucida Grande','Lucida Sans',Arial,sans-serif;padding:7px 12px;border-radius:20px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35)">&#8592; Wesco Hub</a>
 <!-- ============================================================
      SCREEN CHROME — none of this prints (see .screen-only rule)
      ============================================================ -->
@@ -437,27 +738,16 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </div>
   <div class="topbar-actions">
     <span id="statusPill" class="status-pill status-Draft">Draft</span>
-    <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Print</button>
+    <button type="button" class="btn btn-outline" id="topPrintBtn">🖨️ Print</button>
   </div>
 </div>
 
 <div class="role-banner screen-only role-preparer" id="roleBanner">
   <div><strong id="roleBannerLabel">Preparer view</strong> — <span id="roleBannerText">complete the highlighted Wesco fields below, then submit for the subcontractor's signature.</span></div>
   <div class="role-switch">
-    <label for="roleSelect">Viewing as:</label>
-    <select id="roleSelect" onchange="onRoleSwitch()">
-      <option value="preparer">Wesco Preparer</option>
-      <option value="subcontractor">Subcontractor</option>
-    </select>
+    <strong>Wesco staff preparation screen</strong>
+    <input type="hidden" id="roleSelect" value="preparer">
   </div>
-</div>
-
-<div class="notice-banner screen-only" id="demoNotice">
-  This is a standalone HTML file with no server. Role switching above is provided so one person can prepare
-  <em>and</em> preview/test the subcontractor stage — it is a convenience, not a security boundary. To actually
-  route this to a subcontractor for signature, save the file after clicking <code>Submit for Signature</code> and
-  send it to them yourself (e.g., as an email attachment), or configure a real e‑signature integration — see
-  "Integration &amp; setup" at the bottom of the page.
 </div>
 
 <div class="page-shell">
@@ -470,9 +760,11 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 
   <div id="preparerMainFields">
   <p class="preamble">
-    On this
-    <input type="date" id="agreementDate" class="f f-inline f-md" aria-label="Agreement date" required>
-    <span id="agreementDateWords"></span>,
+    <span class="agreement-date-line">On
+      <input type="date" id="agreementDate" class="f f-inline f-md" aria-label="Agreement date (mm/dd/yyyy)" required>
+      <button type="button" class="calendar-button screen-only" data-date-target="agreementDate" aria-label="Open agreement date calendar">📅</button>
+      this
+    </span>,
     Wesco Exteriors, Inc., a corporation organized under the law of the State of North Carolina and maintaining its
     business office address located at 201 Hillstone Drive, Jamestown, North Carolina 27282 (Contractor) and
     <input type="text" id="subLegalName" class="f f-inline f-lg" placeholder="Subcontractor legal name" aria-label="Subcontractor legal name" required>,
@@ -481,7 +773,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </p>
 
   <div class="field-block" style="max-width:420px;">
-    <label for="prepSubEmail" class="req">Subcontractor Email <span class="field-tag tag-preparer">Preparer — for sending, not printed in the agreement text</span></label>
+    <label for="prepSubEmail" class="req">Subcontractor Email</label>
     <input type="email" id="prepSubEmail" class="f" placeholder="name@subcontractor.com" required>
     <div class="field-hint">Used to confirm who this agreement is being sent to before submission. The Subcontractor confirms/updates their own contact email in the signature block on the last page.</div>
   </div>
@@ -523,15 +815,20 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </div>
 
   <p class="clause">1.2 Contractor will provide all materials necessary for the completion of the Work.</p>
+  <div class="field-block">
+    <label for="materialsProvided">Materials Provided by Contractor</label>
+    <textarea id="materialsProvided" class="f large-entry" rows="4" placeholder="Enter complete material details. Multiple sentences and paragraphs are supported." oninput="autoGrow(this)"></textarea>
+  </div>
 
   <p class="clause">
     1.3 Contractor will provide certain heavy equipment necessary for the completion of the work such as
-    <input type="text" id="equip1" class="f f-inline f-sm" placeholder="e.g., scissor" aria-label="Heavy equipment type 1">
-    and
-    <input type="text" id="equip2" class="f f-inline f-sm" placeholder="e.g., boom" aria-label="Heavy equipment type 2">
-    lifts. Subcontractor is responsible for and will pay and reimburse Contractor for all damage, repair costs, or
+    the equipment described below. Subcontractor is responsible for and will pay and reimburse Contractor for all damage, repair costs, or
     other loss of Contractor's equipment associated or due to misuse or negligence.
   </p>
+  <div class="field-block">
+    <label for="heavyEquipmentProvided">Heavy Equipment Provided by Contractor</label>
+    <textarea id="heavyEquipmentProvided" class="f large-entry" rows="4" placeholder="Enter all heavy equipment details. Multiple sentences and paragraphs are supported." oninput="autoGrow(this)"></textarea>
+  </div>
 
   <p class="clause">
     1.4 In the event that Contractor advances payment to assist Subcontractor with its responsibility to provide or
@@ -612,7 +909,10 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       <div class="field-grid">
         <div class="field-block">
           <label for="completionDate">Anticipated Completion Date</label>
-          <input type="date" id="completionDate" class="f">
+          <div class="date-with-button">
+            <input type="date" id="completionDate" class="f">
+            <button type="button" class="calendar-button screen-only" data-date-target="completionDate" aria-label="Open anticipated completion date calendar">📅</button>
+          </div>
         </div>
         <div class="field-block">
           <label for="numberOfDays">— or within this many days from the Commencement Date</label>
@@ -926,6 +1226,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         <label><input type="radio" name="contractorSigMode" value="type" onchange="setSigMode('contractor','type')"> Type signature</label>
       </div>
       <div class="sig-pad-wrap" id="contractorDrawWrap">
+        <span class="docusign-anchor">WESCO_SIGNATURE_ANCHOR</span>
         <canvas class="sig-pad" id="contractorSigPad" width="600" height="110" aria-label="Draw Wesco representative signature"></canvas>
         <div class="sig-controls">
           <button type="button" class="btn btn-outline btn-sm" style="color:#3f3f41;border-color:#a79e8f;" onclick="clearSigPad('contractorSigPad')">Clear</button>
@@ -939,12 +1240,16 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       <p class="static-line" style="margin-top:14px;"><strong>Wesco Exteriors, Inc., CONTRACTOR</strong></p>
 
       <div class="field-block" style="margin:10px 0;">
-        <label for="contractorBy">By</label>
+        <label for="contractorBy">By <span class="docusign-anchor">WESCO_NAME_ANCHOR</span></label>
         <input type="text" id="contractorBy" class="f">
       </div>
       <div class="field-block">
-        <label for="contractorTitle">Title</label>
+        <label for="contractorTitle">Title <span class="docusign-anchor">WESCO_TITLE_ANCHOR</span></label>
         <input type="text" id="contractorTitle" class="f">
+      </div>
+      <div class="field-block">
+        <label for="contractorSignDate">Date Signed <span class="docusign-anchor">WESCO_DATE_ANCHOR</span></label>
+        <input type="date" id="contractorSignDate" class="f">
       </div>
 
       <p class="static-line" style="margin-top:12px;">208 Hillstone Drive</p>
@@ -962,6 +1267,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         <label><input type="radio" name="subSigMode" value="type" onchange="setSigMode('sub','type')"> Type signature</label>
       </div>
       <div class="sig-pad-wrap" id="subDrawWrap">
+        <span class="docusign-anchor">SUB_SIGNATURE_ANCHOR</span>
         <canvas class="sig-pad" id="subSigPad" width="600" height="110" aria-label="Draw subcontractor signature"></canvas>
         <div class="sig-controls">
           <button type="button" class="btn btn-outline btn-sm" style="color:#3f3f41;border-color:#a79e8f;" onclick="clearSigPad('subSigPad')">Clear</button>
@@ -975,39 +1281,39 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       <p class="static-line" style="margin-top:14px;"><strong>SUBCONTRACTOR</strong></p>
 
       <div class="field-block" style="margin:10px 0;">
-        <label for="subCompanyName" class="req">Company Name</label>
+        <label for="subCompanyName" class="req">Company Name <span class="docusign-anchor">SUB_COMPANY_ANCHOR</span></label>
         <input type="text" id="subCompanyName" class="f" required>
       </div>
       <div class="field-block">
-        <label for="subBy" class="req">By</label>
+        <label for="subBy" class="req">By <span class="docusign-anchor">SUB_NAME_ANCHOR</span></label>
         <input type="text" id="subBy" class="f" required>
       </div>
       <div class="field-block">
-        <label for="subTitle">Title</label>
+        <label for="subTitle">Title <span class="docusign-anchor">SUB_TITLE_ANCHOR</span></label>
         <input type="text" id="subTitle" class="f">
       </div>
       <div class="field-block">
-        <label for="subAddress">Address</label>
+        <label for="subAddress">Address <span class="docusign-anchor">SUB_ADDRESS_ANCHOR</span></label>
         <textarea id="subAddress" class="f" rows="2"></textarea>
       </div>
       <div class="field-block">
-        <label for="subOfficePhone">Office Telephone</label>
+        <label for="subOfficePhone">Office Telephone <span class="docusign-anchor">SUB_PHONE_ANCHOR</span></label>
         <input type="tel" id="subOfficePhone" class="f">
       </div>
       <div class="field-block">
-        <label for="subFax">Facsimile</label>
+        <label for="subFax">Facsimile <span class="docusign-anchor">SUB_FAX_ANCHOR</span></label>
         <input type="tel" id="subFax" class="f">
       </div>
       <div class="field-block">
-        <label for="subEmail" class="req">Email</label>
+        <label for="subEmail" class="req">Email <span class="docusign-anchor">SUB_EMAIL_ANCHOR</span></label>
         <input type="email" id="subEmail" class="f" required>
       </div>
       <div class="field-block">
-        <label for="subProjectContact">Name of Project Contact</label>
+        <label for="subProjectContact">Name of Project Contact <span class="docusign-anchor">SUB_CONTACT_ANCHOR</span></label>
         <input type="text" id="subProjectContact" class="f">
       </div>
       <div class="field-block">
-        <label for="subSignDate" class="req">Date Signed</label>
+        <label for="subSignDate" class="req">Date Signed <span class="docusign-anchor">SUB_DATE_ANCHOR</span></label>
         <input type="date" id="subSignDate" class="f" required>
       </div>
     </div>
@@ -1029,7 +1335,19 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     </div>
     <div class="field-block">
       <label for="equipItemReceived">Item Received <span class="field-tag tag-preparer">Preparer</span></label>
-      <input type="text" id="equipItemReceived" class="f" value="GENIE Lift/Trash Box">
+      <details class="equipment-choice-panel screen-only">
+        <summary>Select one or more items</summary>
+        <div class="equipment-choice-list">
+          <label><input type="checkbox" id="equipChoiceGenie" value="GENIE Lift"> GENIE Lift</label>
+          <label><input type="checkbox" id="equipChoiceTrash" value="Trash Box"> Trash Box</label>
+          <label><input type="checkbox" id="equipChoiceOther" value="Other"> Other</label>
+        </div>
+        <div class="field-block" id="equipOtherWrap" hidden style="margin-bottom:0;">
+          <label for="equipOtherText">Other equipment information</label>
+          <textarea id="equipOtherText" class="f" rows="2" placeholder="Describe the other equipment"></textarea>
+        </div>
+      </details>
+      <input type="text" id="equipItemReceived" class="f" placeholder="Selected items appear here" readonly>
     </div>
     <div class="field-block">
       <label for="equipReplacementValue">Estimated Replacement Value <span class="field-tag tag-preparer">Preparer</span></label>
@@ -1040,7 +1358,10 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     </div>
     <div class="field-block span2">
       <label for="equipDateReceived">Date Received <span class="field-tag tag-preparer">Preparer</span></label>
-      <input type="date" id="equipDateReceived" class="f">
+      <div class="date-with-button">
+        <input type="date" id="equipDateReceived" class="f">
+        <button type="button" class="calendar-button screen-only" data-date-target="equipDateReceived" aria-label="Open equipment received date calendar">📅</button>
+      </div>
     </div>
   </div>
 
@@ -1066,6 +1387,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     <label><input type="radio" name="equipSigMode" value="type" onchange="setSigMode('equip','type')"> Type signature</label>
   </div>
   <div class="sig-pad-wrap" id="equipDrawWrap">
+    <span class="docusign-anchor">EQUIP_SIGNATURE_ANCHOR</span>
     <canvas class="sig-pad" id="equipSigPad" width="700" height="110" aria-label="Draw employee signature"></canvas>
     <div class="sig-controls">
       <button type="button" class="btn btn-outline btn-sm" style="color:#3f3f41;border-color:#a79e8f;" onclick="clearSigPad('equipSigPad')">Clear</button>
@@ -1077,15 +1399,15 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 
   <div class="field-grid" style="margin-top:6px;">
     <div class="field-block">
-      <label for="equipEmployeeName" class="req">Employee Name (Please Print)</label>
+      <label for="equipEmployeeName" class="req">Employee Name (Please Print) <span class="docusign-anchor">EQUIP_NAME_ANCHOR</span></label>
       <input type="text" id="equipEmployeeName" class="f" required>
     </div>
     <div class="field-block">
-      <label for="equipCompanyName" class="req">Company Name</label>
+      <label for="equipCompanyName" class="req">Company Name <span class="docusign-anchor">EQUIP_COMPANY_ANCHOR</span></label>
       <input type="text" id="equipCompanyName" class="f" required>
     </div>
     <div class="field-block span2">
-      <label for="equipSignDate" class="req">Date</label>
+      <label for="equipSignDate" class="req">Date <span class="docusign-anchor">EQUIP_DATE_ANCHOR</span></label>
       <input type="date" id="equipSignDate" class="f" style="max-width:220px;" required>
     </div>
   </div>
@@ -1102,10 +1424,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </div>
 
   <div class="bottom-actions">
-    <button type="button" class="btn btn-outline" style="color:#3f3f41;border-color:#a79e8f;" id="loadBtn">📂 Open Saved Agreement</button>
-    <input type="file" id="loadFileInput" class="hidden-file" accept=".html,.htm">
     <button type="button" class="btn btn-outline" style="color:#3f3f41;border-color:#a79e8f;" id="saveDraftBtn">💾 Save Draft</button>
-    <button type="button" class="btn btn-outline" style="color:#3f3f41;border-color:#a79e8f;" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button type="button" class="btn btn-outline" style="color:#3f3f41;border-color:#a79e8f;" id="bottomPrintBtn">🖨️ Print / Save as PDF</button>
     <div class="spacer"></div>
     <button type="button" class="btn btn-outline" style="color:#8a4038;border-color:#8a4038;display:none;" id="returnBtn">↩ Return to Preparer</button>
     <button type="button" class="btn btn-outline" style="color:#3f3f41;border-color:#a79e8f;display:none;" id="archiveBtn">🗄 Mark Archived in Project File</button>
@@ -1154,6 +1474,45 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 </div>
 </div>
 
+<div class="route-modal screen-only" id="subcontractorModal" hidden>
+  <div class="route-dialog" role="dialog" aria-modal="true" aria-labelledby="routeDialogTitle">
+    <h3 id="routeDialogTitle">Send for Subcontractor Review &amp; Signature</h3>
+    <p>Choose the subcontractor, confirm the Wesco signer, then type the subcontractor signer name and email. Both subcontractor signer boxes start blank for every submission. Wesco signs first in Docusign; then Docusign emails the subcontractor.</p>
+    <label for="subcontractorFolderSelect">Subcontractor</label>
+    <select id="subcontractorFolderSelect">
+      <option value="">Loading subcontractors…</option>
+    </select>
+    <div id="otherSubcontractorWrap" hidden style="margin-top:12px;">
+      <label for="otherSubcontractorName">Other subcontractor name</label>
+      <input type="text" id="otherSubcontractorName" placeholder="Type the subcontractor or company name">
+      <div class="field-hint">Completed agreements selected as Other are filed in Documents/We App/Subcontractors/Others.</div>
+    </div>
+    <div class="route-field-grid">
+      <div>
+        <label for="docusignContractorName">Wesco signer name</label>
+        <input type="text" id="docusignContractorName" autocomplete="name">
+      </div>
+      <div>
+        <label for="docusignContractorEmail">Wesco signer email</label>
+        <input type="email" id="docusignContractorEmail" autocomplete="email">
+      </div>
+      <div>
+        <label for="docusignSubcontractorName">Subcontractor signer name</label>
+        <input type="text" id="docusignSubcontractorName" autocomplete="off" placeholder="Type the signer’s full name">
+      </div>
+      <div>
+        <label for="docusignSubcontractorEmail">Subcontractor signer email</label>
+        <input type="email" id="docusignSubcontractorEmail" autocomplete="off" placeholder="Type the signer’s email">
+      </div>
+    </div>
+    <div class="route-status" id="subcontractorRouteStatus" aria-live="polite"></div>
+    <div class="route-actions">
+      <button type="button" class="btn btn-outline" id="cancelRouteBtn">Cancel</button>
+      <button type="button" class="btn btn-maroon" id="confirmRouteBtn">Submit for Signature</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- Embedded state: populated by Save Draft / Submit / Complete so a re-opened file restores exactly
@@ -1163,8 +1522,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 <script>
 /* ==========================================================================
    Wesco Exteriors, Inc. — Subcontractor Agreement
-   Client-side logic. No external libraries, no network calls, no CDNs.
-   Everything here runs entirely inside the person's own browser.
+   Client-side logic. No external libraries or CDNs.
+   SharePoint routing uses the Wesco Azure Static Web App API.
    ========================================================================== */
 (function(){
   'use strict';
@@ -1175,19 +1534,38 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   var AppState = {
     stage: 'draft',            // draft | sent | completed | returned | archived
     poFile: null,              // {name, type, size, dataUrl}
-    role: 'preparer'           // cosmetic only — see notice banner
+    role: 'preparer',          // cosmetic only — see notice banner
+    routedSubcontractor: '',
+    docusignEnvelopeId: ''
   };
+
+  var VERIFIED_SUBCONTRACTOR_FOLDERS = [
+    'Amber Construction',
+    'Anzola, Antonio',
+    'El Bruzz, Esteban',
+    'Hillstone',
+    'Martinez, Rogelio',
+    'Pristine (Sik, Tulio)',
+    'Towa, Rigo',
+    'Zavala, Jonathan'
+  ];
 
   var sigHasContent = { contractor:false, sub:false, equip:false };
 
   var FIELD_IDS = [
-    'agreementDate','subLegalName','prepSubEmail','poNumber','scopeOfWork','equip1','equip2','subcontractPrice',
+    'agreementDate','subLegalName','prepSubEmail','poNumber','scopeOfWork','materialsProvided','heavyEquipmentProvided','subcontractPrice',
     'projectName','projectAddress','projectCity','projectState','completionDate','numberOfDays',
-    'contractorNoticeAddress','contractorBy','contractorTitle',
+    'contractorNoticeAddress','contractorBy','contractorTitle','contractorSignDate',
     'subCompanyName','subBy','subTitle','subAddress','subOfficePhone','subFax','subEmail',
     'subProjectContact','subSignDate',
-    'equipSubName','equipItemReceived','equipReplacementValue','equipDateReceived',
+    'equipSubName','equipItemReceived','equipOtherText','equipReplacementValue','equipDateReceived',
     'equipEmployeeName','equipCompanyName','equipSignDate'
+  ];
+
+  var DOCUSIGN_FILL_FIELD_IDS = [
+    'contractorBy','contractorTitle','contractorSignDate',
+    'subCompanyName','subBy','subTitle','subAddress','subOfficePhone','subFax','subEmail',
+    'subProjectContact','subSignDate','equipEmployeeName','equipCompanyName','equipSignDate'
   ];
 
   var PREPARER_REQUIRED = [
@@ -1214,6 +1592,14 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   ];
 
   function $(id){ return document.getElementById(id); }
+  function escapeHtml(value){
+    return String(value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
 
   /* ------------------------------------------------------------------
      1. Toast helper
@@ -1228,29 +1614,48 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   }
 
   /* ------------------------------------------------------------------
-     2. Agreement date -> "____ day of Month, Year" inline words
-     ------------------------------------------------------------------ */
-  function ordinal(n){
-    var s = ['th','st','nd','rd'], v = n % 100;
-    return n + (s[(v-20)%10] || s[v] || s[0]);
-  }
-  function updateAgreementDateWords(){
-    var val = $('agreementDate').value;
-    var out = $('agreementDateWords');
-    if(!val){ out.textContent = ''; return; }
-    var parts = val.split('-');
-    var y = parseInt(parts[0],10), m = parseInt(parts[1],10), d = parseInt(parts[2],10);
-    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    out.textContent = ' (' + ordinal(d) + ' day of ' + months[m-1] + ', ' + y + ')';
-  }
-
-  /* ------------------------------------------------------------------
-     3. Auto-growing textarea (Scope of Work)
+     2. Auto-growing textarea (Scope of Work)
      ------------------------------------------------------------------ */
   window.autoGrow = function(el){
     el.style.height = 'auto';
     el.style.height = (el.scrollHeight + 3) + 'px';
   };
+
+  function openDatePicker(targetId){
+    var input = $(targetId);
+    if(!input) return;
+    input.focus();
+    if(typeof input.showPicker === 'function') input.showPicker();
+  }
+
+  function syncEquipmentChoices(){
+    var values = [];
+    if($('equipChoiceGenie').checked) values.push('GENIE Lift');
+    if($('equipChoiceTrash').checked) values.push('Trash Box');
+    var otherSelected = $('equipChoiceOther').checked;
+    $('equipOtherWrap').hidden = !otherSelected;
+    if(otherSelected){
+      var details = $('equipOtherText').value.trim();
+      values.push(details ? 'Other: ' + details : 'Other');
+    }
+    $('equipItemReceived').value = values.join(', ');
+  }
+
+  function restoreEquipmentChoices(){
+    var value = $('equipItemReceived').value || '';
+    $('equipChoiceGenie').checked = /GENIE Lift/i.test(value);
+    $('equipChoiceTrash').checked = /Trash Box/i.test(value);
+    var otherMatch = value.match(/Other:\\s*(.+)$/i);
+    $('equipChoiceOther').checked = /(?:^|,\\s*)Other(?:\\s*:|$)/i.test(value);
+    if(otherMatch && !$('equipOtherText').value) $('equipOtherText').value = otherMatch[1];
+    $('equipOtherWrap').hidden = !$('equipChoiceOther').checked;
+  }
+
+  function syncOtherSubcontractorChoice(){
+    var isOther = $('subcontractorFolderSelect').value === '__other__';
+    $('otherSubcontractorWrap').hidden = !isOther;
+    if(isOther) $('otherSubcontractorName').focus();
+  }
 
   /* ------------------------------------------------------------------
      4. Signature pads (draw / type)
@@ -1429,18 +1834,19 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   function updateLockingForStage(){
     var s = AppState.stage;
     var prepLock = (s === 'sent' || s === 'completed' || s === 'archived');
-    var subLock  = (s !== 'sent');
 
     lockContainer('preparerMainFields', prepLock);
     lockContainer('contractorSigCol', prepLock);
     lockContainer('equipPreparerFields', prepLock);
-    lockContainer('subcontractorSigCol', subLock);
-    lockContainer('equipSubFields', subLock);
+    // The public template is for Wesco preparation only. Recipient fields are
+    // completed in Docusign and are never unlocked on this page.
+    lockContainer('subcontractorSigCol', true);
+    lockContainer('equipSubFields', true);
 
     $('submitBtn').style.display   = (s === 'draft' || s === 'returned') ? '' : 'none';
-    $('completeBtn').style.display = (s === 'sent') ? '' : 'none';
-    $('returnBtn').style.display   = (s === 'sent') ? '' : 'none';
-    $('archiveBtn').style.display  = (s === 'completed') ? '' : 'none';
+    $('completeBtn').style.display = 'none';
+    $('returnBtn').style.display   = 'none';
+    $('archiveBtn').style.display  = 'none';
 
     computeStatus();
   }
@@ -1548,7 +1954,81 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   /* ------------------------------------------------------------------
      10. Submit for Signature / Complete / Return / Archive
      ------------------------------------------------------------------ */
+  async function loadSubcontractorFolders(){
+    var select = $('subcontractorFolderSelect');
+    var status = $('subcontractorRouteStatus');
+    select.innerHTML = '<option value="">Loading subcontractors…</option>';
+    select.disabled = true;
+    status.textContent = 'Loading the current SharePoint folders…';
+    var names = [];
+    try{
+      var response = await fetch('/api/subcontractor-agreements', { cache:'no-store' });
+      var data = await response.json();
+      if(!response.ok) throw new Error(data.error || 'Could not load the SharePoint folders.');
+      names = (data.subcontractors || []).map(function(item){ return item.name; });
+      if(!names.length) throw new Error('No subcontractor folders were found.');
+      status.textContent = 'Live list loaded from SharePoint.';
+    } catch(e){
+      names = VERIFIED_SUBCONTRACTOR_FOLDERS.slice();
+      status.textContent = 'Using the verified Wesco subcontractor list for this review copy.';
+    }
+    names = names.filter(function(name){ return name.toLowerCase() !== 'others'; });
+    select.innerHTML = '<option value="">Select a subcontractor…</option>' +
+      names.map(function(name){
+        return '<option value="' + escapeHtml(name) + '">' + escapeHtml(name) + '</option>';
+      }).join('') +
+      '<option value="__other__">Other</option>';
+    select.disabled = false;
+    if(AppState.routedSubcontractor && names.indexOf(AppState.routedSubcontractor) !== -1){
+      select.value = AppState.routedSubcontractor;
+    }
+  }
+
+  function openSubcontractorModal(){
+    $('subcontractorModal').hidden = false;
+    $('otherSubcontractorWrap').hidden = true;
+    $('otherSubcontractorName').value = '';
+    $('docusignContractorName').value =
+      $('contractorBy').value.trim() || $('contractorTypedSig').value.trim();
+    $('docusignSubcontractorName').value = '';
+    $('docusignSubcontractorEmail').value = '';
+    loadCurrentWescoSigner();
+    loadSubcontractorFolders().then(function(){ $('subcontractorFolderSelect').focus(); });
+  }
+
+  function closeSubcontractorModal(){
+    $('subcontractorModal').hidden = true;
+    $('subcontractorRouteStatus').textContent = '';
+  }
+
+  async function loadCurrentWescoSigner(){
+    try{
+      var response = await fetch('/.auth/me', { cache:'no-store' });
+      if(!response.ok) return;
+      var data = await response.json();
+      var principal = data && data.clientPrincipal;
+      if(!principal) return;
+      if(!$('docusignContractorEmail').value.trim()){
+        $('docusignContractorEmail').value = principal.userDetails || '';
+      }
+      if(!$('docusignContractorName').value.trim() && Array.isArray(principal.claims)){
+        var given = principal.claims.find(function(item){ return /givenname$/i.test(item.typ); });
+        var family = principal.claims.find(function(item){ return /surname$/i.test(item.typ); });
+        $('docusignContractorName').value =
+          [given && given.val, family && family.val].filter(Boolean).join(' ');
+      }
+    } catch(ignore){}
+  }
+
   function onSubmitForSignature(){
+    if(location.hostname === '127.0.0.1' || location.hostname === 'localhost'){
+      var liveUrl = 'https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Wesco%20Subcontractor%20Agreement.html';
+      if(window.confirm('This is the local preview and cannot send to Docusign. Open the live Wesco agreement now?')){
+        window.open(liveUrl, '_blank', 'noopener');
+      }
+      showToast('Use the live Wesco agreement to submit for signature.', 'err');
+      return;
+    }
     clearMissingHighlights();
     var missing = validateGroup(PREPARER_REQUIRED);
     if(!AppState.poFile) missing.push('Purchase order upload (Section 1.1)');
@@ -1558,22 +2038,148 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       return;
     }
     showValidationSummary([]);
-    var email = $('prepSubEmail').value.trim();
-    var confirmMsg = 'Confirm the subcontractor\'s email before sending: ' + email +
-      '\n\nClick OK to lock the Wesco fields and prepare this agreement for the subcontractor\'s signature.';
+    openSubcontractorModal();
+  }
+
+  async function uploadAgreementForSignature(){
+    var selected = $('subcontractorFolderSelect').value;
+    var status = $('subcontractorRouteStatus');
+    var confirmButton = $('confirmRouteBtn');
+    if(!selected){
+      status.textContent = 'Select the subcontractor who should receive this agreement.';
+      $('subcontractorFolderSelect').focus();
+      return;
+    }
+    var isOther = selected === '__other__';
+    var otherName = $('otherSubcontractorName').value.trim();
+    if(isOther && !otherName){
+      status.textContent = 'Type the subcontractor name for the Other selection.';
+      $('otherSubcontractorName').focus();
+      return;
+    }
+    var destinationFolder = isOther ? 'Others' : selected;
+    var recipientLabel = isOther ? otherName : selected;
+    var contractorName = $('docusignContractorName').value.trim();
+    var contractorEmail = $('docusignContractorEmail').value.trim();
+    var subcontractorName = $('docusignSubcontractorName').value.trim();
+    var subcontractorEmail = $('docusignSubcontractorEmail').value.trim();
+    if(!contractorName || !contractorEmail || !subcontractorName || !subcontractorEmail){
+      status.textContent = 'Confirm the Wesco signer and subcontractor signer name and email.';
+      if(!subcontractorName) $('docusignSubcontractorName').focus();
+      else if(!subcontractorEmail) $('docusignSubcontractorEmail').focus();
+      return;
+    }
+    if(!$('docusignSubcontractorEmail').checkValidity()){
+      status.textContent = 'Type a valid subcontractor signer email address.';
+      $('docusignSubcontractorEmail').focus();
+      return;
+    }
+    if(contractorEmail.toLowerCase() === subcontractorEmail.toLowerCase()){
+      status.textContent = 'The subcontractor email must be different from the Wesco signer email.';
+      return;
+    }
+    var confirmMsg = 'Send this agreement to ' + recipientLabel + '?\n\n' +
+      'Wesco signer: ' + contractorName + ' <' + contractorEmail + '>\n' +
+      'Subcontractor signer: ' + subcontractorName + ' <' + subcontractorEmail + '>\n' +
+      'Docusign: Wesco completes the left side first; the subcontractor then completes the right side\n' +
+      'Sent copy: Documents/We App/Internal Staff/Rebecca Kirkman/Saved Subcontractors Agreements/Sent for Signature\n' +
+      'Completed copy: Documents/We App/Subcontractors/' + destinationFolder;
     if(!window.confirm(confirmMsg)) return;
 
-    // Convenience defaults carried into the subcontractor's own fields — still editable by them.
-    if(!$('subEmail').value.trim()) $('subEmail').value = email;
-    if(!$('subCompanyName').value.trim()) $('subCompanyName').value = $('subLegalName').value;
+    var previousStage = AppState.stage;
+    var previousRole = AppState.role;
     if(!$('equipSubName').value.trim()) $('equipSubName').value = $('subLegalName').value;
 
     AppState.stage = 'sent';
+    AppState.routedSubcontractor = destinationFolder;
     updateLockingForStage();
-    $('roleSelect').value = 'subcontractor';
-    onRoleSwitch();
-    showToast('Wesco fields locked. Save this file now and send it to the subcontractor.', 'ok');
-    saveCurrentState();
+    confirmButton.disabled = true;
+    $('cancelRouteBtn').disabled = true;
+    var envelopeSent = false;
+    status.textContent = 'Creating the Docusign envelope and signature fields…';
+    try{
+      var payload = buildAgreementFile();
+      var printableHtml = buildPrintableHtml();
+      var docusignResponse = await fetch('/api/subcontractor-agreement-docusign', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify({
+          subcontractor:destinationFolder,
+          subcontractorName:subcontractorName,
+          subcontractorEmail:subcontractorEmail,
+          contractorName:contractorName,
+          contractorEmail:contractorEmail,
+          projectName:$('projectName').value.trim(),
+          fileName:payload.filename,
+          documentBase64:await blobToBase64(new Blob([printableHtml], { type:'text/html' })),
+          purchaseOrder:{
+            fileName:AppState.poFile.name,
+            contentType:AppState.poFile.type,
+            documentBase64:String(AppState.poFile.dataUrl || '').split(',').pop()
+          }
+        })
+      });
+      var docusignData = await docusignResponse.json();
+      if(!docusignResponse.ok || !docusignData.envelopeId){
+        if(docusignData.consentUrl){
+          status.innerHTML = 'Docusign administrator consent is required. <a href="' +
+            escapeHtml(docusignData.consentUrl) +
+            '" target="_blank" rel="noopener" style="color:#ff9d55;">Grant Docusign consent</a>, then submit again.';
+          throw new Error('Docusign administrator consent is required.');
+        }
+        throw new Error(
+          (docusignData.error || 'Docusign could not send the agreement.') +
+          (docusignData.code ? ' [' + docusignData.code + ']' : '') +
+          (docusignData.envelopeId
+            ? ' Draft envelope: ' + docusignData.envelopeId + '.'
+            : '')
+        );
+      }
+      AppState.docusignEnvelopeId = docusignData.envelopeId;
+      envelopeSent = true;
+      saveCurrentState();
+      status.textContent =
+        'Docusign sent. Envelope ' + docusignData.envelopeId +
+        '. Saving the sent agreement to SharePoint…';
+      var sessionResponse = await fetch('/api/subcontractor-agreements', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify({ subcontractor:destinationFolder, fileName:payload.filename })
+      });
+      var sessionData = await sessionResponse.json();
+      if(!sessionResponse.ok || !sessionData.uploadUrl){
+        throw new Error(sessionData.error || 'The sent agreement could not be archived in SharePoint.');
+      }
+      await uploadBlobInChunks(sessionData.uploadUrl, payload.blob, status);
+      closeSubcontractorModal();
+      showToast(
+        'Sent through Docusign to ' + recipientLabel +
+        '. Envelope: ' + docusignData.envelopeId,
+        'ok'
+      );
+    } catch(e){
+      if(envelopeSent){
+        saveCurrentState();
+        closeSubcontractorModal();
+        showToast(
+          'Docusign envelope ' + AppState.docusignEnvelopeId +
+          ' was sent, but the SharePoint sent copy needs attention.',
+          'err'
+        );
+        return;
+      }
+      AppState.stage = previousStage;
+      AppState.role = previousRole;
+      AppState.routedSubcontractor = '';
+      $('roleSelect').value = previousRole;
+      onRoleSwitch();
+      updateLockingForStage();
+      if(!status.querySelector('a')) status.textContent = 'Submission failed: ' + e.message;
+      showToast('The agreement was not sent through Docusign. Please try again.', 'err');
+    } finally {
+      confirmButton.disabled = false;
+      $('cancelRouteBtn').disabled = false;
+    }
   }
 
   function onCompleteAgreement(){
@@ -1625,6 +2231,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       values: values,
       stage: AppState.stage,
       role: AppState.role,
+      routedSubcontractor: AppState.routedSubcontractor,
+      docusignEnvelopeId: AppState.docusignEnvelopeId,
       poFile: AppState.poFile,
       signatures: {
         contractor: { mode: getSigMode('contractor'), typed: $('contractorTypedSig').value,
@@ -1686,10 +2294,14 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     }
     AppState.stage = data.stage || 'draft';
     AppState.role = data.role || 'preparer';
+    AppState.routedSubcontractor = data.routedSubcontractor || '';
+    AppState.docusignEnvelopeId = data.docusignEnvelopeId || '';
     $('roleSelect').value = AppState.role;
     onRoleSwitch();
-    updateAgreementDateWords();
     autoGrow($('scopeOfWork'));
+    autoGrow($('materialsProvided'));
+    autoGrow($('heavyEquipmentProvided'));
+    restoreEquipmentChoices();
     updateLockingForStage();
   }
 
@@ -1706,14 +2318,169 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     return 'Wesco Subcontractor Agreement - ' + project + ' - ' + sub + ' - ' + dateVal + '.html';
   }
 
+  function buildAgreementFile(){
+    var state = collectState();
+    $('savedStateScript').textContent = JSON.stringify(state);
+    var htmlStr = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    return {
+      blob: new Blob([htmlStr], { type:'text/html' }),
+      filename: buildFilename()
+    };
+  }
+
+  function blobToBase64(blob){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){
+        var result = String(reader.result || '');
+        resolve(result.slice(result.indexOf(',') + 1));
+      };
+      reader.onerror = function(){ reject(reader.error || new Error('Could not read the agreement file.')); };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function buildPrintableHtml(){
+    var clone = document.documentElement.cloneNode(true);
+
+    FIELD_IDS.forEach(function(id){
+      var source = $(id);
+      var target = clone.querySelector('#' + id);
+      if(!source || !target) return;
+      if(target.tagName === 'TEXTAREA'){
+        target.textContent = source.value;
+      } else if(target.tagName === 'SELECT'){
+        Array.prototype.forEach.call(target.options, function(option){
+          if(option.value === source.value) option.setAttribute('selected','selected');
+          else option.removeAttribute('selected');
+        });
+      } else {
+        target.setAttribute('value', source.value);
+      }
+    });
+
+    DOCUSIGN_FILL_FIELD_IDS.forEach(function(id){
+      var target = clone.querySelector('#' + id);
+      if(!target) return;
+      if(target.tagName === 'TEXTAREA'){
+        target.textContent = '';
+      } else {
+        target.setAttribute('value', '');
+      }
+    });
+
+    var poPreview = clone.querySelector('#poPreview');
+    if(poPreview){
+      poPreview.innerHTML = '';
+      var poAttachmentNote = clone.ownerDocument.createElement('p');
+      poAttachmentNote.textContent =
+        'Purchase Order attached as a separate Docusign document: ' +
+        (AppState.poFile ? AppState.poFile.name : 'Not attached');
+      poPreview.appendChild(poAttachmentNote);
+    }
+
+    var clonedCanvases = clone.querySelectorAll('canvas');
+    Array.prototype.forEach.call(clonedCanvases, function(clonedCanvas){
+      var signatureLine = clone.ownerDocument.createElement('div');
+      signatureLine.setAttribute('aria-label', 'Signature field completed in Docusign');
+      signatureLine.style.cssText = 'display:block;width:100%;height:110px;border-bottom:1px solid #000;';
+      clonedCanvas.parentNode.replaceChild(signatureLine, clonedCanvas);
+    });
+
+    Array.prototype.forEach.call(clone.querySelectorAll('script'), function(script){ script.remove(); });
+    Array.prototype.forEach.call(
+      clone.querySelectorAll('.screen-only,.sig-mode-toggle,.sig-controls,.field-tag'),
+      function(element){ element.remove(); }
+    );
+    Array.prototype.forEach.call(
+      clone.querySelectorAll('.docusign-anchor'),
+      function(anchor){
+        /*
+         * DocuSign must be able to read these markers after HTML-to-PDF
+         * conversion. Inline !important rules override the normal print rule
+         * that hides anchors from paper copies, without changing this page's
+         * on-screen or printed appearance.
+         */
+        anchor.style.cssText =
+          'display:inline!important;position:static!important;width:auto!important;' +
+          'height:auto!important;overflow:visible!important;white-space:nowrap!important;' +
+          'color:#fff!important;font-size:2px!important;line-height:2px!important;' +
+          'letter-spacing:0!important;';
+      }
+    );
+
+    var previewStyle = clone.ownerDocument.createElement('style');
+    previewStyle.textContent =
+      '@media screen{' +
+      'html,body{background:#fff!important;color:#000!important;font-family:\"Lucida Sans Unicode\",\"Lucida Grande\",\"Lucida Sans\",Arial,sans-serif!important;font-size:12pt!important;line-height:1!important;}' +
+      '.page-shell{max-width:8.5in!important;margin:58px auto 30px!important;padding:.5in!important;background:#fff!important;}' +
+      '.paper{background:#fff!important;color:#000!important;border:0!important;box-shadow:none!important;padding:0!important;}' +
+      '.paper *{color:#000!important;}' +
+      '.docusign-anchor{display:inline-block!important;color:#fff!important;font-size:2px!important;line-height:2px!important;}' +
+      '.locked .field-block label::after{content:\"\"!important;}' +
+      '.section-heading,.sig-col{border-color:#000!important;}' +
+      '.f,input.f,textarea.f,select.f,.boxed-verbiage,.po-box,.sig-pad,.typed-sig{background:#fff!important;color:#000!important;border-color:#000!important;box-shadow:none!important;}' +
+      '.print-preview-toolbar{position:fixed;top:0;left:0;right:0;z-index:99999;display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 16px;background:#080d10;color:#fff!important;font:700 13px \"Lucida Sans Unicode\",\"Lucida Grande\",\"Lucida Sans\",Arial,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.35);}' +
+      '.print-preview-toolbar span{color:#fff!important;}' +
+      '.print-preview-toolbar button{border:0;border-radius:4px;background:#f36a00;color:#fff;padding:8px 16px;font:700 13px inherit;cursor:pointer;}' +
+      '}' +
+      '@media print{.print-preview-toolbar{display:none!important;}}';
+    clone.querySelector('head').appendChild(previewStyle);
+
+    var toolbar = clone.ownerDocument.createElement('div');
+    toolbar.className = 'print-preview-toolbar';
+    toolbar.innerHTML = '<button type="button" onclick="window.print()">Print now</button>' +
+      '<span>If the print dialog does not open automatically, press Ctrl+P.</span>';
+    clone.querySelector('body').insertBefore(toolbar, clone.querySelector('body').firstChild);
+
+    return '<!DOCTYPE html>\n' + clone.outerHTML;
+  }
+
+  function printAgreement(){
+    document.body.classList.add('print-preview-active');
+    $('printPreviewToolbar').hidden = false;
+    window.scrollTo(0,0);
+    window.setTimeout(function(){
+      try{ window.print(); } catch(ignore){}
+    }, 200);
+  }
+
+  function exitPrintPreview(){
+    document.body.classList.remove('print-preview-active');
+    $('printPreviewToolbar').hidden = true;
+    window.scrollTo(0,0);
+  }
+
+  async function uploadBlobInChunks(uploadUrl, blob, statusEl){
+    var chunkSize = 5 * 1024 * 1024;
+    var start = 0;
+    while(start < blob.size){
+      var end = Math.min(start + chunkSize, blob.size);
+      var response = await fetch(uploadUrl, {
+        method:'PUT',
+        headers:{
+          'Content-Type':'text/html',
+          'Content-Range':'bytes ' + start + '-' + (end - 1) + '/' + blob.size
+        },
+        body:blob.slice(start, end)
+      });
+      if(!response.ok && response.status !== 202){
+        var detail = '';
+        try{ detail = (await response.json()).error.message; } catch(ignore){}
+        throw new Error(detail || 'SharePoint rejected the file upload.');
+      }
+      start = end;
+      statusEl.textContent = 'Uploading the agreement to SharePoint… ' +
+        Math.round((start / blob.size) * 100) + '%';
+    }
+  }
+
   function saveCurrentState(){
-    var state, htmlStr, blob, filename;
+    var payload, blob, filename;
     try{
-      state = collectState();
-      $('savedStateScript').textContent = JSON.stringify(state);
-      htmlStr = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      blob = new Blob([htmlStr], { type:'text/html' });
-      filename = buildFilename();
+      payload = buildAgreementFile();
+      blob = payload.blob;
+      filename = payload.filename;
     } catch(e){
       console.error('[Save Draft] error building save payload:', e.message);
       showToast('Could not prepare the file to save: ' + e.message, 'err');
@@ -1776,12 +2543,33 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
      13. Wire everything up on load
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', function(){
+    if(
+      (location.hostname === '127.0.0.1' || location.hostname === 'localhost') &&
+      new URLSearchParams(location.search).get('localPreview') !== '1'
+    ){
+      location.replace(
+        'https://wonderful-field-08b34ac0f.7.azurestaticapps.net/' +
+        'Wesco%20Subcontractor%20Agreement.html?source=local-redirect'
+      );
+      return;
+    }
+
     initSigPad('contractorSigPad', 'contractor');
     initSigPad('subSigPad', 'sub');
     initSigPad('equipSigPad', 'equip');
 
-    $('agreementDate').addEventListener('change', updateAgreementDateWords);
     autoGrow($('scopeOfWork'));
+    autoGrow($('materialsProvided'));
+    autoGrow($('heavyEquipmentProvided'));
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-date-target]'), function(button){
+      button.addEventListener('click', function(){ openDatePicker(button.getAttribute('data-date-target')); });
+    });
+    ['equipChoiceGenie','equipChoiceTrash','equipChoiceOther'].forEach(function(id){
+      $(id).addEventListener('change', syncEquipmentChoices);
+    });
+    $('equipOtherText').addEventListener('input', syncEquipmentChoices);
+    $('subcontractorFolderSelect').addEventListener('change', syncOtherSubcontractorChoice);
 
     $('poUploadBtn').addEventListener('click', function(){ $('poFileInput').click(); });
     $('poReplaceBtn').addEventListener('click', function(){ $('poFileInput').click(); });
@@ -1791,15 +2579,19 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     });
 
     $('submitBtn').addEventListener('click', onSubmitForSignature);
+    $('topPrintBtn').addEventListener('click', printAgreement);
+    $('bottomPrintBtn').addEventListener('click', printAgreement);
+    $('printNowBtn').addEventListener('click', function(){ window.print(); });
+    $('exitPrintPreviewBtn').addEventListener('click', exitPrintPreview);
+    $('cancelRouteBtn').addEventListener('click', closeSubcontractorModal);
+    $('confirmRouteBtn').addEventListener('click', uploadAgreementForSignature);
+    $('subcontractorModal').addEventListener('click', function(e){
+      if(e.target === $('subcontractorModal')) closeSubcontractorModal();
+    });
     $('completeBtn').addEventListener('click', onCompleteAgreement);
     $('returnBtn').addEventListener('click', onReturnToPreparer);
     $('archiveBtn').addEventListener('click', onArchive);
     $('saveDraftBtn').addEventListener('click', saveCurrentState);
-    $('loadBtn').addEventListener('click', function(){ $('loadFileInput').click(); });
-    $('loadFileInput').addEventListener('change', function(e){
-      if(e.target.files && e.target.files[0]) loadFromFile(e.target.files[0]);
-    });
-
     // Live status preview while still in Draft (never claims a state that hasn't been reached)
     document.getElementById('preparerMainFields').addEventListener('input', function(){
       if(AppState.stage === 'draft') computeStatus();

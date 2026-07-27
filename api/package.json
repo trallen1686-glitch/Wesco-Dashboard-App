@@ -4,10 +4,14 @@
   "private": true,
   "main": "src/functions/*.js",
   "scripts": {
-    "start": "func start"
+    "start": "func start",
+    "test": "node --test"
   },
   "dependencies": {
     "@azure/functions": "^4.5.1",
-    "@azure/msal-node": "^2.13.1"
+    "@azure/identity": "^4.13.1",
+    "@azure/keyvault-secrets": "^4.11.2",
+    "@azure/msal-node": "^5.4.2",
+    "docusign-esign": "^10.0.0"
   }
 }
