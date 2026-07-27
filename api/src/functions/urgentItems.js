@@ -172,7 +172,7 @@ app.http("urgentItems", {
       return {
         status: 500,
         jsonBody: {
-          error: "The urgent items service is temporarily unavailable.",
+          error: `The urgent items service is temporarily unavailable. [${category}]`,
           category,
         },
       };
