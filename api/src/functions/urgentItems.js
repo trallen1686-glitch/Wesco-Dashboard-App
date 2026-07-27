@@ -149,6 +149,7 @@ app.http("urgentItems", {
       const created = await dataverseJson(
         `${ENTITY_SET}?$select=${SELECT}`,
         {
+          credentialProfile: "equipment",
           method: "POST",
           headers: { Prefer: "return=representation" },
           body: JSON.stringify(payload),
