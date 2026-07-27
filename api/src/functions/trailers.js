@@ -1,5 +1,5 @@
 const { app } = require("@azure/functions");
-const { graphFetchFor, visitsTableName, sanitizeForSheetName } = require("../graphClient");
+const { graphFetchFor, visitsTableName, sanitizeForSheetName, odataQuote } = require("../graphClient");
 
 const WORKBOOK = "trailer";
 const EXCLUDED_SHEETS = new Set(["Template"]);
@@ -9,7 +9,7 @@ function gf(path, options) {
 }
 
 function worksheetSegment(sheetName) {
-  return `worksheets('${encodeURIComponent(sheetName)}')`;
+  return `worksheets('${odataQuote(sheetName)}')`;
 }
 
 function parseHeaderRange(values) {
@@ -88,7 +88,7 @@ async function findAndRenameVisitsTable(sheetName, desiredTableName) {
   const tablesResp = await gf(`/${seg}/tables`);
   let visitsTable = null;
   for (const table of tablesResp.value) {
-    const tableSeg = `${seg}/tables('${encodeURIComponent(table.name)}')`;
+    const tableSeg = `${seg}/tables('${odataQuote(table.name)}')`;
     const headerRange = await gf(`/${tableSeg}/headerRowRange`);
     const firstHeader = headerRange.values && headerRange.values[0] && headerRange.values[0][0];
     if (String(firstHeader).trim().toLowerCase() === "date") {
@@ -101,7 +101,7 @@ async function findAndRenameVisitsTable(sheetName, desiredTableName) {
   let finalName = desiredTableName;
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      await gf(`/${seg}/tables('${encodeURIComponent(visitsTable.name)}')`, {
+      await gf(`/${seg}/tables('${odataQuote(visitsTable.name)}')`, {
         method: "PATCH",
         body: JSON.stringify({ name: finalName }),
       });

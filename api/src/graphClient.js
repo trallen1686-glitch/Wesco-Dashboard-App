@@ -118,6 +118,15 @@ function sanitizeForSheetName(name) {
   return s.slice(0, 31) || "Equipment";
 }
 
+// Encode a value for safe use inside an OData single-quoted literal in a
+// Graph URL path segment, e.g. worksheets('...') or tables('...'). A literal
+// apostrophe in the value (e.g. a sheet named "Chris O'keefe") would
+// otherwise terminate the quoted literal early and break the request, so it
+// must be doubled per OData escaping rules, on top of normal URL-encoding.
+function odataQuote(value) {
+  return encodeURIComponent(value).replace(/'/g, "''");
+}
+
 module.exports = {
   graphFetch,
   graphFetchFor,
@@ -126,4 +135,5 @@ module.exports = {
   visitsTableName,
   sanitizeForTableName,
   sanitizeForSheetName,
+  odataQuote,
 };

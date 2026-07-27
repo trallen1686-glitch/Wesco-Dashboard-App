@@ -1,4 +1,5 @@
 const { app } = require("@azure/functions");
+const { odataQuote } = require("../graphClient");
 const { getSheetTableName, worksheetSegment, gf } = require("./employees");
 
 // Same raw-value quirk as the other logs' Date columns, but "Date Purchased"
@@ -34,7 +35,7 @@ app.http("listEmployeeHardware", {
     try {
       const sheetName = decodeURIComponent(request.params.sheet);
       const tableName = await getSheetTableName(sheetName);
-      const seg = `${worksheetSegment(sheetName)}/tables('${encodeURIComponent(tableName)}')`;
+      const seg = `${worksheetSegment(sheetName)}/tables('${odataQuote(tableName)}')`;
       const rowsResp = await gf(`/${seg}/rows`);
       const items = rowsResp.value.map(rowToItem).filter((item) => item.device);
       return { jsonBody: items };
@@ -54,7 +55,7 @@ app.http("addEmployeeHardware", {
       const sheetName = decodeURIComponent(request.params.sheet);
       const body = await request.json();
       const tableName = await getSheetTableName(sheetName);
-      const seg = `${worksheetSegment(sheetName)}/tables('${encodeURIComponent(tableName)}')`;
+      const seg = `${worksheetSegment(sheetName)}/tables('${odataQuote(tableName)}')`;
 
       const rowsResp = await gf(`/${seg}/rows`);
       const existingCount = rowsResp.value.filter((r) => r.values[0][1]).length;
@@ -92,7 +93,7 @@ app.http("deleteEmployeeHardware", {
       const sheetName = decodeURIComponent(request.params.sheet);
       const index = Number(request.params.index);
       const tableName = await getSheetTableName(sheetName);
-      const seg = `${worksheetSegment(sheetName)}/tables('${encodeURIComponent(tableName)}')`;
+      const seg = `${worksheetSegment(sheetName)}/tables('${odataQuote(tableName)}')`;
       await gf(`/${seg}/rows/itemAt(index=${index})`, { method: "DELETE" });
       return { status: 204 };
     } catch (err) {

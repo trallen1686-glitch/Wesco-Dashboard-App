@@ -1,5 +1,5 @@
 const { app } = require("@azure/functions");
-const { graphFetchFor, visitsTableName } = require("../graphClient");
+const { graphFetchFor, visitsTableName, odataQuote } = require("../graphClient");
 
 const WORKBOOK = "trailer";
 
@@ -9,7 +9,7 @@ function gf(path, options) {
 
 function tableSegment(sheetName) {
   const table = visitsTableName(sheetName);
-  return `worksheets('${encodeURIComponent(sheetName)}')/tables('${encodeURIComponent(table)}')`;
+  return `worksheets('${odataQuote(sheetName)}')/tables('${odataQuote(table)}')`;
 }
 
 // Excel table rows return raw cell values, so a date-formatted cell comes back

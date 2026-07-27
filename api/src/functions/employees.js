@@ -1,5 +1,5 @@
 const { app } = require("@azure/functions");
-const { graphFetchFor, sanitizeForSheetName } = require("../graphClient");
+const { graphFetchFor, sanitizeForSheetName, odataQuote } = require("../graphClient");
 
 const WORKBOOK = "hardware";
 const TEMPLATE_SHEET = "TEMPLATE";
@@ -9,7 +9,7 @@ function gf(path, options) {
 }
 
 function worksheetSegment(sheetName) {
-  return `worksheets('${encodeURIComponent(sheetName)}')`;
+  return `worksheets('${odataQuote(sheetName)}')`;
 }
 
 // Unlike the equipment/trailer/vehicle logs, this workbook's per-sheet tables
@@ -38,7 +38,7 @@ app.http("listEmployees", {
           const seg = worksheetSegment(sheet.name);
           const nameRange = await gf(`/${seg}/range(address='A3')`);
           const tableName = await getSheetTableName(sheet.name);
-          const rowsResp = await gf(`/${seg}/tables('${encodeURIComponent(tableName)}')/rows`);
+          const rowsResp = await gf(`/${seg}/tables('${odataQuote(tableName)}')/rows`);
           const itemCount = rowsResp.value.filter((r) => r.values[0][1]).length; // column B = device name
 
           return {
