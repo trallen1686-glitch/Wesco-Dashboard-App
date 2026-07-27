@@ -152,7 +152,7 @@ function anchorTab(anchorString, recipientId, tabLabel, options = {}) {
     anchorString,
     anchorUnits: "pixels",
     anchorXOffset: String(options.xOffset ?? 0),
-    anchorYOffset: String(options.yOffset ?? 14),
+    anchorYOffset: String(options.yOffset ?? 0),
     anchorIgnoreIfNotPresent: "false",
     tabLabel,
     optional: options.optional ? "true" : "false",

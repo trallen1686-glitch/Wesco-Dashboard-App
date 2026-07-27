@@ -260,6 +260,15 @@ input.f[type="tel"], input.f[type="date"]{
 .field-hint{ font-family: var(--sans); font-size:11px; color:var(--ink-soft); margin-top:3px; }
 .date-with-button{ display:flex; align-items:center; gap:6px; }
 .date-with-button input{ flex:1; }
+.completion-fields .field-block{
+  display:flex;
+  flex-direction:column;
+}
+.completion-fields .field-block label{
+  min-height:2.6em;
+  display:flex;
+  align-items:flex-end;
+}
 .calendar-button{
   flex:0 0 38px;
   min-height:36px;
@@ -385,6 +394,40 @@ input[type="file"].hidden-file{ position:absolute; width:1px; height:1px; opacit
   color:var(--wesco-black);
 }
 .sig-caption{ font-family:var(--sans); font-size:10.5px; color:var(--ink-soft); text-align:center; margin-top:2px; letter-spacing:.03em; text-transform:uppercase;}
+.section-ten-block{ margin-top:0; }
+.equipment-signature-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px 22px;
+  align-items:start;
+  margin-top:6px;
+}
+.equipment-signature-cell{ margin:10px 0 16px; min-width:0; }
+.equipment-signature-cell > label{
+  display:block;
+  font-family:var(--sans);
+  font-size:11.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ink-soft);
+  margin-bottom:4px;
+}
+.docusign-field-target{
+  display:block;
+  position:relative;
+  flex:1 1 auto;
+  min-width:0;
+}
+.signature-placeholder{
+  display:block;
+  width:100%;
+  height:38px;
+  border-bottom:1px solid #000;
+}
+@media (max-width:600px){
+  .equipment-signature-grid{ grid-template-columns:1fr; }
+}
 
 .doc-footer-tag{
   font-family: var(--sans);
@@ -408,6 +451,110 @@ input[type="file"].hidden-file{ position:absolute; width:1px; height:1px; opacit
   .page-break{ break-before: page; page-break-before: always; }
 }
 .avoid-break{ break-inside: avoid; page-break-inside: avoid; }
+
+/*
+ * The Docusign-only clone receives the docusign-document class. These rules
+ * use print-safe table/line layouts so HTML conversion cannot stack the two
+ * Section 10 columns or expand the signing fields across multiple pages.
+ */
+html.docusign-document .section-ten-block{
+  break-inside:avoid!important;
+  page-break-inside:avoid!important;
+}
+html.docusign-document .section-ten-block .sig-grid{
+  display:table!important;
+  table-layout:fixed!important;
+  width:100%!important;
+  margin:12px 0 0!important;
+}
+html.docusign-document .section-ten-block .sig-col{
+  display:table-cell!important;
+  width:50%!important;
+  vertical-align:top!important;
+  border-top:0!important;
+  padding:0 14px 0 0!important;
+}
+html.docusign-document .section-ten-block #subcontractorSigCol{
+  padding:0 0 0 14px!important;
+}
+html.docusign-document .section-ten-block .field-block{
+  display:flex!important;
+  align-items:flex-end!important;
+  gap:5px!important;
+  margin:4px 0!important;
+}
+html.docusign-document .equipment-signature-grid .field-block{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:1px!important;
+  margin:4px 0!important;
+}
+html.docusign-document .section-ten-block .field-block label,
+html.docusign-document .equipment-signature-grid .field-block label,
+html.docusign-document .equipment-signature-cell > label{
+  display:inline-block!important;
+  flex:0 0 auto!important;
+  min-height:0!important;
+  margin:0!important;
+  font-size:10pt!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+html.docusign-document .equipment-signature-grid .field-block label{ order:2!important; }
+html.docusign-document .equipment-signature-grid .field-block .docusign-field-target{ order:1!important; }
+html.docusign-document .section-ten-block input.f,
+html.docusign-document .section-ten-block textarea.f,
+html.docusign-document .equipment-signature-grid input.f{
+  width:100%!important;
+  height:22px!important;
+  min-height:22px!important;
+  padding:0 4px!important;
+  border:0!important;
+  border-bottom:1px solid #000!important;
+  border-radius:0!important;
+  background:#fff!important;
+  box-sizing:border-box!important;
+}
+html.docusign-document .section-ten-block textarea.f{
+  height:42px!important;
+  min-height:42px!important;
+}
+html.docusign-document .section-ten-block .sig-pad-wrap,
+html.docusign-document .equipment-signature-cell .sig-pad-wrap{
+  margin:0 0 2px!important;
+}
+html.docusign-document .section-ten-block .sig-caption{
+  text-align:left!important;
+  margin:1px 0 3px!important;
+  font-size:9pt!important;
+}
+html.docusign-document .section-ten-block .static-line{
+  margin:2px 0!important;
+  font-size:10pt!important;
+  line-height:1!important;
+}
+html.docusign-document .section-ten-block .doc-footer-tag{
+  margin-top:14px!important;
+}
+html.docusign-document .equipment-signature-grid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px 22px!important;
+  align-items:start!important;
+  margin-top:12px!important;
+}
+html.docusign-document .equipment-signature-cell{
+  margin:4px 0!important;
+}
+html.docusign-document .equipment-signature-cell .sig-caption{
+  text-align:left!important;
+  margin-top:1px!important;
+  font-size:9pt!important;
+}
+html.docusign-document .signature-placeholder{
+  height:30px!important;
+}
 
 /* ---------- Bottom action bar ---------- */
 .bottom-bar{
@@ -718,6 +865,99 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   }
   .boxed-verbiage,.po-box{ border:1px solid #000 !important; }
   .typed-sig{ border-left:0 !important; border-right:0 !important; border-top:0 !important; }
+  .completion-fields .field-block label{
+    min-height:2.6em !important;
+    display:flex !important;
+    align-items:flex-end !important;
+  }
+  .section-ten-block{
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
+  }
+  .section-ten-block .sig-grid{
+    display:table !important;
+    table-layout:fixed !important;
+    width:100% !important;
+    margin:12px 0 0 !important;
+  }
+  .section-ten-block .sig-col{
+    display:table-cell !important;
+    width:50% !important;
+    vertical-align:top !important;
+    border-top:0 !important;
+    padding:0 14px 0 0 !important;
+  }
+  .section-ten-block #subcontractorSigCol{ padding:0 0 0 14px !important; }
+  .section-ten-block .field-block{
+    display:flex !important;
+    align-items:flex-end !important;
+    gap:5px !important;
+    margin:4px 0 !important;
+  }
+  .equipment-signature-grid .field-block{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:1px !important;
+    margin:4px 0 !important;
+  }
+  .section-ten-block .field-block label,
+  .equipment-signature-grid .field-block label,
+  .equipment-signature-cell > label{
+    display:inline-block !important;
+    flex:0 0 auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    font-size:10pt !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+  .equipment-signature-grid .field-block label{ order:2 !important; }
+  .equipment-signature-grid .field-block input.f,
+  .equipment-signature-grid .field-block .docusign-field-target{ order:1 !important; }
+  .section-ten-block input.f,
+  .section-ten-block textarea.f,
+  .equipment-signature-grid input.f{
+    width:100% !important;
+    height:22px !important;
+    min-height:22px !important;
+    padding:0 4px !important;
+    border:0 !important;
+    border-bottom:1px solid #000 !important;
+    border-radius:0 !important;
+    box-sizing:border-box !important;
+  }
+  .section-ten-block textarea.f{
+    height:42px !important;
+    min-height:42px !important;
+  }
+  .section-ten-block .sig-pad-wrap,
+  .equipment-signature-cell .sig-pad-wrap{ margin:0 0 2px !important; }
+  .section-ten-block .sig-caption{
+    text-align:left !important;
+    margin:1px 0 3px !important;
+    font-size:9pt !important;
+  }
+  .section-ten-block .static-line{
+    margin:2px 0 !important;
+    font-size:10pt !important;
+    line-height:1 !important;
+  }
+  .section-ten-block .doc-footer-tag{ margin-top:14px !important; }
+  .equipment-signature-grid{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:10px 22px !important;
+    align-items:start !important;
+    margin-top:12px !important;
+  }
+  .equipment-signature-cell{ margin:4px 0 !important; }
+  .equipment-signature-cell .sig-caption{
+    text-align:left !important;
+    margin-top:1px !important;
+    font-size:9pt !important;
+  }
+  .signature-placeholder{ height:30px !important; }
 }
 </style>
 </head>
@@ -906,7 +1146,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
         It is anticipated that the Work of this Agreement shall be substantially completed (subject to any
         adjustments to the Subcontractor's schedule of Work) no later than
       </p>
-      <div class="field-grid">
+      <div class="field-grid completion-fields">
         <div class="field-block">
           <label for="completionDate">Anticipated Completion Date</label>
           <div class="date-with-button">
@@ -1207,19 +1447,18 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     </li>
   </ol>
 
+  <div class="section-ten-block avoid-break">
   <h2 class="section-heading"><span class="num">SECTION 10.</span>ASSIGNMENT</h2>
   <p class="clause">No assignment of this Subcontract Agreement by Subcontractor is permitted without prior written permission from the Contractor.</p>
 
   <p class="clause" style="text-align:center; font-weight:700; margin-top:30px;">
     THIS SUBCONTRACT AGREEMENT IS ACKNOWLEDGED AND EXECUTED AS OF THE DATE SET FORTH ABOVE BY:
   </p>
-  </div><!-- /preparerMainFields -->
-
-  <div class="sig-grid avoid-break">
+  <div class="sig-grid">
 
     <!-- ===================== CONTRACTOR (WESCO) SIGNATURE — Preparer-controlled ===================== -->
     <div class="sig-col" id="contractorSigCol">
-      <h4>Wesco Exteriors, Inc. <span class="field-tag tag-preparer">Preparer</span></h4>
+      <h4 class="screen-only">Wesco Exteriors, Inc. <span class="field-tag tag-preparer">Preparer</span></h4>
 
       <div class="sig-mode-toggle">
         <label><input type="radio" name="contractorSigMode" value="draw" checked onchange="setSigMode('contractor','draw')"> Draw signature</label>
@@ -1260,7 +1499,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 
     <!-- ===================== SUBCONTRACTOR SIGNATURE — Subcontractor-controlled ===================== -->
     <div class="sig-col" id="subcontractorSigCol">
-      <h4>Subcontractor <span class="field-tag tag-subcontractor">Subcontractor</span></h4>
+      <h4 class="screen-only">Subcontractor <span class="field-tag tag-subcontractor">Subcontractor</span></h4>
 
       <div class="sig-mode-toggle">
         <label><input type="radio" name="subSigMode" value="draw" checked onchange="setSigMode('sub','draw')"> Draw signature</label>
@@ -1320,6 +1559,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </div>
 
   <p class="doc-footer-tag">Wesco.Subcontractor Agreement.Revised.05.04.2021.docx</p>
+  </div><!-- /section-ten-block -->
+  </div><!-- /preparerMainFields -->
 
 </div><!-- /paper (page 1 contract) -->
 </div><!-- /page-shell -->
@@ -1381,34 +1622,37 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
   </p>
 
   <div id="equipSubFields">
-  <div class="sig-mode-toggle">
-    <span class="field-tag tag-subcontractor">Subcontractor</span>
-    <label style="margin-left:8px;"><input type="radio" name="equipSigMode" value="draw" checked onchange="setSigMode('equip','draw')"> Draw signature</label>
-    <label><input type="radio" name="equipSigMode" value="type" onchange="setSigMode('equip','type')"> Type signature</label>
-  </div>
-  <div class="sig-pad-wrap" id="equipDrawWrap">
-    <span class="docusign-anchor">EQUIP_SIGNATURE_ANCHOR</span>
-    <canvas class="sig-pad" id="equipSigPad" width="700" height="110" aria-label="Draw employee signature"></canvas>
-    <div class="sig-controls">
-      <button type="button" class="btn btn-outline btn-sm" style="color:#3f3f41;border-color:#a79e8f;" onclick="clearSigPad('equipSigPad')">Clear</button>
-    </div>
-  </div>
-  <div class="sig-pad-wrap" id="equipTypeWrap" style="display:none;">
-    <input type="text" id="equipTypedSig" class="typed-sig" placeholder="Type full name to sign" aria-label="Typed employee signature">
-  </div>
-
-  <div class="field-grid" style="margin-top:6px;">
+  <div class="equipment-signature-grid">
     <div class="field-block">
       <label for="equipEmployeeName" class="req">Employee Name (Please Print) <span class="docusign-anchor">EQUIP_NAME_ANCHOR</span></label>
       <input type="text" id="equipEmployeeName" class="f" required>
+    </div>
+    <div class="equipment-signature-cell">
+      <label class="req screen-only">Signature</label>
+      <div class="sig-mode-toggle">
+        <span class="field-tag tag-subcontractor">Subcontractor</span>
+        <label style="margin-left:8px;"><input type="radio" name="equipSigMode" value="draw" checked onchange="setSigMode('equip','draw')"> Draw signature</label>
+        <label><input type="radio" name="equipSigMode" value="type" onchange="setSigMode('equip','type')"> Type signature</label>
+      </div>
+      <div class="sig-pad-wrap" id="equipDrawWrap">
+        <span class="docusign-anchor">EQUIP_SIGNATURE_ANCHOR</span>
+        <canvas class="sig-pad" id="equipSigPad" width="700" height="110" aria-label="Draw employee signature"></canvas>
+        <div class="sig-controls">
+          <button type="button" class="btn btn-outline btn-sm" style="color:#3f3f41;border-color:#a79e8f;" onclick="clearSigPad('equipSigPad')">Clear</button>
+        </div>
+      </div>
+      <div class="sig-pad-wrap" id="equipTypeWrap" style="display:none;">
+        <input type="text" id="equipTypedSig" class="typed-sig" placeholder="Type full name to sign" aria-label="Typed employee signature">
+      </div>
+      <div class="sig-caption req">Signature</div>
     </div>
     <div class="field-block">
       <label for="equipCompanyName" class="req">Company Name <span class="docusign-anchor">EQUIP_COMPANY_ANCHOR</span></label>
       <input type="text" id="equipCompanyName" class="f" required>
     </div>
-    <div class="field-block span2">
+    <div class="field-block">
       <label for="equipSignDate" class="req">Date <span class="docusign-anchor">EQUIP_DATE_ANCHOR</span></label>
-      <input type="date" id="equipSignDate" class="f" style="max-width:220px;" required>
+      <input type="date" id="equipSignDate" class="f" required>
     </div>
   </div>
   </div><!-- /equipSubFields -->
@@ -2342,6 +2586,7 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
 
   function buildPrintableHtml(){
     var clone = document.documentElement.cloneNode(true);
+    clone.classList.add('docusign-document');
 
     FIELD_IDS.forEach(function(id){
       var source = $(id);
@@ -2363,10 +2608,48 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       var target = clone.querySelector('#' + id);
       if(!target) return;
       if(target.tagName === 'TEXTAREA'){
+        target.value = '';
         target.textContent = '';
       } else {
+        target.value = '';
         target.setAttribute('value', '');
+        if(target.getAttribute('type') === 'date'){
+          target.setAttribute('type', 'text');
+          target.removeAttribute('placeholder');
+        }
       }
+    });
+
+    var docusignAnchorTargets = {
+      WESCO_NAME_ANCHOR:'contractorBy',
+      WESCO_TITLE_ANCHOR:'contractorTitle',
+      WESCO_DATE_ANCHOR:'contractorSignDate',
+      SUB_COMPANY_ANCHOR:'subCompanyName',
+      SUB_NAME_ANCHOR:'subBy',
+      SUB_TITLE_ANCHOR:'subTitle',
+      SUB_ADDRESS_ANCHOR:'subAddress',
+      SUB_PHONE_ANCHOR:'subOfficePhone',
+      SUB_FAX_ANCHOR:'subFax',
+      SUB_EMAIL_ANCHOR:'subEmail',
+      SUB_CONTACT_ANCHOR:'subProjectContact',
+      SUB_DATE_ANCHOR:'subSignDate',
+      EQUIP_NAME_ANCHOR:'equipEmployeeName',
+      EQUIP_COMPANY_ANCHOR:'equipCompanyName',
+      EQUIP_DATE_ANCHOR:'equipSignDate'
+    };
+    Object.keys(docusignAnchorTargets).forEach(function(anchorText){
+      var target = clone.querySelector('#' + docusignAnchorTargets[anchorText]);
+      var anchor = Array.prototype.find.call(
+        clone.querySelectorAll('.docusign-anchor'),
+        function(candidate){ return candidate.textContent.trim() === anchorText; }
+      );
+      if(!target || !anchor) return;
+      var wrapper = clone.ownerDocument.createElement('div');
+      wrapper.className = 'docusign-field-target';
+      target.parentNode.insertBefore(wrapper, target);
+      anchor.remove();
+      wrapper.appendChild(anchor);
+      wrapper.appendChild(target);
     });
 
     var poPreview = clone.querySelector('#poPreview');
@@ -2382,8 +2665,8 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
     var clonedCanvases = clone.querySelectorAll('canvas');
     Array.prototype.forEach.call(clonedCanvases, function(clonedCanvas){
       var signatureLine = clone.ownerDocument.createElement('div');
+      signatureLine.className = 'signature-placeholder';
       signatureLine.setAttribute('aria-label', 'Signature field completed in Docusign');
-      signatureLine.style.cssText = 'display:block;width:100%;height:110px;border-bottom:1px solid #000;';
       clonedCanvas.parentNode.replaceChild(signatureLine, clonedCanvas);
     });
 
@@ -2397,12 +2680,11 @@ details.config-panel label{ display:block; margin-top:10px; font-weight:600; col
       function(anchor){
         /*
          * DocuSign must be able to read these markers after HTML-to-PDF
-         * conversion. Inline !important rules override the normal print rule
-         * that hides anchors from paper copies, without changing this page's
-         * on-screen or printed appearance.
+         * conversion. Each marker is positioned inside its actual input line
+         * or signature line, so Docusign places the overlay in the same box.
          */
         anchor.style.cssText =
-          'display:inline!important;position:static!important;width:auto!important;' +
+          'display:inline!important;position:absolute!important;left:6px!important;top:6px!important;width:auto!important;' +
           'height:auto!important;overflow:visible!important;white-space:nowrap!important;' +
           'color:#fff!important;font-size:2px!important;line-height:2px!important;' +
           'letter-spacing:0!important;';

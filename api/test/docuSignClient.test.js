@@ -129,6 +129,8 @@ test("Section 10 assigns Wesco left-side fields and subcontractor right-side fie
   );
   assert.equal(subcontractorEmail.value, "tantaneiarountree@gmail.com");
   assert.equal(subcontractorEmail.locked, "false");
+  assert.equal(subcontractorEmail.anchorXOffset, "0");
+  assert.equal(subcontractorEmail.anchorYOffset, "0");
 });
 
 test("every Docusign AutoPlace anchor exists in the agreement template", () => {
@@ -159,8 +161,16 @@ test("every Docusign AutoPlace anchor exists in the agreement template", () => {
   assert.match(source, /clone\.querySelectorAll\('\.docusign-anchor'\)/);
   assert.match(
     source,
-    /display:inline!important;position:static!important/
+    /display:inline!important;position:absolute!important;left:6px!important;top:6px!important/
   );
+  assert.match(source, /class="field-grid completion-fields"/);
+  assert.match(source, /class="section-ten-block avoid-break"/);
+  assert.match(source, /class="equipment-signature-grid"/);
+  assert.match(source, /WESCO_NAME_ANCHOR:'contractorBy'/);
+  assert.match(source, /EQUIP_DATE_ANCHOR:'equipSignDate'/);
+  assert.match(source, /target\.value = ''/);
+  assert.match(source, /target\.setAttribute\('type', 'text'\)/);
+  assert.match(source, /class="req screen-only">Signature<\/label>/);
 });
 
 test("Docusign API error body is preserved for a useful diagnosis", () => {
@@ -197,7 +207,7 @@ test("browser payload sends the PO separately and removes the nested PDF preview
     /Purchase Order attached as a separate Docusign document:/
   );
   assert.match(source, /poPreview\.innerHTML = ''/);
-  assert.match(source, /position:static!important/);
+  assert.match(source, /position:absolute!important;left:6px!important;top:6px!important/);
   assert.match(
     source,
     /clone\.querySelectorAll\('\.docusign-anchor'\)/
