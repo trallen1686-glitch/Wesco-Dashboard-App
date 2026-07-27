@@ -11,10 +11,6 @@
     {
       "route": "/WesConnect_Executive_Task_List.html",
       "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/Staff-Portal-Starter-Template.html",
-      "allowedRoles": ["authenticated"]
     }
   ],
   "responseOverrides": {
