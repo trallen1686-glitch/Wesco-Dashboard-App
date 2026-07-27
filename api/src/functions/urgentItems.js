@@ -156,9 +156,25 @@ app.http("urgentItems", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
+      const message = String((error && error.message) || "").toLowerCase();
+      const category =
+        message.includes("prvcreate") || message.includes("privilege") || error.status === 403
+          ? "create_permission"
+          : message.includes("does not exist") || message.includes("undeclared property")
+            ? "invalid_column"
+            : message.includes("maximum length") || message.includes("too long")
+              ? "field_length"
+              : message.includes("required") || message.includes("cannot be null")
+                ? "required_field"
+                : error.status
+                  ? `dataverse_http_${error.status}`
+                  : "api_create_error";
       return {
         status: 500,
-        jsonBody: { error: "The urgent items service is temporarily unavailable." },
+        jsonBody: {
+          error: "The urgent items service is temporarily unavailable.",
+          category,
+        },
       };
     }
   },
