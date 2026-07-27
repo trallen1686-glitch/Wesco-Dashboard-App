@@ -111,7 +111,8 @@ app.http("urgentItems", {
     try {
       if (request.method === "GET") {
         const result = await dataverseJson(
-          `${ENTITY_SET}?$select=${SELECT}&$orderby=createdon desc`
+          `${ENTITY_SET}?$select=${SELECT}&$orderby=createdon desc`,
+          { credentialProfile: "equipment" }
         );
         return { jsonBody: { items: (result.value || []).map(mapRecord) } };
       }
