@@ -136,6 +136,7 @@ app.http("urgentItems", {
         cre09_urgentissuetitle: type,
         cre09_reportedby: cleanText(body.issuer, 100),
         cre09_duedate: cleanText(body.dueDate, 10),
+        wes_urgentissues_startdate: cleanText(body.dateIssued, 10),
         cre09_assignedto: issuedFor.join(", ").slice(0, 100),
         cre09_issuedescription: cleanText(body.description, 1500),
         cre09_notes: `WESCO_URGENT_META:${JSON.stringify({
@@ -156,41 +157,9 @@ app.http("urgentItems", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
-      const message = String((error && error.message) || "").toLowerCase();
-      const category =
-        message.includes("cre09_urgentissuetitle")
-          ? "title_field"
-          : message.includes("cre09_reportedby")
-            ? "reported_by_field"
-            : message.includes("cre09_duedate")
-              ? "due_date_field"
-              : message.includes("cre09_assignedto")
-                ? "assigned_to_field"
-                : message.includes("cre09_issuedescription")
-                  ? "description_field"
-                  : message.includes("cre09_notes")
-                    ? "notes_field"
-                    : message.includes("prvcreate") || message.includes("privilege") || error.status === 403
-                      ? "create_permission"
-                      : message.includes("does not exist") || message.includes("undeclared property")
-                        ? "invalid_column"
-                        : message.includes("maximum length") || message.includes("too long")
-                          ? "field_length"
-                          : message.includes("required") || message.includes("cannot be null")
-                            ? "required_field"
-                            : message.includes("date") || message.includes("edm.datetime")
-                              ? "date_value"
-                              : message.includes("validation")
-                                ? "dataverse_validation"
-                                : error.status
-                                  ? `dataverse_http_${error.status}`
-                                  : "api_create_error";
       return {
         status: 500,
-        jsonBody: {
-          error: `The urgent items service is temporarily unavailable. [${category}]`,
-          category,
-        },
+        jsonBody: { error: "The urgent items service is temporarily unavailable." },
       };
     }
   },
