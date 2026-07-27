@@ -111,8 +111,7 @@ app.http("urgentItems", {
     try {
       if (request.method === "GET") {
         const result = await dataverseJson(
-          `${ENTITY_SET}?$select=${SELECT}&$orderby=createdon desc`,
-          { credentialProfile: "equipment" }
+          `${ENTITY_SET}?$select=${SELECT}&$orderby=createdon desc`
         );
         return { jsonBody: { items: (result.value || []).map(mapRecord) } };
       }
@@ -136,7 +135,6 @@ app.http("urgentItems", {
       const payload = {
         cre09_urgentissuetitle: type,
         cre09_reportedby: cleanText(body.issuer, 100),
-        wes_urgentissues_startdate: cleanText(body.dateIssued, 10),
         cre09_duedate: cleanText(body.dueDate, 10),
         cre09_assignedto: issuedFor.join(", ").slice(0, 100),
         cre09_issuedescription: cleanText(body.description, 1500),
@@ -150,7 +148,6 @@ app.http("urgentItems", {
       const created = await dataverseJson(
         `${ENTITY_SET}?$select=${SELECT}`,
         {
-          credentialProfile: "equipment",
           method: "POST",
           headers: { Prefer: "return=representation" },
           body: JSON.stringify(payload),
