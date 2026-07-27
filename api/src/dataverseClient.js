@@ -9,8 +9,8 @@ function dataverseUrl() {
   return value;
 }
 
-function credentialCandidates(profile = "default") {
-  const defaultCandidates = [
+function credentialCandidates() {
+  const candidates = [
     {
       clientId: process.env.DATAVERSE_CLIENT_ID,
       tenantId: process.env.DATAVERSE_TENANT_ID,
@@ -27,10 +27,6 @@ function credentialCandidates(profile = "default") {
       clientSecret: process.env.GRAPH_CLIENT_SECRET,
     },
   ];
-  const equipment = defaultCandidates[1];
-  const candidates = profile === "equipment"
-    ? [equipment, ...defaultCandidates.filter((candidate) => candidate !== equipment)]
-    : defaultCandidates;
   const seen = new Set();
   return candidates.filter(({ clientId, tenantId, clientSecret }) => {
     if (!clientId || !tenantId || !clientSecret) return false;
@@ -41,12 +37,12 @@ function credentialCandidates(profile = "default") {
   });
 }
 
-async function getAccessToken(profile = "default") {
+async function getAccessToken() {
   if (cachedToken && cachedToken.expiresOn > Date.now() + 60_000) {
     return cachedToken.token;
   }
   let lastError = null;
-  for (const credential of credentialCandidates(profile)) {
+  for (const credential of credentialCandidates()) {
     try {
       const client = new ConfidentialClientApplication({
         auth: {
@@ -72,22 +68,20 @@ async function getAccessToken(profile = "default") {
 }
 
 async function dataverseFetch(path, options = {}) {
-  const profile = options.credentialProfile || "default";
-  const { credentialProfile, ...fetchOptions } = options;
-  const token = await getAccessToken(profile);
+  const token = await getAccessToken();
   const response = await fetch(
     path.startsWith("http")
       ? path
       : `${dataverseUrl()}/api/data/v9.2/${path.replace(/^\/+/, "")}`,
     {
-      ...fetchOptions,
+      ...options,
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
         "OData-MaxVersion": "4.0",
         "OData-Version": "4.0",
         "Content-Type": "application/json",
-        ...(fetchOptions.headers || {}),
+        ...(options.headers || {}),
       },
     }
   );
@@ -95,7 +89,7 @@ async function dataverseFetch(path, options = {}) {
   if (!response.ok) {
     const text = await response.text().catch(() => "");
     const error = new Error(
-      `Dataverse ${fetchOptions.method || "GET"} failed: ${response.status} ${text.slice(0, 500)}`
+      `Dataverse ${options.method || "GET"} failed: ${response.status} ${text.slice(0, 500)}`
     );
     error.status = response.status;
     throw error;
