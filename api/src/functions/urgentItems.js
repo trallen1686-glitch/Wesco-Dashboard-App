@@ -159,16 +159,9 @@ app.http("urgentItems", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
-      const message = String(error && error.message ? error.message : error);
-      const diagnosticCode = /Dataverse GET failed: 403/.test(message)
-        ? "DATAVERSE_FORBIDDEN"
-        : /Dataverse GET failed: 400/.test(message)
-          ? "DATAVERSE_QUERY_INVALID"
-          : /Dataverse GET failed: 404/.test(message)
-            ? "DATAVERSE_TABLE_NOT_FOUND"
-            : /invalid_client_credential/.test(message)
-              ? "DATAVERSE_CREDENTIAL_INVALID"
-              : "DATAVERSE_READ_FAILED";
+      const diagnosticCode = Number.isInteger(error && error.status)
+        ? `DATAVERSE_HTTP_${error.status}`
+        : "DATAVERSE_AUTH_FAILED";
       return {
         status: 500,
         jsonBody: {
