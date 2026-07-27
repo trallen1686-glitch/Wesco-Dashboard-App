@@ -158,17 +158,33 @@ app.http("urgentItems", {
       context.error(error);
       const message = String((error && error.message) || "").toLowerCase();
       const category =
-        message.includes("prvcreate") || message.includes("privilege") || error.status === 403
-          ? "create_permission"
-          : message.includes("does not exist") || message.includes("undeclared property")
-            ? "invalid_column"
-            : message.includes("maximum length") || message.includes("too long")
-              ? "field_length"
-              : message.includes("required") || message.includes("cannot be null")
-                ? "required_field"
-                : error.status
-                  ? `dataverse_http_${error.status}`
-                  : "api_create_error";
+        message.includes("cre09_urgentissuetitle")
+          ? "title_field"
+          : message.includes("cre09_reportedby")
+            ? "reported_by_field"
+            : message.includes("cre09_duedate")
+              ? "due_date_field"
+              : message.includes("cre09_assignedto")
+                ? "assigned_to_field"
+                : message.includes("cre09_issuedescription")
+                  ? "description_field"
+                  : message.includes("cre09_notes")
+                    ? "notes_field"
+                    : message.includes("prvcreate") || message.includes("privilege") || error.status === 403
+                      ? "create_permission"
+                      : message.includes("does not exist") || message.includes("undeclared property")
+                        ? "invalid_column"
+                        : message.includes("maximum length") || message.includes("too long")
+                          ? "field_length"
+                          : message.includes("required") || message.includes("cannot be null")
+                            ? "required_field"
+                            : message.includes("date") || message.includes("edm.datetime")
+                              ? "date_value"
+                              : message.includes("validation")
+                                ? "dataverse_validation"
+                                : error.status
+                                  ? `dataverse_http_${error.status}`
+                                  : "api_create_error";
       return {
         status: 500,
         jsonBody: {
