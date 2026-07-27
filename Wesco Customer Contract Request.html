@@ -5,54 +5,215 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wesco Customer Contract Request</title>
   <style>
-    :root { --navy:#173c58; --blue:#2875bb; --red:#7b1f31; --ink:#17232d; --line:#cbd5de; --soft:#eef4f8; --page:#edf1f4; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:var(--page); }
-    * { box-sizing:border-box; }
-    body { margin:0; }
-    main { width:min(920px,calc(100% - 32px)); margin:32px auto; padding:42px 48px 48px; background:#fff; border:1px solid #dbe2e8; box-shadow:0 12px 34px rgba(23,60,88,.12); }
-    header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:4px solid var(--navy); }
-    .logo { width:210px; height:auto; display:block; }
-    .title { text-align:right; }
-    h1 { margin:5px 0 4px; color:var(--navy); font-size:30px; line-height:1.1; letter-spacing:0; }
-    .subtitle { margin:0; color:var(--blue); font-size:17px; font-weight:700; }
-    .notice { margin:24px 0; padding:14px 16px; color:var(--navy); background:var(--soft); border-left:4px solid var(--blue); font-weight:700; line-height:1.4; }
-    fieldset { margin:0; padding:0; border:0; }
-    legend { width:100%; margin-bottom:14px; color:var(--navy); font-size:19px; font-weight:700; }
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:17px 20px; }
-    .field { min-width:0; }
-    .field.wide { grid-column:1 / -1; }
-    label { display:block; margin-bottom:7px; color:var(--navy); font-size:14px; font-weight:700; }
-    .required { color:var(--red); }
-    input,textarea { width:100%; min-height:44px; padding:10px 12px; border:1px solid #aebdca; border-radius:4px; background:#fff; color:var(--ink); font:inherit; }
-    textarea { min-height:96px; resize:vertical; line-height:1.45; }
-    input:focus,textarea:focus { outline:3px solid rgba(40,117,187,.2); border-color:var(--blue); }
-    .preview-wrap { margin-top:30px; padding-top:26px; border-top:1px solid var(--line); }
-    .preview-wrap h2 { margin:0 0 14px; color:var(--blue); font-size:19px; letter-spacing:0; }
-    #emailPreview { padding:18px; background:#f8fafb; border:1px solid var(--line); line-height:1.55; white-space:pre-wrap; }
-    .actions { display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-top:24px; }
-    button { min-height:46px; padding:0 24px; border:0; border-radius:4px; background:var(--navy); color:#fff; font:inherit; font-weight:700; cursor:pointer; }
-    button:hover { background:#0f3048; }
-    button:focus-visible { outline:3px solid rgba(40,117,187,.35); outline-offset:3px; }
-    #status { min-height:22px; color:#246b3e; font-weight:700; }
-    @media (max-width:680px) {
-      main { width:100%; margin:0; padding:24px 18px 30px; border:0; box-shadow:none; }
-      header { align-items:center; }
-      .logo { width:155px; }
-      h1 { font-size:23px; }
-      .subtitle { font-size:14px; }
-      .form-grid { grid-template-columns:1fr; }
-      .field.wide { grid-column:auto; }
-      .actions { align-items:stretch; flex-direction:column; }
-      button { width:100%; }
-    }
-    @media print {
-      :root { background:#fff; }
-      main { width:100%; margin:0; padding:24px; border:0; box-shadow:none; }
-      .actions { display:none; }
-    }
-  </style>
+:root{
+  --orange:#FF7012;
+  --white:#FFFFFF;
+  --muted:rgba(255,255,255,.62);
+  --muted-soft:rgba(255,255,255,.42);
+  --line:#FF7012;
+  --focus-ring:rgba(255,112,18,.55);
+  --success:#8BE28B;
+  --font:'Segoe UI','Open Sans',system-ui,-apple-system,Arial,sans-serif;
+  font-family:var(--font);
+  color:var(--white);
+  background:#090e10;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  background:#090e10;
+  color:var(--white);
+  font-family:var(--font);
+  font-size:14.5px;
+  line-height:1.45;
+}
+.widget{
+  min-height:100vh;
+  min-height:100dvh;
+  padding:24px;
+  background:rgba(9,14,16,.74);
+}
+.back-row{max-width:860px;margin:0 auto 12px}
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--orange);
+  text-decoration:none;
+  font-size:12.5px;
+  font-weight:800;
+  border:1px solid var(--orange);
+  border-radius:4px;
+  padding:8px 13px;
+  background:transparent;
+  transition:background .12s ease,color .12s ease;
+}
+.back-link:hover,.back-link:focus-visible{
+  background:var(--orange);
+  color:#1a1a1a;
+  outline:none;
+}
+main{
+  width:100%;
+  max-width:860px;
+  margin:0 auto;
+  padding:0;
+  background:rgba(9,14,16,.74);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:5px;
+  overflow:hidden;
+  box-shadow:0 16px 42px rgba(0,0,0,.28);
+}
+header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px 22px;
+  border-bottom:2px solid var(--line);
+}
+.logo{height:42px;width:auto;display:block;flex-shrink:0}
+.title{flex:1;min-width:0;text-align:left}
+h1{
+  margin:0;
+  color:var(--white);
+  font-size:20px;
+  line-height:1.25;
+  font-weight:800;
+  letter-spacing:.01em;
+}
+.subtitle{margin:3px 0 0;color:var(--muted);font-size:12px;font-weight:400}
+.notice{
+  margin:0 22px;
+  padding:17px 0 10px;
+  color:var(--muted);
+  background:transparent;
+  border:0;
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.45;
+}
+form{padding:0 22px 22px}
+fieldset{margin:0;padding:0;border:0}
+fieldset+fieldset{
+  margin-top:7px!important;
+  padding-top:0;
+  border-top:1px solid var(--line);
+}
+legend{
+  width:100%;
+  margin:0;
+  padding:19px 0 9px;
+  color:var(--orange);
+  font-size:11.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+.field{min-width:0}
+.field.wide{grid-column:1/-1}
+label{
+  display:block;
+  margin-bottom:5px;
+  color:var(--white);
+  font-size:12.5px;
+  font-weight:700;
+}
+.required{color:var(--orange);font-weight:800}
+input,textarea{
+  width:100%;
+  min-height:42px;
+  padding:10px 11px;
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:4px;
+  background:rgba(255,255,255,.05);
+  color:var(--white);
+  font:inherit;
+  font-size:13.5px;
+}
+input::placeholder,textarea::placeholder{color:var(--muted-soft)}
+textarea{min-height:96px;resize:vertical;line-height:1.45}
+input:focus,textarea:focus{
+  outline:none;
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px var(--focus-ring);
+  background:rgba(255,112,18,.06);
+}
+.preview-wrap{
+  margin-top:19px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.preview-wrap h2{
+  margin:0 0 9px;
+  color:var(--orange);
+  font-size:11.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+#emailPreview{
+  padding:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.18);
+  border-left:3px solid var(--orange);
+  border-radius:4px;
+  color:var(--white);
+  line-height:1.55;
+  white-space:pre-wrap;
+}
+.actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+button{
+  min-height:46px;
+  padding:0 24px;
+  border:1px solid var(--orange);
+  border-radius:4px;
+  background:var(--orange);
+  color:#1a1a1a;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+button:hover,button:focus-visible{filter:brightness(1.08);outline:none}
+button:active{transform:translateY(1px)}
+#status{min-height:22px;color:var(--success);font-weight:700}
+@media(max-width:620px){
+  .widget{padding:12px}
+  header{padding:14px 16px;align-items:flex-start}
+  .logo{height:34px}
+  .notice{margin:0 16px}
+  form{padding:0 16px 18px}
+  .form-grid{grid-template-columns:1fr}
+  .field.wide{grid-column:auto}
+  .actions{align-items:stretch;flex-direction:column}
+  button{width:100%}
+}
+@media print{
+  html,body,.widget{background:#fff;color:#000}
+  .widget{padding:0}
+  .back-row,.actions{display:none}
+  main{max-width:none;margin:0;border:0;box-shadow:none;background:#fff;color:#000}
+  header{border-bottom-color:#000}
+  h1,label,#emailPreview{color:#000}
+  input,textarea,#emailPreview{border-color:#777;color:#000;background:#fff}
+}
+</style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#102b3d;color:#fff;font:700 11px Arial,sans-serif;padding:7px 12px;border-radius:20px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)">&#8592; Wesco Hub</a>
+<div class="widget">
+  <div class="back-row">
+    <a href="index.html" class="back-link">&#8592; Wesco Hub</a>
+  </div>
   <main>
     <header>
       <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc.">
@@ -124,8 +285,9 @@
       </div>
     </form>
   </main>
+</div>
 
-  <script>
+<script>
     const form = document.getElementById('contractForm');
     const preview = document.getElementById('emailPreview');
     const status = document.getElementById('status');
