@@ -115,6 +115,176 @@
       main { width: 100%; margin: 0; padding: 24px; border: 0; box-shadow: none; }
       .actions { display: none; }
     }
+
+    /* Visual system matched to New-Project-Template.html. Form content and behavior unchanged. */
+    :root {
+      --orange: #FF7012;
+      --white: #FFFFFF;
+      --muted: rgba(255,255,255,.62);
+      --muted-soft: rgba(255,255,255,.42);
+      --line: #FF7012;
+      --focus-ring: rgba(255,112,18,.55);
+      --success: #8BE28B;
+      --font: 'Segoe UI', 'Open Sans', system-ui, -apple-system, Arial, sans-serif;
+      color: var(--white);
+      background: #090e10;
+      font-family: var(--font);
+    }
+    html, body {
+      min-height: 100%;
+      background: #090e10;
+      color: var(--white);
+      font-family: var(--font);
+    }
+    body { padding: 24px; }
+    body > a {
+      position: static !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 7px;
+      margin: 0 auto 12px;
+      max-width: 860px;
+      background: transparent !important;
+      color: var(--orange) !important;
+      border: 1px solid var(--orange);
+      border-radius: 4px !important;
+      box-shadow: none !important;
+      padding: 8px 13px !important;
+      font: 800 12.5px var(--font) !important;
+      transition: background .12s ease, color .12s ease;
+    }
+    body > a:hover, body > a:focus-visible {
+      background: var(--orange) !important;
+      color: #1a1a1a !important;
+      outline: none;
+    }
+    main {
+      width: min(860px, 100%);
+      margin: 0 auto;
+      padding: 0 22px 22px;
+      background: rgba(9,14,16,.74);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 5px;
+      box-shadow: 0 16px 42px rgba(0,0,0,.28);
+      overflow: hidden;
+    }
+    header {
+      align-items: center;
+      gap: 16px;
+      margin: 0 -22px;
+      padding: 16px 22px;
+      border-bottom: 2px solid var(--orange);
+    }
+    .logo { width: auto; height: 42px; flex-shrink: 0; }
+    .title { flex: 1; min-width: 0; text-align: left; }
+    h1 {
+      margin: 0;
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+    .subtitle { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .notice {
+      margin: 19px 0 7px;
+      padding: 12px 14px;
+      color: var(--white);
+      background: rgba(255,112,18,.08);
+      border: 1px solid rgba(255,112,18,.55);
+      border-left: 3px solid var(--orange);
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    fieldset { padding-top: 7px; }
+    legend {
+      margin: 0 0 9px;
+      padding: 19px 0 9px;
+      color: var(--orange);
+      border-bottom: 1px solid var(--orange);
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .form-grid { gap: 14px 18px; }
+    label { margin-bottom: 5px; color: var(--white); font-size: 12.5px; }
+    .required { color: var(--orange); }
+    input, select, textarea {
+      min-height: 42px;
+      padding: 10px 11px;
+      color: var(--white);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 4px;
+      font-family: var(--font);
+      font-size: 13.5px;
+      color-scheme: dark;
+    }
+    select option { color: var(--white); background: #090e10; }
+    input::placeholder, textarea::placeholder { color: var(--muted-soft); }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+      background: rgba(255,112,18,.06);
+    }
+    .preview-wrap {
+      margin-top: 19px;
+      padding-top: 19px;
+      border-top: 1px solid var(--orange);
+    }
+    .preview-wrap h2 {
+      margin: 0 0 9px;
+      color: var(--orange);
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    #emailPreview {
+      padding: 16px;
+      color: var(--white);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.18);
+      border-left: 3px solid var(--orange);
+      border-radius: 4px;
+    }
+    .actions {
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--orange);
+    }
+    button {
+      min-height: 46px;
+      padding: 12px 22px;
+      background: var(--orange);
+      color: #1a1a1a;
+      border: 1px solid var(--orange);
+      border-radius: 4px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 800;
+    }
+    button:hover, button:focus-visible { background: var(--orange); filter: brightness(1.08); outline: none; }
+    #status { color: var(--success); }
+    @media (max-width: 680px) {
+      body { padding: 12px; }
+      main { width: 100%; margin: 0; padding: 0 16px 18px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 16px 42px rgba(0,0,0,.28); }
+      header { margin: 0 -16px; padding: 14px 16px; align-items: flex-start; }
+      .logo { width: auto; height: 34px; }
+      h1 { font-size: 20px; }
+      .subtitle { font-size: 12px; }
+    }
+    @media print {
+      html, body { background: #fff; color: #000; }
+      body { padding: 0; }
+      body > a { display: none !important; }
+      main { width: 100%; margin: 0; padding: 24px; background: #fff; color: #000; border: 0; box-shadow: none; }
+      header { margin: 0; }
+      h1, label, #emailPreview { color: #000; }
+      input, select, textarea, #emailPreview { color: #000; background: #fff; border-color: #777; }
+    }
   </style>
 </head>
 <body>
