@@ -16,6 +16,7 @@ const SELECT = [
   "cre09_urgentid",
   "cre09_urgentissuetitle",
   "cre09_reportedby",
+  "wes_urgentissues_startdate",
   "cre09_duedate",
   "cre09_assignedto",
   "cre09_issuedescription",
@@ -85,6 +86,7 @@ function mapRecord(record) {
     issuer: record.cre09_reportedby || "",
     dateIssued:
       meta.dateIssued ||
+      String(record.wes_urgentissues_startdate || "").slice(0, 10) ||
       String(record.createdon || "").slice(0, 10),
     dueDate: record.cre09_duedate || "",
     issuedFor: String(record.cre09_assignedto || "")
@@ -135,6 +137,7 @@ app.http("urgentItems", {
       const payload = {
         cre09_urgentissuetitle: type,
         cre09_reportedby: cleanText(body.issuer, 100),
+        wes_urgentissues_startdate: cleanText(body.dateIssued, 10),
         cre09_duedate: cleanText(body.dueDate, 10),
         cre09_assignedto: issuedFor.join(", ").slice(0, 100),
         cre09_issuedescription: cleanText(body.description, 1500),
