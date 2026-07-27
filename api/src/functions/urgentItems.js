@@ -159,16 +159,9 @@ app.http("urgentItems", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
-      const diagnostic =
-        new URL(request.url).searchParams.get("diagnostic") === "urgent-api-20260727"
-          ? String(error && error.message ? error.message : error).slice(0, 1200)
-          : undefined;
       return {
         status: 500,
-        jsonBody: {
-          error: "The urgent items service is temporarily unavailable.",
-          ...(diagnostic ? { diagnostic } : {}),
-        },
+        jsonBody: { error: "The urgent items service is temporarily unavailable." },
       };
     }
   },
