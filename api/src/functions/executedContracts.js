@@ -111,7 +111,9 @@ async function listWorkbookRows() {
       estimateUrl: v[11] || "", submittedAt: v[12] || "",
       id: v[13] || `row-${row.index}`,
     };
-  }).reverse();
+  }).filter((record) =>
+    record.projectName || record.customer || record.projectNumber || record.id.startsWith("row-") === false
+  ).reverse();
 }
 
 app.http("executedContracts", {
