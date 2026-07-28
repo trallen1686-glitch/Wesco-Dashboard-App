@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wesco Add New Executed Contract</title>
+  <style>
+    :root {
+      --orange: #ff7012;
+      --white: #fff;
+      --muted: rgba(255,255,255,.65);
+      --panel: rgba(9,14,16,.82);
+      --line: rgba(255,255,255,.18);
+      --focus: rgba(255,112,18,.55);
+      --font: "Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      padding: 24px;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255,112,18,.09), transparent 24rem),
+        #090e10;
+      font: 14.5px/1.45 var(--font);
+    }
+    .shell { max-width: 920px; margin: 0 auto; }
+    .top-actions { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+    .container {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 5px;
+      box-shadow: 0 16px 42px rgba(0,0,0,.28);
+      padding: 0 22px 22px;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 0 16px;
+      border-bottom: 2px solid var(--orange);
+      margin-bottom: 18px;
+    }
+    .logo-wrap {
+      width: 176px;
+      min-width: 176px;
+      background: #fff;
+      border-radius: 4px;
+      padding: 5px 8px;
+    }
+    .logo-wrap img { display: block; width: 100%; height: auto; }
+    h1 { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: .01em; }
+    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .section-title {
+      color: var(--orange);
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 19px 0 10px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--orange);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .full-width { grid-column: 1 / -1; }
+    label { color: var(--white); font-size: 12.5px; font-weight: 700; }
+    input, select {
+      width: 100%;
+      padding: 10px 11px;
+      color: var(--white);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 4px;
+      font: 13.5px var(--font);
+      color-scheme: dark;
+    }
+    select option { color: var(--white); background: #090e10; }
+    input::placeholder { color: rgba(255,255,255,.42); }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--focus);
+      background: rgba(255,112,18,.06);
+    }
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .upload-card {
+      border: 1px dashed rgba(255,112,18,.65);
+      background: rgba(255,112,18,.055);
+      border-radius: 5px;
+      padding: 15px;
+    }
+    .upload-card strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .file-name { min-height: 20px; color: var(--muted); font-size: 12px; margin: 8px 0 0; word-break: break-word; }
+    .button-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--orange); }
+    button, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 43px;
+      border: 1px solid var(--orange);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font: 800 13.5px var(--font);
+      cursor: pointer;
+      background: var(--orange);
+      color: #1a1a1a;
+      text-decoration: none;
+    }
+    button:hover, button:focus-visible, .button:hover, .button:focus-visible { filter: brightness(1.08); outline: none; }
+    .secondary { background: transparent; color: var(--orange); }
+    .danger { border-color: #ff5858; color: #ff8b8b; background: transparent; }
+    .hidden-file { position: absolute; left: -9999px; }
+    .status {
+      display: none;
+      margin: 16px 0 0;
+      padding: 11px 13px;
+      border-left: 4px solid var(--orange);
+      background: rgba(255,112,18,.08);
+      color: var(--white);
+    }
+    .status.show { display: block; }
+    .screen[hidden] { display: none; }
+    .audit-tools { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .audit-tools input { flex: 1; }
+    .audit-list { display: grid; gap: 10px; }
+    .audit-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 14px;
+      align-items: center;
+      text-align: left;
+      background: rgba(255,255,255,.04);
+      color: var(--white);
+      border-color: var(--line);
+    }
+    .audit-item:hover { border-color: var(--orange); background: rgba(255,112,18,.08); }
+    .audit-item small { color: var(--muted); font-weight: 500; }
+    .empty { color: var(--muted); border: 1px dashed var(--line); padding: 24px; text-align: center; }
+    .review-card {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+    .review-grid div { border-bottom: 1px solid var(--line); padding: 7px 0; }
+    .review-grid strong { display: block; color: var(--orange); font-size: 11px; text-transform: uppercase; }
+    @media (max-width: 760px) {
+      body { padding: 14px; }
+      .container { padding: 0 16px 18px; }
+      .header { align-items: flex-start; flex-direction: column; }
+      .form-grid, .upload-grid, .review-grid { grid-template-columns: 1fr; }
+      .full-width { grid-column: 1; }
+      .button-row { grid-template-columns: 1fr 1fr; }
+      .audit-item { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; color: #111; padding: 0; }
+      .container { background: #fff; border: 0; box-shadow: none; max-width: none; }
+      h1, label, .review-grid div, .audit-item { color: #111; }
+      .top-actions, .button-row, .audit-tools, .upload-card .button, .danger { display: none !important; }
+      input, select { color: #111; border-color: #888; background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top-actions">
+      <button type="button" class="secondary" id="auditButton">Audit Log</button>
+    </div>
+
+    <section class="container screen" id="formScreen">
+      <header class="header">
+        <div class="logo-wrap"><img src="upload/Wesco Logo 2(2).png" alt="Wesco Exteriors, Inc."></div>
+        <div>
+          <h1>Wesco Add New Executed Contract</h1>
+          <p class="subtitle">Enter the executed contract information and upload the supporting contract and estimate.</p>
+        </div>
+      </header>
+
+      <form id="contractForm">
+        <div class="section-title">Project and Customer Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="projectName">Project Name</label>
+            <input id="projectName" name="projectName" required placeholder="Enter project name">
+          </div>
+          <div class="form-group">
+            <label for="customer">Customer</label>
+            <input id="customer" name="customer" required placeholder="Enter customer name">
+          </div>
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input id="contactNumber" name="contactNumber" type="tel" required placeholder="(000) 000-0000">
+          </div>
+          <div class="form-group">
+            <label for="projectAddress">Project Address</label>
+            <input id="projectAddress" name="projectAddress" required placeholder="Enter project address">
+          </div>
+        </div>
+
+        <div class="section-title">Contract Tracking Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="estimateNumber">Estimate Number</label>
+            <input id="estimateNumber" name="estimateNumber" required placeholder="Enter estimate number">
+          </div>
+          <div class="form-group">
+            <label for="invoiceNumber">Invoice Number</label>
+            <input id="invoiceNumber" name="invoiceNumber" required placeholder="Enter invoice number">
+          </div>
+          <div class="form-group">
+            <label for="projectNumber">Project Number Assigned</label>
+            <input id="projectNumber" name="projectNumber" required placeholder="Enter assigned project number">
+          </div>
+          <div class="form-group">
+            <label for="executionDate">Date of Execution</label>
+            <input id="executionDate" name="executionDate" type="date" required>
+          </div>
+          <div class="form-group full-width">
+            <label for="executedBy">Executed By</label>
+            <select id="executedBy" name="executedBy" required>
+              <option value="">Select employee</option>
+              <option>Stephanie Atkinson</option>
+              <option>Wes Atkinson</option>
+              <option>Rebecca Kirkman</option>
+              <option>Oscar Centeno</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title">Required Uploads</div>
+        <div class="upload-grid">
+          <div class="upload-card">
+            <strong>Executed Contract</strong>
+            <span class="subtitle">PDF, Word document, or image</span>
+            <input class="hidden-file" id="contractFile" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+            <label class="button secondary" for="contractFile">Upload Contract</label>
+            <p class="file-name" id="contractFileName">No contract selected</p>
+          </div>
+          <div class="upload-card">
+            <strong>Approved Estimate</strong>
+            <span class="subtitle">PDF, Excel, Word document, or image</span>
+            <input class="hidden-file" id="estimateFile" type="file" accept=".pdf,.xls,.xlsx,.doc,.docx,.png,.jpg,.jpeg">
+            <label class="button secondary" for="estimateFile">Upload Estimate</label>
+            <p class="file-name" id="estimateFileName">No estimate selected</p>
+          </div>
+        </div>
+
+        <div class="status" id="status" role="status"></div>
+        <div class="button-row">
+          <button type="button" class="secondary" id="saveButton">Save Draft</button>
+          <button type="button" class="secondary" id="printButton">Print</button>
+          <button type="reset" class="secondary" id="newButton">New Template</button>
+          <button type="submit">Submit Contract</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="container screen" id="auditScreen" hidden>
+      <header class="header">
+        <div class="logo-wrap"><img src="upload/Wesco Logo 2(2).png" alt="Wesco Exteriors, Inc."></div>
+        <div>
+          <h1>Executed Contract Audit Log</h1>
+          <p class="subtitle">Select an executed contract to review or print its details.</p>
+        </div>
+      </header>
+      <div class="audit-tools">
+        <button type="button" class="secondary" id="backButton">Back to Form</button>
+        <input id="auditSearch" type="search" placeholder="Search project, customer, project number, or executor">
+      </div>
+      <div class="audit-list" id="auditList"></div>
+      <div id="reviewPanel"></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const API_URL = "/api/executed-contracts";
+      const DRAFT_KEY = "wescoExecutedContractDraft";
+      const form = document.getElementById("contractForm");
+      const statusBox = document.getElementById("status");
+      const contractFile = document.getElementById("contractFile");
+      const estimateFile = document.getElementById("estimateFile");
+      let auditRecords = [];
+
+      const fields = ["projectName","customer","contactNumber","projectAddress","estimateNumber","invoiceNumber","projectNumber","executionDate","executedBy"];
+      const values = () => Object.fromEntries(fields.map(id => [id, document.getElementById(id).value.trim()]));
+      const notify = message => {
+        statusBox.textContent = message;
+        statusBox.classList.add("show");
+      };
+      const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char =>
+        ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[char]));
+      const setScreen = audit => {
+        document.getElementById("formScreen").hidden = audit;
+        document.getElementById("auditScreen").hidden = !audit;
+        document.getElementById("auditButton").style.display = audit ? "none" : "inline-flex";
+        if (audit) loadAudit();
+        window.scrollTo({top: 0, behavior: "smooth"});
+      };
+
+      function loadDraft() {
+        const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+        if (!draft) return;
+        fields.forEach(id => document.getElementById(id).value = draft[id] || "");
+        document.getElementById("contractFileName").textContent = draft.contractFileName || "No contract selected";
+        document.getElementById("estimateFileName").textContent = draft.estimateFileName || "No estimate selected";
+        notify("Saved draft restored. Please reselect uploaded files before submitting.");
+      }
+
+      function saveDraft() {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          ...values(),
+          contractFileName: contractFile.files[0]?.name || document.getElementById("contractFileName").textContent,
+          estimateFileName: estimateFile.files[0]?.name || document.getElementById("estimateFileName").textContent
+        }));
+        notify("Draft saved on this device. You can close this page and open it again later.");
+      }
+
+      function renderAudit(filter = "") {
+        const query = filter.toLowerCase();
+        const visible = auditRecords.filter(r => Object.values(r).join(" ").toLowerCase().includes(query));
+        document.getElementById("auditList").innerHTML = visible.length ? visible.map(r => `
+          <button type="button" class="audit-item" data-id="${escapeHtml(r.id)}">
+            <span><strong>${escapeHtml(r.projectName)}</strong><br><small>${escapeHtml(r.customer)}</small></span>
+            <span>${escapeHtml(r.projectNumber)}<br><small>Project Number</small></span>
+            <span>${escapeHtml(r.executionDate)}<br><small>${escapeHtml(r.executedBy)}</small></span>
+            <span>Review ›</span>
+          </button>`).join("") : `<div class="empty">No executed contracts are in the audit log yet.</div>`;
+      }
+
+      async function loadAudit() {
+        const list = document.getElementById("auditList");
+        list.innerHTML = `<div class="empty">Loading executed contracts…</div>`;
+        try {
+          const response = await fetch(API_URL, { cache: "no-store" });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || "Audit log could not be loaded.");
+          auditRecords = payload.records || [];
+          renderAudit(document.getElementById("auditSearch").value);
+        } catch (error) {
+          list.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+        }
+      }
+
+      function reviewRecord(id) {
+        const record = auditRecords.find(r => r.id === id);
+        if (!record) return;
+        const labels = {
+          projectName:"Project Name", customer:"Customer", contactNumber:"Contact Number",
+          projectAddress:"Project Address", estimateNumber:"Estimate Number", invoiceNumber:"Invoice Number",
+          projectNumber:"Project Number Assigned", executionDate:"Date of Execution", executedBy:"Executed By",
+          contractUrl:"Contract File", estimateUrl:"Estimate File"
+        };
+        document.getElementById("reviewPanel").innerHTML = `
+          <div class="review-card">
+            <div class="section-title">Contract Review</div>
+            <div class="review-grid">${Object.entries(labels).map(([key,label]) => {
+              const value = record[key];
+              const display = key.endsWith("Url") && value
+                ? `<a class="button secondary" href="${escapeHtml(value)}" target="_blank" rel="noopener">Open File</a>`
+                : escapeHtml(value || "Not provided");
+              return `<div><strong>${label}</strong>${display}</div>`;
+            }).join("")}</div>
+            <div class="button-row">
+              <button type="button" class="secondary" onclick="window.print()">Print Record</button>
+            </div>
+          </div>`;
+      }
+
+      const filePayload = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({
+          fileName: file.name,
+          contentType: file.type || "application/octet-stream",
+          documentBase64: String(reader.result).split(",")[1]
+        });
+        reader.onerror = () => reject(new Error(`Could not read ${file.name}.`));
+        reader.readAsDataURL(file);
+      });
+
+      contractFile.addEventListener("change", () => {
+        document.getElementById("contractFileName").textContent = contractFile.files[0]?.name || "No contract selected";
+      });
+      estimateFile.addEventListener("change", () => {
+        document.getElementById("estimateFileName").textContent = estimateFile.files[0]?.name || "No estimate selected";
+      });
+      document.getElementById("saveButton").addEventListener("click", saveDraft);
+      document.getElementById("printButton").addEventListener("click", () => window.print());
+      document.getElementById("auditButton").addEventListener("click", () => setScreen(true));
+      document.getElementById("backButton").addEventListener("click", () => setScreen(false));
+      document.getElementById("auditSearch").addEventListener("input", e => renderAudit(e.target.value));
+      document.getElementById("newButton").addEventListener("click", () => {
+        localStorage.removeItem(DRAFT_KEY);
+        document.getElementById("contractFileName").textContent = "No contract selected";
+        document.getElementById("estimateFileName").textContent = "No estimate selected";
+        statusBox.classList.remove("show");
+      });
+      document.getElementById("auditList").addEventListener("click", e => {
+        const item = e.target.closest("[data-id]");
+        if (item) reviewRecord(item.dataset.id);
+      });
+
+      form.addEventListener("submit", async e => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        if (!contractFile.files[0] || !estimateFile.files[0]) {
+          notify("Please upload both the executed contract and the approved estimate before submitting.");
+          return;
+        }
+        const submitButton = form.querySelector('[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting…";
+        notify("Uploading the contract and estimate to SharePoint…");
+        try {
+          const [contractPayload, estimatePayload] = await Promise.all([
+            filePayload(contractFile.files[0]),
+            filePayload(estimateFile.files[0])
+          ]);
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...values(),
+              contractFile: contractPayload,
+              estimateFile: estimatePayload
+            })
+          });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || "Submission failed.");
+          localStorage.removeItem(DRAFT_KEY);
+          form.reset();
+          document.getElementById("contractFileName").textContent = "No contract selected";
+          document.getElementById("estimateFileName").textContent = "No estimate selected";
+          document.getElementById("executionDate").valueAsDate = new Date();
+          notify("Contract submitted. The files and shared Audit Log were updated in SharePoint.");
+        } catch (error) {
+          notify(error.message);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit Contract";
+        }
+      });
+
+      document.getElementById("executionDate").valueAsDate = new Date();
+      loadDraft();
+    })();
+  </script>
+</body>
+</html>
