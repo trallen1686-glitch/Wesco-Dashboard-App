@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco Exteriors Approval Request Form</title>
+<style>
+:root{
+  --orange:#FF7012;
+  --white:#FFFFFF;
+  --ink:#FFFFFF;
+  --muted:rgba(255,255,255,.62);
+  --muted-soft:rgba(255,255,255,.42);
+  --page:#090e10;
+  --panel:rgba(9,14,16,.78);
+  --surface:rgba(255,255,255,.05);
+  --surface-soft:rgba(255,255,255,.03);
+  --border:rgba(255,255,255,.18);
+  --border-strong:rgba(255,255,255,.30);
+  --focus:rgba(255,112,18,.55);
+  --success:#8BE28B;
+  --danger:#FF9A72;
+  --font:'Segoe UI','Open Sans',system-ui,-apple-system,Arial,sans-serif;
+}
+*{ box-sizing:border-box; }
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--page);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:14.5px;
+  line-height:1.45;
+}
+body{ padding:24px; }
+.container{
+  width:min(960px,100%);
+  margin:0 auto;
+  overflow:hidden;
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:5px;
+  box-shadow:0 16px 42px rgba(0,0,0,.28);
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px 22px;
+  border-bottom:2px solid var(--orange);
+}
+.logo{ width:auto; height:50px; flex-shrink:0; }
+.header-copy{ flex:1; min-width:0; }
+h1{
+  margin:0;
+  color:var(--white);
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:.01em;
+}
+.subtitle{ margin:3px 0 0; color:var(--muted); font-size:12px; }
+.landing-screen{
+  padding:48px 22px 56px;
+  text-align:center;
+}
+.landing-card{
+  max-width:620px;
+  margin:0 auto;
+  padding:38px 28px;
+  background:var(--surface-soft);
+  border:1px solid var(--border);
+  border-top:3px solid var(--orange);
+  border-radius:5px;
+  box-shadow:0 12px 32px rgba(0,0,0,.22);
+}
+.landing-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:58px;
+  height:58px;
+  margin:0 auto 18px;
+  color:#1a1a1a;
+  background:var(--orange);
+  border-radius:50%;
+  font-size:30px;
+  font-weight:300;
+}
+.landing-card h2{
+  display:block;
+  margin:0;
+  padding:0;
+  color:#fff;
+  border:0;
+  font-size:24px;
+  text-transform:none;
+  letter-spacing:0;
+}
+.landing-card p{
+  max-width:500px;
+  margin:10px auto 24px;
+  color:var(--muted);
+  font-size:13.5px;
+}
+.landing-actions{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.landing-actions button{ min-width:210px; }
+.form-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 -22px;
+  padding:10px 22px;
+  background:rgba(255,255,255,.025);
+  border-bottom:1px solid var(--border);
+}
+.form-topbar button{
+  min-height:36px;
+  padding:7px 12px;
+  font-size:12px;
+}
+.form-state{
+  color:var(--muted);
+  font-size:11.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+form{ padding:4px 22px 22px; }
+fieldset{ min-width:0; margin:0; padding:0; border:0; }
+h2{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:6px 0 0;
+  padding:19px 0 9px;
+  color:var(--orange);
+  border-top:1px solid var(--orange);
+  font-size:11.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+fieldset > h2:first-child{ border-top:0; }
+.section-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  color:#1a1a1a;
+  background:var(--orange);
+  border-radius:50%;
+  font-size:11px;
+}
+.row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px 18px;
+}
+.field{
+  min-width:0;
+  margin-bottom:14px;
+}
+.field.full{ grid-column:1 / -1; }
+label{
+  display:block;
+  margin-bottom:5px;
+  color:var(--white);
+  font-size:12.5px;
+  font-weight:700;
+}
+.optional{ color:var(--muted); font-size:11px; font-weight:500; }
+input,
+select,
+textarea{
+  width:100%;
+  min-height:42px;
+  padding:10px 11px;
+  color:var(--white);
+  background:var(--surface);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+  font:13.5px var(--font);
+  color-scheme:dark;
+}
+textarea{ min-height:104px; resize:vertical; }
+select option{ color:#fff; background:#090e10; }
+input::placeholder,
+textarea::placeholder{ color:var(--muted-soft); }
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none;
+  background:rgba(255,112,18,.06);
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px var(--focus);
+}
+.attachment-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.attachment-option{
+  display:flex;
+  align-items:center;
+  min-height:46px;
+  margin:0;
+  padding:10px 12px;
+  color:#fff;
+  background:var(--surface-soft);
+  border:1px solid var(--border);
+  border-radius:4px;
+  cursor:pointer;
+}
+.attachment-option:hover{
+  background:rgba(255,112,18,.06);
+  border-color:var(--orange);
+}
+.attachment-option input{
+  width:17px;
+  min-height:0;
+  height:17px;
+  margin:0 9px 0 0;
+  padding:0;
+  accent-color:var(--orange);
+}
+.conditional-field{ display:none; }
+.conditional-field.show{ display:block; }
+.request-actions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid var(--orange);
+}
+button{
+  min-height:46px;
+  padding:12px 18px;
+  color:#1a1a1a;
+  background:var(--orange);
+  border:1px solid var(--orange);
+  border-radius:4px;
+  font:800 14px var(--font);
+  cursor:pointer;
+}
+button:hover,
+button:focus-visible{
+  background:var(--orange);
+  filter:brightness(1.08);
+  outline:none;
+}
+button.secondary{
+  color:var(--orange);
+  background:transparent;
+}
+button.secondary:hover,
+button.secondary:focus-visible{
+  color:#1a1a1a;
+  background:var(--orange);
+}
+.approval-shell{
+  position:relative;
+  margin:22px -22px -22px;
+  padding:4px 22px 22px;
+  background:rgba(255,255,255,.015);
+  border-top:1px solid rgba(255,255,255,.14);
+}
+.approval-lock{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:16px 0 4px;
+  padding:13px 14px;
+  color:var(--muted);
+  background:rgba(255,255,255,.03);
+  border:1px dashed rgba(255,255,255,.25);
+  border-radius:4px;
+  font-size:12.5px;
+}
+.lock-icon{ color:var(--orange); font-size:18px; }
+.approval-shell.unlocked .approval-lock{
+  color:var(--success);
+  background:rgba(139,226,139,.06);
+  border-color:rgba(139,226,139,.35);
+}
+#approvalFields[disabled]{
+  opacity:.34;
+  filter:grayscale(.35);
+  pointer-events:none;
+  user-select:none;
+}
+.status-table-wrap{
+  overflow-x:auto;
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+.status-table{
+  width:100%;
+  min-width:660px;
+  border-collapse:collapse;
+}
+.status-table th,
+.status-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:12.5px;
+}
+.status-table th{
+  color:#1a1a1a;
+  background:var(--orange);
+  font-weight:800;
+}
+.status-table tr:last-child td{ border-bottom:0; }
+.status-table td{ color:var(--muted); background:var(--surface-soft); }
+.status-table tr.active-step td{
+  color:#fff;
+  background:rgba(255,112,18,.08);
+}
+.status-table tr.active-step td:first-child{
+  color:var(--orange);
+  font-weight:800;
+}
+.status-line{
+  min-height:22px;
+  margin:13px 0 0;
+  color:var(--success);
+  font-size:12.5px;
+  font-weight:700;
+  text-align:center;
+}
+.status-line.error{ color:var(--danger); }
+.required-note{ color:var(--muted); font-size:11.5px; }
+.required-mark{ color:var(--orange); }
+@media (max-width:720px){
+  body{ padding:12px; }
+  .header{ align-items:flex-start; padding:14px 16px; }
+  .logo{ height:38px; }
+  h1{ font-size:18px; }
+  form{ padding:4px 16px 18px; }
+  .row{ grid-template-columns:1fr; gap:0; }
+  .field.full{ grid-column:auto; }
+  .attachment-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .request-actions{ grid-template-columns:1fr; }
+  .approval-shell{ margin:18px -16px -18px; padding:4px 16px 18px; }
+  .landing-screen{ padding:28px 16px 36px; }
+  .landing-card{ padding:30px 18px; }
+  .landing-card h2{ font-size:21px; }
+  .landing-actions{ flex-direction:column; }
+  .landing-actions button{ width:100%; min-width:0; }
+  .form-topbar{ margin:0 -16px; padding:9px 16px; }
+}
+@media (max-width:460px){
+  .attachment-grid{ grid-template-columns:1fr; }
+}
+@media print{
+  html,body{ background:#fff; color:#000; }
+  body{ padding:0; }
+  .container{ width:100%; background:#fff; border:0; box-shadow:none; }
+  .header{ border-bottom:2px solid #000; }
+  .landing-screen,.form-topbar{ display:none !important; }
+  h1,label{ color:#000; }
+  .subtitle,.optional,.required-note{ color:#444; }
+  h2{ color:#000; border-color:#777; }
+  .section-number{ color:#fff; background:#000; }
+  input,select,textarea{
+    color:#000;
+    background:#fff;
+    border-color:#777;
+    color-scheme:light;
+  }
+  .attachment-option{ color:#000; background:#fff; border-color:#777; }
+  .request-actions,.status-line,.approval-lock{ display:none !important; }
+  .approval-shell{ margin:14px 0 0; padding:0; background:#fff; border-top:1px solid #777; }
+  #approvalFields[disabled]{ opacity:1; filter:none; }
+  .status-table th{ color:#fff; background:#000; }
+  .status-table td{ color:#000; background:#fff; }
+}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc.">
+    <div class="header-copy">
+      <h1>Approval Request Form</h1>
+      <p class="subtitle">Wesco Exteriors, Inc. · Internal approval routing and electronic review</p>
+    </div>
+  </header>
+
+  <section class="landing-screen" id="landingScreen">
+    <div class="landing-card">
+      <div class="landing-icon" aria-hidden="true">+</div>
+      <h2>Approval Request Center</h2>
+      <p>Start a new approval request, attach the supporting documents, and route it to the appropriate Wesco reviewer.</p>
+      <div class="landing-actions">
+        <button id="newRequestButton" type="button">New Approval Request</button>
+        <button class="secondary" id="continueButton" type="button" hidden>Continue Saved Request</button>
+      </div>
+    </div>
+  </section>
+
+  <form id="approvalForm" novalidate hidden>
+    <div class="form-topbar">
+      <button class="secondary" id="approvalHomeButton" type="button">← Approval Home</button>
+      <span class="form-state" id="formState">New Request</span>
+    </div>
+    <fieldset id="requesterFields">
+      <h2><span class="section-number">1</span> Request Information</h2>
+
+      <div class="row">
+        <div class="field">
+          <label for="requestId">Request ID</label>
+          <input id="requestId" name="requestId" type="text" placeholder="Enter or assign a request ID">
+        </div>
+        <div class="field">
+          <label for="dateSubmitted">Date Submitted</label>
+          <input id="dateSubmitted" name="dateSubmitted" type="date">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="submittedBy">Submitted By <span class="required-mark">*</span></label>
+          <input id="submittedBy" name="submittedBy" type="text" placeholder="Your full name" required>
+        </div>
+        <div class="field">
+          <label for="requestDepartment">Department</label>
+          <input id="requestDepartment" name="requestDepartment" type="text" placeholder="Your department">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="projectName">Project Name</label>
+          <input id="projectName" name="projectName" type="text" placeholder="Project or customer name">
+        </div>
+        <div class="field">
+          <label for="projectNumber">Project Number</label>
+          <input id="projectNumber" name="projectNumber" type="text" placeholder="Project number, if applicable">
+        </div>
+      </div>
+
+      <h2><span class="section-number">2</span> Request Details</h2>
+
+      <div class="field">
+        <label for="requestType">Request Type <span class="required-mark">*</span></label>
+        <select id="requestType" name="requestType" required>
+          <option value="">Select Request Type</option>
+          <option>Estimate</option>
+          <option>Bid Proposal</option>
+          <option>Purchase Order</option>
+          <option>Change Order</option>
+          <option>Subcontractor Agreement</option>
+          <option>Material Purchase</option>
+          <option>Budget Revision</option>
+          <option>Contract Request</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="vendorCustomer">Vendor, Customer, Subcontractor</label>
+          <input id="vendorCustomer" name="vendorCustomer" type="text" placeholder="Enter the organization or contact">
+        </div>
+        <div class="field">
+          <label for="amount">Amount <span class="optional">(If required)</span></label>
+          <input id="amount" name="amount" type="number" min="0" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">Description of Request <span class="required-mark">*</span></label>
+        <textarea id="description" name="description" placeholder="Describe what needs approval" required></textarea>
+      </div>
+
+      <h2><span class="section-number">3</span> Attachments Included</h2>
+
+      <div class="attachment-grid">
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Quote">Quote</label>
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Contract">Contract</label>
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Estimate Package">Estimate Package</label>
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Scope of Work">Scope of Work</label>
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Budget Sheet">Budget Sheet</label>
+        <label class="attachment-option"><input name="attachments" type="checkbox" value="Supporting Documentation">Supporting Documentation</label>
+        <label class="attachment-option"><input id="otherAttachmentCheck" name="attachments" type="checkbox" value="Other Attachment">Other Attachment</label>
+      </div>
+
+      <div class="field conditional-field" id="otherAttachmentField">
+        <label for="otherAttachment">Other Attachment Description</label>
+        <input id="otherAttachment" name="otherAttachment" type="text" placeholder="Describe the other attachment">
+      </div>
+
+      <div class="request-actions">
+        <button class="secondary" id="saveButton" type="button">Save</button>
+        <button class="secondary" id="printButton" type="button">Print</button>
+        <button id="sendButton" type="button">Send for Approval</button>
+      </div>
+      <div class="status-line" id="requestStatus" role="status" aria-live="polite"></div>
+    </fieldset>
+
+    <section class="approval-shell" id="approvalShell">
+      <div class="approval-lock" id="approvalLock">
+        <span class="lock-icon" aria-hidden="true">🔒</span>
+        <span id="lockMessage">Approval fields are locked until the request is sent for approval.</span>
+      </div>
+
+      <fieldset id="approvalFields" disabled>
+        <h2><span class="section-number">4</span> Approval Information</h2>
+
+        <div class="row">
+          <div class="field">
+            <label for="approverName">Approver Name</label>
+            <select id="approverName" name="approverName">
+              <option value="">Select Approver</option>
+              <option value="Wes Atkinson">Wes Atkinson</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field conditional-field" id="otherApproverField">
+            <label for="otherApproverName">Other Approver Name <span class="required-mark">*</span></label>
+            <input id="otherApproverName" name="otherApproverName" type="text" placeholder="Type the approver's full name">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="approvalTitle">Approval Title</label>
+            <select id="approvalTitle" name="approvalTitle">
+              <option value="">Select Approval Title</option>
+              <option value="President">President</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field conditional-field" id="otherTitleField">
+            <label for="otherApprovalTitle">Other Approval Title <span class="required-mark">*</span></label>
+            <input id="otherApprovalTitle" name="otherApprovalTitle" type="text" placeholder="Type the approver's title">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="approvalDepartment">Department</label>
+          <select id="approvalDepartment" name="approvalDepartment">
+            <option value="">Select Review Department</option>
+            <option>Department Review</option>
+            <option>Project Manager Review</option>
+            <option>Executive Approval</option>
+            <option>Final Processing</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="decision">Decision</label>
+          <select id="decision" name="decision">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Requires Revision">Requires Revision</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="approverComments">Approver Comments</label>
+          <textarea id="approverComments" name="approverComments" placeholder="Add review comments or instructions"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="dateReviewed">Date Reviewed</label>
+            <input id="dateReviewed" name="dateReviewed" type="date">
+          </div>
+          <div class="field">
+            <label for="electronicSignature">Electronic Signature</label>
+            <input id="electronicSignature" name="electronicSignature" type="text" placeholder="Type your full legal name">
+          </div>
+        </div>
+
+        <h2><span class="section-number">5</span> Workflow Status</h2>
+
+        <div class="status-table-wrap">
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Approver</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-step="Department Review"><td>Department Review</td><td></td><td>Pending</td><td></td></tr>
+              <tr data-step="Project Manager Review"><td>Project Manager Review</td><td></td><td>Pending</td><td></td></tr>
+              <tr data-step="Executive Approval"><td>Executive Approval</td><td></td><td>Pending</td><td></td></tr>
+              <tr data-step="Final Processing"><td>Final Processing</td><td></td><td>Pending</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="required-note">Typing a name in Electronic Signature records the approver’s intended signature on this internal review copy.</p>
+      </fieldset>
+    </section>
+  </form>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  var STORAGE_KEY = 'wescoApprovalTemplateReviewV1';
+  var form = document.getElementById('approvalForm');
+  var landingScreen = document.getElementById('landingScreen');
+  var continueButton = document.getElementById('continueButton');
+  var requesterFields = document.getElementById('requesterFields');
+  var approvalFields = document.getElementById('approvalFields');
+  var approvalShell = document.getElementById('approvalShell');
+  var requestStatus = document.getElementById('requestStatus');
+  var sentForApproval = false;
+
+  function setStatus(message, isError){
+    requestStatus.textContent = message || '';
+    requestStatus.classList.toggle('error', !!isError);
+  }
+
+  function todayValue(){
+    var date = new Date();
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  }
+
+  function toggleConditional(selectId, fieldId, inputId){
+    var select = document.getElementById(selectId);
+    var field = document.getElementById(fieldId);
+    var input = document.getElementById(inputId);
+    var show = select.value === 'Other';
+    field.classList.toggle('show', show);
+    input.required = show;
+    if(!show) input.value = '';
+  }
+
+  function toggleOtherAttachment(){
+    var checked = document.getElementById('otherAttachmentCheck').checked;
+    document.getElementById('otherAttachmentField').classList.toggle('show', checked);
+    if(!checked) document.getElementById('otherAttachment').value = '';
+  }
+
+  function setApprovalLocked(locked){
+    sentForApproval = !locked;
+    approvalFields.disabled = locked;
+    approvalShell.classList.toggle('unlocked', !locked);
+    document.getElementById('lockMessage').textContent = locked
+      ? 'Approval fields are locked until the request is sent for approval.'
+      : 'Request sent for approval. The approver section is now available.';
+    document.querySelector('.lock-icon').textContent = locked ? '🔒' : '✓';
+  }
+
+  function effectiveApproverName(){
+    return document.getElementById('approverName').value === 'Other'
+      ? document.getElementById('otherApproverName').value.trim()
+      : document.getElementById('approverName').value;
+  }
+
+  function updateWorkflow(){
+    var department = document.getElementById('approvalDepartment').value;
+    var approver = effectiveApproverName();
+    var decision = document.getElementById('decision').value;
+    var reviewed = document.getElementById('dateReviewed').value;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.status-table tbody tr'), function(row){
+      var active = row.getAttribute('data-step') === department;
+      row.classList.toggle('active-step', active);
+      if(active){
+        row.cells[1].textContent = approver;
+        row.cells[2].textContent = decision;
+        row.cells[3].textContent = reviewed;
+      }
+    });
+  }
+
+  function resetWorkflow(){
+    Array.prototype.forEach.call(document.querySelectorAll('.status-table tbody tr'), function(row){
+      row.classList.remove('active-step');
+      row.cells[1].textContent = '';
+      row.cells[2].textContent = 'Pending';
+      row.cells[3].textContent = '';
+    });
+  }
+
+  function showLanding(){
+    form.hidden = true;
+    landingScreen.hidden = false;
+    continueButton.hidden = !hasSavedRequest();
+  }
+
+  function showForm(stateLabel){
+    landingScreen.hidden = true;
+    form.hidden = false;
+    document.getElementById('formState').textContent = stateLabel || 'Approval Request';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function hasSavedRequest(){
+    try{ return !!localStorage.getItem(STORAGE_KEY); }catch(error){ return false; }
+  }
+
+  function startNewRequest(){
+    if(hasSavedRequest() && !window.confirm('Start a new approval request? This will replace the locally saved draft when you select Save.')){
+      return;
+    }
+    form.reset();
+    setApprovalLocked(true);
+    resetWorkflow();
+    toggleOtherAttachment();
+    toggleConditional('approverName','otherApproverField','otherApproverName');
+    toggleConditional('approvalTitle','otherTitleField','otherApprovalTitle');
+    document.getElementById('dateSubmitted').value = todayValue();
+    setStatus('');
+    showForm('New Request');
+    document.getElementById('submittedBy').focus();
+  }
+
+  function collectData(){
+    var data = { sentForApproval: sentForApproval, fields: {}, attachments: [] };
+    Array.prototype.forEach.call(form.querySelectorAll('input, select, textarea'), function(control){
+      if(!control.name) return;
+      if(control.type === 'checkbox'){
+        if(control.checked) data.attachments.push(control.value);
+      }else{
+        data.fields[control.name] = control.value;
+      }
+    });
+    return data;
+  }
+
+  function saveForm(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      setStatus('Saved locally on this device.');
+    }catch(error){
+      setStatus('This browser could not save the form locally.', true);
+    }
+  }
+
+  function restoreForm(){
+    var raw;
+    try{ raw = localStorage.getItem(STORAGE_KEY); }catch(error){ return; }
+    if(!raw) return;
+    try{
+      var data = JSON.parse(raw);
+      Object.keys(data.fields || {}).forEach(function(name){
+        var control = form.elements[name];
+        if(control && typeof control.value !== 'undefined') control.value = data.fields[name];
+      });
+      Array.prototype.forEach.call(form.querySelectorAll('input[type="checkbox"][name="attachments"]'), function(box){
+        box.checked = (data.attachments || []).indexOf(box.value) !== -1;
+      });
+      setApprovalLocked(!data.sentForApproval);
+      toggleOtherAttachment();
+      toggleConditional('approverName','otherApproverField','otherApproverName');
+      toggleConditional('approvalTitle','otherTitleField','otherApprovalTitle');
+      updateWorkflow();
+      setStatus('Saved review copy restored.');
+    }catch(error){
+      setStatus('The saved review copy could not be restored.', true);
+    }
+  }
+
+  function validateRequester(){
+    var required = requesterFields.querySelectorAll('[required]');
+    for(var i = 0; i < required.length; i += 1){
+      if(!required[i].value.trim()){
+        required[i].focus();
+        setStatus('Complete the highlighted required request field before sending.', true);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  document.getElementById('saveButton').addEventListener('click', saveForm);
+  document.getElementById('printButton').addEventListener('click', function(){ window.print(); });
+  document.getElementById('sendButton').addEventListener('click', function(){
+    if(!validateRequester()) return;
+    setApprovalLocked(false);
+    saveForm();
+    setStatus('Request sent for approval. Approver fields are now unlocked.');
+    approvalShell.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+  document.getElementById('otherAttachmentCheck').addEventListener('change', toggleOtherAttachment);
+  document.getElementById('approverName').addEventListener('change', function(){
+    toggleConditional('approverName','otherApproverField','otherApproverName');
+    updateWorkflow();
+  });
+  document.getElementById('approvalTitle').addEventListener('change', function(){
+    toggleConditional('approvalTitle','otherTitleField','otherApprovalTitle');
+  });
+  ['otherApproverName','approvalDepartment','decision','dateReviewed'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', updateWorkflow);
+    document.getElementById(id).addEventListener('change', updateWorkflow);
+  });
+  document.getElementById('newRequestButton').addEventListener('click', startNewRequest);
+  continueButton.addEventListener('click', function(){
+    restoreForm();
+    showForm(sentForApproval ? 'Sent for Approval' : 'Saved Draft');
+  });
+  document.getElementById('approvalHomeButton').addEventListener('click', showLanding);
+
+  if(!document.getElementById('dateSubmitted').value){
+    document.getElementById('dateSubmitted').value = todayValue();
+  }
+  setApprovalLocked(true);
+  continueButton.hidden = !hasSavedRequest();
+  showLanding();
+})();
+</script>
+</body>
+</html>
