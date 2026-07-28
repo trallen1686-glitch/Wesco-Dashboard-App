@@ -564,6 +564,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
 
     activeTabs = Object.assign({}, PERSON_EXTRA_TABS[p.name] || {}, TAB_LINKS);
     if(p.name === 'Wes Atkinson'){
+      delete activeTabs.toDoList;
       delete activeTabs.masterTaskList;
       delete activeTabs.executiveTaskList;
     }
