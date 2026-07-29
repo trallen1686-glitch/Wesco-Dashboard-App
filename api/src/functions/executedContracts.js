@@ -62,6 +62,12 @@ function safeSegment(value) {
   return String(value).replace(/[<>:"/\\|?*\u0000-\u001F]/g, "_").slice(0, 180);
 }
 
+function excelDate(value) {
+  if (typeof value !== "number") return value || "";
+  const utc = Date.UTC(1899, 11, 30) + Math.round(value * 86_400_000);
+  return new Date(utc).toISOString().slice(0, 10);
+}
+
 async function uploadSupportingFile(file, record) {
   const folder = await uploadFolder();
   if (!folder.folder) {
@@ -104,7 +110,7 @@ async function listWorkbookRows() {
     const v = row.values?.[0] || [];
     return {
       projectName: v[0] || "", customer: v[1] || "",
-      projectAddress: v[2] || "", executionDate: v[3] || "",
+      projectAddress: v[2] || "", executionDate: excelDate(v[3]),
       executedBy: v[4] || "", contactNumber: v[6] || "",
       estimateNumber: v[7] || "", invoiceNumber: v[8] || "",
       projectNumber: v[9] || "", contractUrl: v[10] || "",
