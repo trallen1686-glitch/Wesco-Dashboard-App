@@ -139,6 +139,12 @@ function safeFailure(error) {
   return "DATAVERSE_WRITE";
 }
 
+function safeFailureField(error) {
+  const message = String(error && error.message || "");
+  const match = message.match(/(?:property|attribute)[^'"]*['"]([a-z0-9_]+)['"]/i);
+  return match ? match[1] : undefined;
+}
+
 app.http("vendors", {
   methods: ["GET", "POST"],
   authLevel: "anonymous",
@@ -158,7 +164,7 @@ app.http("vendors", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
-      return { status: 500, jsonBody: { error: "The vendor database is temporarily unavailable.", code: safeFailure(error) } };
+      return { status: 500, jsonBody: { error: "The vendor database is temporarily unavailable.", code: safeFailure(error), field: safeFailureField(error) } };
     }
   }
 });
@@ -182,7 +188,7 @@ app.http("vendorRecord", {
       return { jsonBody: { item: mapRecord(updated) } };
     } catch (error) {
       context.error(error);
-      return { status: 500, jsonBody: { error: "The vendor record could not be updated.", code: safeFailure(error) } };
+      return { status: 500, jsonBody: { error: "The vendor record could not be updated.", code: safeFailure(error), field: safeFailureField(error) } };
     }
   }
 });
