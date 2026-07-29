@@ -296,6 +296,13 @@
         statusBox.textContent = message;
         statusBox.classList.add("show");
       };
+      const displayDate = value => {
+        if (typeof value !== "number" && !/^\d{5}(?:\.\d+)?$/.test(String(value || ""))) {
+          return value || "";
+        }
+        const utc = Date.UTC(1899, 11, 30) + Math.round(Number(value) * 86400000);
+        return new Date(utc).toISOString().slice(0, 10);
+      };
       const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char =>
         ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[char]));
       const setScreen = audit => {
@@ -343,7 +350,9 @@
           const response = await fetch(API_URL, { cache: "no-store" });
           const payload = await response.json();
           if (!response.ok) throw new Error(payload.error || "Audit log could not be loaded.");
-          auditRecords = payload.records || [];
+          auditRecords = (payload.records || [])
+            .filter(r => r.projectName || r.customer || r.projectNumber)
+            .map(r => ({ ...r, executionDate: displayDate(r.executionDate) }));
           renderAudit(document.getElementById("auditSearch").value);
         } catch (error) {
           list.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
