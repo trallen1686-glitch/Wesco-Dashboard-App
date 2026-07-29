@@ -119,6 +119,9 @@ function payloadFrom(body) {
     new_returnpolicies: clean(body.returnPolicies, 1500),
     new_vendorcomments: META_PREFIX + JSON.stringify(meta)
   };
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === "") delete payload[key];
+  }
   if (payload.new_creditlimit === null) delete payload.new_creditlimit;
   if (payload.new_deliveryfee === null) delete payload.new_deliveryfee;
   return payload;
