@@ -29,5 +29,12 @@
   link.href = portalUrl.toString();
   link.setAttribute('aria-label', 'Back to Staff Portal');
   link.textContent = '\u2190 Back to Staff Portal';
+  link.addEventListener('click', function(event){
+    if(window.opener && !window.opener.closed){
+      event.preventDefault();
+      window.opener.focus();
+      window.close();
+    }
+  });
   document.body.appendChild(link);
 })();
