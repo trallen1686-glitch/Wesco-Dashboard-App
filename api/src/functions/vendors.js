@@ -88,7 +88,7 @@ function payloadFrom(body) {
     status: clean(body.status, 20),
     vendorComments: clean(body.vendorComments, 1500)
   };
-  return {
+  const payload = {
     new_name: clean(body.vendorName, 850),
     new_vendorid: clean(body.vendorId, 100),
     new_vendorname: clean(body.vendorName, 850),
@@ -119,6 +119,9 @@ function payloadFrom(body) {
     new_returnpolicies: clean(body.returnPolicies, 1500),
     new_vendorcomments: META_PREFIX + JSON.stringify(meta)
   };
+  if (payload.new_creditlimit === null) delete payload.new_creditlimit;
+  if (payload.new_deliveryfee === null) delete payload.new_deliveryfee;
+  return payload;
 }
 
 function validate(body) {
