@@ -1,0 +1,16 @@
+{
+  "SchemaName": "new_PunchListDistributionItem_DistributionItemKey",
+  "DisplayName": {
+    "@odata.type": "Microsoft.Dynamics.CRM.Label",
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Punch List Distribution Item Key",
+        "LanguageCode": 1033
+      }
+    ]
+  },
+  "KeyAttributes": [
+    "new_distributionitemkey"
+  ]
+}
