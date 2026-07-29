@@ -80,7 +80,7 @@ async function load(){
   var response=await fetch(API,{headers:{Accept:"application/json"}});
   if(!response.ok)throw new Error("Approval API returned "+response.status);
   var payload=await response.json();
-  data=(Array.isArray(payload.items)?payload.items:[]).map(mapRecord);
+  data=(Array.isArray(payload.items)?payload.items:[]).filter(function(item){return !/^SYNC-(?:UPDATE-)?TEST-/.test(item.requestId||"");}).map(mapRecord);
   document.getElementById("connectionText").textContent="Connected · New requests sent to Wes Atkinson appear here automatically.";
   populateTypes();render();
  }catch(error){
