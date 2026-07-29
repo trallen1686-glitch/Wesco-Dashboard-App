@@ -477,7 +477,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   }
 
   function renderSelectorView(){
-    var visiblePeople = canViewAllPeople ? PEOPLE : (signedInPerson ? [signedInPerson] : []);
+    var visiblePeople = PEOPLE;
     var groups = [
       { title: 'Estimator', people: visiblePeople.filter(function(p){ return p.role === 'Estimator'; }) },
       { title: 'Project Managers', people: visiblePeople.filter(function(p){ return p.role === 'PM'; }) },
@@ -501,10 +501,6 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
   }
 
   function goToPerson(name){
-    if(!canViewAllPeople && (!signedInPerson || signedInPerson.name !== name)){
-      showToast('You can only open your own Staff Portal.', true);
-      return;
-    }
     var url = new URL(window.location.href);
     url.searchParams.set('person', name);
     window.location.href = url.toString();
@@ -515,21 +511,6 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      ------------------------------------------------------------------ */
   var activeTabs = {};
   var currentPersonObj = null;
-  var signedInPerson = null;
-  var canViewAllPeople = false;
-
-  async function loadSignedInPerson(){
-    var signedInEmail = (new URLSearchParams(window.location.search).get('email') || '').trim();
-    var identityUrl = '/api/executive-tasks/me' + (signedInEmail ? '?email=' + encodeURIComponent(signedInEmail) : '');
-    var response = await fetch(identityUrl);
-    var data = await response.json();
-    if(!response.ok) throw new Error(data.error || 'Sign in with your Wesco account.');
-    canViewAllPeople = !!data.canViewAll;
-    signedInPerson = PEOPLE.find(function(p){
-      return p.email.toLowerCase() === String(data.email || '').toLowerCase();
-    }) || null;
-    if(!signedInPerson) throw new Error('Your Wesco login is not assigned to a Staff Portal name.');
-  }
 
   function openTab(key, personName){
     var t = activeTabs[key];
@@ -708,20 +689,9 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      Wire up
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', async function(){
-    try{
-      await loadSignedInPerson();
-    } catch(e){
-      $('starterView').style.display = 'none';
-      $('selectorView').style.display = '';
-      $('selectorRoot').innerHTML = '<div class="empty-messages">' + escapeHtml(e.message) + '</div>';
-      showToast(e.message, true);
-      return;
-    }
-
     var params = new URLSearchParams(window.location.search);
     var personParam = (params.get('person') || '').trim().toLowerCase();
-    var requested = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
-    var match = canViewAllPeople ? requested : signedInPerson;
+    var match = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
 
     if(match){
       $('selectorView').style.display = 'none';
@@ -738,12 +708,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     $('backLink').addEventListener('click', function(){
       var url = new URL(window.location.href);
       url.searchParams.delete('person');
-      if(canViewAllPeople){
-        window.location.href = url.toString();
-      } else {
-        url.searchParams.set('person', signedInPerson.name);
-        window.location.href = url.toString();
-      }
+      window.location.href = url.toString();
     });
 
     $('messagesBackLink').addEventListener('click', closeMessagesView);
