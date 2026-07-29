@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco Approval Request Log</title>
+<style>
+:root{
+  --orange:#FF7012;
+  --white:#FFFFFF;
+  --ink:#FFFFFF;
+  --muted:rgba(255,255,255,.62);
+  --muted-soft:rgba(255,255,255,.42);
+  --page:#090e10;
+  --panel:rgba(9,14,16,.78);
+  --surface:rgba(255,255,255,.05);
+  --surface-soft:rgba(255,255,255,.03);
+  --border:rgba(255,255,255,.18);
+  --border-strong:rgba(255,255,255,.30);
+  --focus:rgba(255,112,18,.55);
+  --success:#8BE28B;
+  --success-bg:rgba(139,226,139,.11);
+  --danger:#FF9A72;
+  --danger-bg:rgba(255,107,107,.11);
+  --pending:#FFB36B;
+  --pending-bg:rgba(255,179,107,.11);
+  --font:'Segoe UI','Open Sans',system-ui,-apple-system,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--page);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:14px;
+  line-height:1.45;
+}
+body{padding:24px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.container{
+  width:min(1240px,100%);
+  margin:0 auto;
+  overflow:hidden;
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:5px;
+  box-shadow:0 16px 42px rgba(0,0,0,.28);
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px 22px;
+  border-bottom:2px solid var(--orange);
+}
+.logo{width:auto;height:50px;flex-shrink:0}
+.header-copy{flex:1;min-width:0}
+h1{margin:0;font-size:21px;font-weight:800;letter-spacing:.01em}
+.subtitle{margin:3px 0 0;color:var(--muted);font-size:12px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  min-height:40px;
+  padding:9px 14px;
+  color:#1a1a1a;
+  background:var(--orange);
+  border:1px solid var(--orange);
+  border-radius:4px;
+  font-weight:800;
+}
+.btn:hover,.btn:focus-visible{filter:brightness(1.08);outline:none}
+.btn.secondary{color:var(--orange);background:transparent}
+.btn.secondary:hover,.btn.secondary:focus-visible{color:#1a1a1a;background:var(--orange)}
+.content{padding:20px 22px 24px}
+.connection{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:16px;
+  padding:10px 12px;
+  color:var(--success);
+  background:var(--success-bg);
+  border:1px solid rgba(139,226,139,.3);
+  border-radius:4px;
+  font-size:12px;
+  font-weight:700;
+}
+.connection-dot{
+  width:8px;
+  height:8px;
+  flex:0 0 auto;
+  background:var(--success);
+  border-radius:50%;
+  box-shadow:0 0 0 4px rgba(139,226,139,.10);
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:18px;
+}
+.summary-card{
+  padding:15px 16px;
+  background:var(--surface-soft);
+  border:1px solid var(--border);
+  border-top:3px solid var(--border-strong);
+  border-radius:4px;
+}
+.summary-card.pending{border-top-color:var(--pending)}
+.summary-card.approved{border-top-color:var(--success)}
+.summary-card.denied{border-top-color:var(--danger)}
+.summary-value{display:block;font-size:25px;font-weight:800;line-height:1}
+.summary-label{display:block;margin-top:7px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.toolbar{
+  display:grid;
+  grid-template-columns:minmax(220px,1fr) 180px auto auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:12px;
+  padding-top:18px;
+  border-top:1px solid var(--orange);
+}
+.search-wrap{position:relative}
+.search-wrap span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+input,select{
+  width:100%;
+  min-height:42px;
+  padding:9px 11px;
+  color:#fff;
+  background:var(--surface);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+  color-scheme:dark;
+}
+.search-wrap input{padding-left:35px}
+input::placeholder{color:var(--muted-soft)}
+input:focus,select:focus{
+  outline:none;
+  background:rgba(255,112,18,.06);
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px var(--focus);
+}
+select option{background:#090e10;color:#fff}
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+table{width:100%;min-width:1080px;border-collapse:collapse}
+th,td{
+  padding:11px 12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+th{
+  position:sticky;
+  top:0;
+  z-index:1;
+  color:#1a1a1a;
+  background:var(--orange);
+  font-size:11.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.035em;
+}
+tbody tr{background:var(--surface-soft)}
+tbody tr:hover{background:rgba(255,112,18,.065)}
+tbody tr:last-child td{border-bottom:0}
+td{color:var(--muted);font-size:12.5px}
+.request-link{
+  padding:0;
+  color:var(--orange);
+  background:transparent;
+  border:0;
+  font-weight:800;
+}
+.request-link:hover{text-decoration:underline}
+.primary-text{color:#fff;font-weight:700}
+.amount{font-variant-numeric:tabular-nums}
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 9px;
+  border-radius:12px;
+  font-size:10.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.035em;
+}
+.status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.status.pending{color:var(--pending);background:var(--pending-bg)}
+.status.approved{color:var(--success);background:var(--success-bg)}
+.status.denied{color:var(--danger);background:var(--danger-bg)}
+.empty{
+  padding:46px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+.empty strong{display:block;margin-bottom:5px;color:#fff;font-size:15px}
+.footer-note{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:10px;
+  color:var(--muted);
+  font-size:11.5px;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+}
+.modal.show{display:flex}
+.dialog{
+  width:min(720px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#0c1215;
+  border:1px solid var(--border-strong);
+  border-radius:5px;
+  box-shadow:0 22px 70px rgba(0,0,0,.5);
+}
+.dialog-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:16px 18px;
+  border-bottom:2px solid var(--orange);
+}
+.dialog-head h2{margin:0;font-size:17px}
+.close{
+  width:34px;
+  height:34px;
+  color:var(--muted);
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px 20px;
+  padding:18px;
+}
+.detail{min-width:0}
+.detail.full{grid-column:1/-1}
+.detail label{
+  display:block;
+  margin-bottom:3px;
+  color:var(--orange);
+  font-size:10.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+}
+.detail div{color:#fff;overflow-wrap:anywhere}
+.review-badge{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 7px;
+  color:var(--pending);
+  background:var(--pending-bg);
+  border-radius:10px;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+@media(max-width:850px){
+  .header{align-items:flex-start;flex-wrap:wrap}
+  .header-actions{width:100%;justify-content:flex-start}
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toolbar{grid-template-columns:1fr 160px}
+  .toolbar .btn{width:100%}
+}
+@media(max-width:560px){
+  body{padding:12px}
+  .header,.content{padding-left:16px;padding-right:16px}
+  .logo{height:38px}
+  h1{font-size:18px}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .toolbar{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+  .detail.full{grid-column:auto}
+  .footer-note{display:block}
+}
+@media print{
+  html,body{background:#fff;color:#000}
+  body{padding:0}
+  .container{width:100%;background:#fff;border:0;box-shadow:none}
+  .header{border-bottom-color:#000}
+  h1,.primary-text{color:#000}
+  .subtitle,.footer-note,td{color:#444}
+  .header-actions,.toolbar,.connection{display:none!important}
+  .summary-card{background:#fff;border-color:#777}
+  .summary-value{color:#000}
+  .table-wrap{overflow:visible;border-color:#777}
+  table{min-width:0}
+  th{position:static;color:#fff;background:#000}
+  tbody tr,tbody tr:hover{background:#fff}
+  th,td{border-color:#bbb;white-space:normal}
+  .request-link{color:#000}
+}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc.">
+    <div class="header-copy">
+      <h1>Approval Request Log <span class="review-badge">Review Template</span></h1>
+      <p class="subtitle">Wesco Exteriors, Inc. · Submitted requests and approval decisions</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn secondary" id="printButton" type="button">Print Log</button>
+      <button class="btn" id="newRequestButton" type="button">New Approval Request</button>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="connection">
+      <span class="connection-dot" aria-hidden="true"></span>
+      <span id="connectionText">Connecting to Wesco Approval Request Form…</span>
+    </div>
+
+    <div class="summary-grid" aria-label="Approval totals">
+      <div class="summary-card"><span class="summary-value" id="totalCount">0</span><span class="summary-label">All Requests</span></div>
+      <div class="summary-card pending"><span class="summary-value" id="pendingCount">0</span><span class="summary-label">Pending</span></div>
+      <div class="summary-card approved"><span class="summary-value" id="approvedCount">0</span><span class="summary-label">Approved</span></div>
+      <div class="summary-card denied"><span class="summary-value" id="deniedCount">0</span><span class="summary-label">Denied</span></div>
+    </div>
+
+    <div class="toolbar">
+      <label class="search-wrap">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" placeholder="Search request ID, project, submitter, vendor…">
+      </label>
+      <select id="statusFilter" aria-label="Filter by approval status">
+        <option value="All">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Denied">Denied</option>
+      </select>
+      <button class="btn secondary" id="refreshButton" type="button">Refresh</button>
+      <button class="btn secondary" id="exportButton" type="button">Export CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Submitted</th>
+            <th>Submitted By</th>
+            <th>Project</th>
+            <th>Request Type</th>
+            <th>Approver</th>
+            <th>Review Department</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+      <div class="empty" id="emptyState" hidden>
+        <strong>No approval requests found</strong>
+        Submit a request from the Approval Request Form or adjust the current filter.
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span id="resultCount">Showing 0 requests</span>
+      <span id="sourceNote">Loading the shared Wesco approval data source.</span>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="dialog">
+    <div class="dialog-head">
+      <h2 id="detailTitle">Approval Request Details</h2>
+      <button class="close" id="closeModal" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="detail-grid" id="detailGrid"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var LOG_KEY = 'wescoApprovalRequestLogV1';
+  var APPROVAL_API = '/api/approval-requests';
+  var records = [];
+  var body = document.getElementById('logBody');
+  var emptyState = document.getElementById('emptyState');
+  var searchInput = document.getElementById('searchInput');
+  var statusFilter = document.getElementById('statusFilter');
+  var modal = document.getElementById('detailModal');
+  var detailGrid = document.getElementById('detailGrid');
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  function reviewSamples(){
+    var now = new Date();
+    return [
+      {
+        requestId:'AR-REVIEW-1003',dateSubmitted:'2026-07-28',submittedBy:'Jordan Lee',
+        requestDepartment:'Operations',projectName:'Riverside Commons',projectNumber:'26-041',
+        requestType:'Purchase Order',vendorCustomer:'ABC Building Supply',amount:'18450',
+        description:'Material purchase approval for the exterior package.',approverName:'Wes Atkinson',
+        approvalTitle:'President',approvalDepartment:'Executive Approval',status:'Pending',
+        decision:'Pending',approverComments:'',dateReviewed:'',electronicSignature:'',
+        updatedAt:new Date(now.getTime()-35*60000).toISOString(),sample:true
+      },
+      {
+        requestId:'AR-REVIEW-1002',dateSubmitted:'2026-07-27',submittedBy:'Taylor Morgan',
+        requestDepartment:'Estimating',projectName:'Northgate Retail',projectNumber:'26-036',
+        requestType:'Bid Proposal',vendorCustomer:'Northgate Development',amount:'92000',
+        description:'Final bid proposal approval before customer submission.',approverName:'Wes Atkinson',
+        approvalTitle:'President',approvalDepartment:'Executive Approval',status:'Approved',
+        decision:'Approved',approverComments:'Approved as submitted.',dateReviewed:'2026-07-28',
+        electronicSignature:'Wes Atkinson',updatedAt:new Date(now.getTime()-3*3600000).toISOString(),sample:true
+      },
+      {
+        requestId:'AR-REVIEW-1001',dateSubmitted:'2026-07-25',submittedBy:'Casey Brooks',
+        requestDepartment:'Project Management',projectName:'Oakview Apartments',projectNumber:'26-028',
+        requestType:'Change Order',vendorCustomer:'Oakview Partners',amount:'12750',
+        description:'Change order for revised wall panel scope.',approverName:'Wes Atkinson',
+        approvalTitle:'President',approvalDepartment:'Executive Approval',status:'Denied',
+        decision:'Denied',approverComments:'Revise pricing and supporting scope.',dateReviewed:'2026-07-27',
+        electronicSignature:'Wes Atkinson',updatedAt:new Date(now.getTime()-25*3600000).toISOString(),sample:true
+      }
+    ];
+  }
+
+  async function loadRecords(){
+    try{
+      var response = await fetch(APPROVAL_API,{headers:{Accept:'application/json'}});
+      if(!response.ok) throw new Error('Approval API returned ' + response.status);
+      var data = await response.json();
+      records = Array.isArray(data.items) ? data.items : [];
+      if(!Array.isArray(records)) records = [];
+      document.getElementById('connectionText').textContent =
+        'Connected to Wesco Approval Request Form · New submissions appear as Pending and update to Approved or Denied';
+      document.getElementById('sourceNote').textContent =
+        'Shared Azure data · Refreshes automatically when this page is reopened.';
+    }catch(error){
+      try{
+        var raw = localStorage.getItem(LOG_KEY);
+        records = raw ? JSON.parse(raw) : reviewSamples();
+        if(!Array.isArray(records)) records = [];
+      }catch(storageError){
+        records = reviewSamples();
+      }
+      document.getElementById('connectionText').textContent =
+        'Review connection · Local form submissions update this log in the current browser';
+      document.getElementById('sourceNote').textContent =
+        'Review mode uses browser storage; the published page uses the Wesco Azure API.';
+    }
+    render();
+  }
+
+  function normalizedStatus(record){
+    if(record.status === 'Approved') return 'Approved';
+    if(record.status === 'Denied' || record.status === 'Rejected') return 'Denied';
+    return 'Pending';
+  }
+
+  function formatDate(value){
+    if(!value) return '—';
+    var parts = String(value).slice(0,10).split('-');
+    if(parts.length !== 3) return escapeHtml(value);
+    return parts[1] + '/' + parts[2] + '/' + parts[0];
+  }
+
+  function formatUpdated(value){
+    if(!value) return '—';
+    var date = new Date(value);
+    if(Number.isNaN(date.getTime())) return escapeHtml(value);
+    return date.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+
+  function formatAmount(value){
+    if(value === '' || value == null) return '—';
+    var amount = Number(value);
+    if(Number.isNaN(amount)) return escapeHtml(value);
+    return amount.toLocaleString('en-US',{style:'currency',currency:'USD'});
+  }
+
+  function filteredRecords(){
+    var query = searchInput.value.trim().toLowerCase();
+    var selected = statusFilter.value;
+    return records
+      .filter(function(record){
+        var status = normalizedStatus(record);
+        if(selected !== 'All' && status !== selected) return false;
+        if(!query) return true;
+        return [
+          record.requestId,record.submittedBy,record.requestDepartment,record.projectName,
+          record.projectNumber,record.requestType,record.vendorCustomer,record.approverName,
+          record.approvalDepartment,record.description
+        ].join(' ').toLowerCase().indexOf(query) !== -1;
+      })
+      .sort(function(a,b){ return String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')); });
+  }
+
+  function updateSummary(){
+    document.getElementById('totalCount').textContent = records.length;
+    document.getElementById('pendingCount').textContent = records.filter(function(r){return normalizedStatus(r)==='Pending';}).length;
+    document.getElementById('approvedCount').textContent = records.filter(function(r){return normalizedStatus(r)==='Approved';}).length;
+    document.getElementById('deniedCount').textContent = records.filter(function(r){return normalizedStatus(r)==='Denied';}).length;
+  }
+
+  function render(){
+    updateSummary();
+    var filtered = filteredRecords();
+    body.innerHTML = filtered.map(function(record){
+      var status = normalizedStatus(record);
+      return '<tr>' +
+        '<td><button class="request-link" type="button" data-request-id="' + escapeHtml(record.requestId) + '">' + escapeHtml(record.requestId || 'Unassigned') + '</button></td>' +
+        '<td>' + formatDate(record.dateSubmitted) + '</td>' +
+        '<td class="primary-text">' + escapeHtml(record.submittedBy || '—') + '</td>' +
+        '<td><span class="primary-text">' + escapeHtml(record.projectName || '—') + '</span>' +
+          (record.projectNumber ? '<br><small>' + escapeHtml(record.projectNumber) + '</small>' : '') + '</td>' +
+        '<td>' + escapeHtml(record.requestType || '—') + '</td>' +
+        '<td>' + escapeHtml(record.approverName || '—') + '</td>' +
+        '<td>' + escapeHtml(record.approvalDepartment || '—') + '</td>' +
+        '<td class="amount">' + formatAmount(record.amount) + '</td>' +
+        '<td><span class="status ' + status.toLowerCase() + '">' + status + '</span></td>' +
+        '<td>' + formatUpdated(record.updatedAt) + '</td>' +
+      '</tr>';
+    }).join('');
+    emptyState.hidden = filtered.length !== 0;
+    document.getElementById('resultCount').textContent =
+      'Showing ' + filtered.length + ' of ' + records.length + ' request' + (records.length === 1 ? '' : 's');
+  }
+
+  function detail(label,value,full){
+    return '<div class="detail' + (full ? ' full' : '') + '"><label>' +
+      escapeHtml(label) + '</label><div>' + escapeHtml(value || '—') + '</div></div>';
+  }
+
+  function openDetails(requestId){
+    var record = records.find(function(item){return String(item.requestId) === String(requestId);});
+    if(!record) return;
+    var status = normalizedStatus(record);
+    document.getElementById('detailTitle').textContent = 'Approval Request ' + (record.requestId || '');
+    detailGrid.innerHTML =
+      detail('Status',status) +
+      detail('Submitted',formatDate(record.dateSubmitted)) +
+      detail('Submitted By',record.submittedBy) +
+      detail('Request Department',record.requestDepartment) +
+      detail('Project',record.projectName) +
+      detail('Project Number',record.projectNumber) +
+      detail('Request Type',record.requestType) +
+      detail('Vendor, Customer, Subcontractor',record.vendorCustomer) +
+      detail('Amount',formatAmount(record.amount)) +
+      detail('Approver',record.approverName) +
+      detail('Approval Title',record.approvalTitle) +
+      detail('Review Department',record.approvalDepartment) +
+      detail('Date Reviewed',formatDate(record.dateReviewed)) +
+      detail('Electronic Signature',record.electronicSignature) +
+      detail('Description',record.description,true) +
+      detail('Approver Comments',record.approverComments,true);
+    modal.classList.add('show');
+  }
+
+  function csvValue(value){
+    return '"' + String(value == null ? '' : value).replace(/"/g,'""') + '"';
+  }
+
+  function exportCsv(){
+    var headers = ['Request ID','Date Submitted','Submitted By','Request Department','Project','Project Number','Request Type','Vendor/Customer/Subcontractor','Amount','Approver','Review Department','Status','Date Reviewed','Last Updated'];
+    var lines = [headers.map(csvValue).join(',')];
+    filteredRecords().forEach(function(record){
+      lines.push([
+        record.requestId,record.dateSubmitted,record.submittedBy,record.requestDepartment,
+        record.projectName,record.projectNumber,record.requestType,record.vendorCustomer,
+        record.amount,record.approverName,record.approvalDepartment,normalizedStatus(record),
+        record.dateReviewed,record.updatedAt
+      ].map(csvValue).join(','));
+    });
+    var blob = new Blob([lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Wesco-Approval-Request-Log.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  body.addEventListener('click',function(event){
+    var button = event.target.closest('[data-request-id]');
+    if(button) openDetails(button.getAttribute('data-request-id'));
+  });
+  searchInput.addEventListener('input',render);
+  statusFilter.addEventListener('change',render);
+  document.getElementById('refreshButton').addEventListener('click',loadRecords);
+  document.getElementById('exportButton').addEventListener('click',exportCsv);
+  document.getElementById('printButton').addEventListener('click',function(){window.print();});
+  document.getElementById('newRequestButton').addEventListener('click',function(){
+    window.location.href = 'Wesco-Approval-Template.html';
+  });
+  document.getElementById('closeModal').addEventListener('click',function(){modal.classList.remove('show');});
+  modal.addEventListener('click',function(event){if(event.target === modal) modal.classList.remove('show');});
+  document.addEventListener('keydown',function(event){if(event.key === 'Escape') modal.classList.remove('show');});
+  window.addEventListener('storage',function(event){if(event.key === LOG_KEY) loadRecords();});
+
+  loadRecords();
+})();
+</script>
+</body>
+</html>

@@ -403,6 +403,7 @@ button.secondary:focus-visible{
       <div class="landing-actions">
         <button id="newRequestButton" type="button">New Approval Request</button>
         <button class="secondary" id="continueButton" type="button" hidden>Continue Saved Request</button>
+        <button class="secondary" id="approvalLogButton" type="button">View Approval Log</button>
       </div>
     </div>
   </section>
@@ -562,7 +563,7 @@ button.secondary:focus-visible{
           <select id="decision" name="decision">
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
+            <option value="Denied">Denied</option>
             <option value="Requires Revision">Requires Revision</option>
           </select>
         </div>
@@ -615,6 +616,8 @@ button.secondary:focus-visible{
   'use strict';
 
   var STORAGE_KEY = 'wescoApprovalTemplateReviewV1';
+  var LOG_KEY = 'wescoApprovalRequestLogV1';
+  var APPROVAL_API = '/api/approval-requests';
   var form = document.getElementById('approvalForm');
   var landingScreen = document.getElementById('landingScreen');
   var continueButton = document.getElementById('continueButton');
@@ -634,6 +637,20 @@ button.secondary:focus-visible{
     return date.getFullYear() + '-' +
       String(date.getMonth() + 1).padStart(2, '0') + '-' +
       String(date.getDate()).padStart(2, '0');
+  }
+
+  function requestIdValue(){
+    var control = document.getElementById('requestId');
+    if(control.value.trim()) return control.value.trim();
+    var now = new Date();
+    control.value = 'AR-' +
+      now.getFullYear() +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      String(now.getDate()).padStart(2, '0') + '-' +
+      String(now.getHours()).padStart(2, '0') +
+      String(now.getMinutes()).padStart(2, '0') +
+      String(now.getSeconds()).padStart(2, '0');
+    return control.value;
   }
 
   function toggleConditional(selectId, fieldId, inputId){
@@ -740,9 +757,69 @@ button.secondary:focus-visible{
     return data;
   }
 
+  function logStatus(){
+    var decision = document.getElementById('decision').value;
+    if(decision === 'Approved' || decision === 'Denied') return decision;
+    return 'Pending';
+  }
+
+  function approvalLogRecord(){
+    return {
+      requestId: requestIdValue(),
+      dateSubmitted: document.getElementById('dateSubmitted').value,
+      submittedBy: document.getElementById('submittedBy').value.trim(),
+      requestDepartment: document.getElementById('requestDepartment').value.trim(),
+      projectName: document.getElementById('projectName').value.trim(),
+      projectNumber: document.getElementById('projectNumber').value.trim(),
+      requestType: document.getElementById('requestType').value,
+      vendorCustomer: document.getElementById('vendorCustomer').value.trim(),
+      amount: document.getElementById('amount').value,
+      description: document.getElementById('description').value.trim(),
+      approverName: effectiveApproverName(),
+      approvalTitle: document.getElementById('approvalTitle').value === 'Other'
+        ? document.getElementById('otherApprovalTitle').value.trim()
+        : document.getElementById('approvalTitle').value,
+      approvalDepartment: document.getElementById('approvalDepartment').value,
+      status: logStatus(),
+      decision: document.getElementById('decision').value,
+      approverComments: document.getElementById('approverComments').value.trim(),
+      dateReviewed: document.getElementById('dateReviewed').value,
+      electronicSignature: document.getElementById('electronicSignature').value.trim(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  async function syncApprovalLog(){
+    if(!sentForApproval) return;
+    var record = approvalLogRecord();
+    try{
+      var records = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+      if(!Array.isArray(records)) records = [];
+      var index = records.findIndex(function(item){ return item.requestId === record.requestId; });
+      if(index === -1) records.unshift(record);
+      else records[index] = record;
+      localStorage.setItem(LOG_KEY, JSON.stringify(records));
+    }catch(error){
+      // The Azure API remains the production source if browser storage is unavailable.
+    }
+    try{
+      var response = await fetch(APPROVAL_API, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(record)
+      });
+      if(!response.ok) throw new Error('Approval API returned ' + response.status);
+    }catch(error){
+      if(location.protocol === 'https:' && location.hostname.indexOf('azurestaticapps.net') !== -1){
+        setStatus('The form is saved, but the shared Approval Log could not be reached. Try Save again.', true);
+      }
+    }
+  }
+
   function saveForm(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      syncApprovalLog();
       setStatus('Saved locally on this device.');
     }catch(error){
       setStatus('This browser could not save the form locally.', true);
@@ -798,15 +875,26 @@ button.secondary:focus-visible{
   document.getElementById('approverName').addEventListener('change', function(){
     toggleConditional('approverName','otherApproverField','otherApproverName');
     updateWorkflow();
+    syncApprovalLog();
   });
   document.getElementById('approvalTitle').addEventListener('change', function(){
     toggleConditional('approvalTitle','otherTitleField','otherApprovalTitle');
+    syncApprovalLog();
   });
   ['otherApproverName','approvalDepartment','decision','dateReviewed'].forEach(function(id){
     document.getElementById(id).addEventListener('input', updateWorkflow);
-    document.getElementById(id).addEventListener('change', updateWorkflow);
+    document.getElementById(id).addEventListener('change', function(){
+      updateWorkflow();
+      syncApprovalLog();
+    });
+  });
+  ['approverComments','electronicSignature','otherApprovalTitle'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', syncApprovalLog);
   });
   document.getElementById('newRequestButton').addEventListener('click', startNewRequest);
+  document.getElementById('approvalLogButton').addEventListener('click', function(){
+    window.location.href = 'Approval-Request-Log-Template.html';
+  });
   continueButton.addEventListener('click', function(){
     restoreForm();
     showForm(sentForApproval ? 'Sent for Approval' : 'Saved Draft');
