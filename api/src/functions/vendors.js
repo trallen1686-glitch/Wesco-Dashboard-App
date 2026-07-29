@@ -141,8 +141,8 @@ function safeFailure(error) {
 
 function safeFailureField(error) {
   const message = String(error && error.message || "");
-  const match = message.match(/(?:property|attribute)[^'"]*['"]([a-z0-9_]+)['"]/i);
-  return match ? match[1] : undefined;
+  const matches = message.match(/new_[a-z0-9_]+/ig) || [];
+  return [...new Set(matches.map(value => value.toLowerCase()))].slice(0, 5);
 }
 
 app.http("vendors", {
