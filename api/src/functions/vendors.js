@@ -128,6 +128,14 @@ function validate(body) {
   return clean(body.vendorId, 100) && clean(body.vendorName, 850) && clean(body.vendorCategory, 100);
 }
 
+function safeFailure(error) {
+  const message = String(error && error.message || "");
+  if (/privilege|accesscheck|seclib|permission|not authorized/i.test(message)) return "DATAVERSE_PERMISSION";
+  if (/property|attribute|payload|undeclared/i.test(message)) return "DATAVERSE_SCHEMA";
+  if (/currency|transactioncurrency/i.test(message)) return "DATAVERSE_CURRENCY";
+  return "DATAVERSE_WRITE";
+}
+
 app.http("vendors", {
   methods: ["GET", "POST"],
   authLevel: "anonymous",
@@ -147,7 +155,7 @@ app.http("vendors", {
       return { status: 201, jsonBody: { item: mapRecord(created) } };
     } catch (error) {
       context.error(error);
-      return { status: 500, jsonBody: { error: "The vendor database is temporarily unavailable." } };
+      return { status: 500, jsonBody: { error: "The vendor database is temporarily unavailable.", code: safeFailure(error) } };
     }
   }
 });
@@ -171,7 +179,7 @@ app.http("vendorRecord", {
       return { jsonBody: { item: mapRecord(updated) } };
     } catch (error) {
       context.error(error);
-      return { status: 500, jsonBody: { error: "The vendor record could not be updated." } };
+      return { status: 500, jsonBody: { error: "The vendor record could not be updated.", code: safeFailure(error) } };
     }
   }
 });
