@@ -456,7 +456,7 @@ td{color:var(--muted);font-size:12.5px}
       var response = await fetch(APPROVAL_API,{headers:{Accept:'application/json'}});
       if(!response.ok) throw new Error('Approval API returned ' + response.status);
       var data = await response.json();
-      records = Array.isArray(data.items) ? data.items : [];
+      records = Array.isArray(data.items) ? data.items.filter(function(item){ return !/^SYNC-(?:UPDATE-)?TEST-/.test(item.requestId || ''); }) : [];
       if(!Array.isArray(records)) records = [];
       document.getElementById('connectionText').textContent =
         'Connected to Wesco Approval Request Form · New submissions appear as Pending and update to Approved or Denied';
