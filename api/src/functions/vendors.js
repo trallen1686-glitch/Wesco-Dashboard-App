@@ -12,7 +12,7 @@ const SELECT = [
   "new_representativephone", "new_representativeemail", "new_deliveryfee",
   "new_deliverynotes", "new_productcategories", "new_pricinginformation",
   "new_specialdiscounts", "new_manufacturerprograms", "new_freightpolicies",
-  "new_returnpolicies", "new_vendorcomments", "createdon", "modifiedon"
+  "new_returnpolicies", "new_vendorcomments", "new_vendormetadata", "createdon", "modifiedon"
 ].join(",");
 
 function clean(value, max = 4000) {
@@ -30,7 +30,7 @@ function validId(value) {
 }
 
 function metaFrom(record) {
-  const value = String(record.new_vendorcomments || "");
+  const value = String(record.new_vendormetadata || "");
   if (!value.startsWith(META_PREFIX)) return { vendorComments: value };
   try { return JSON.parse(value.slice(META_PREFIX.length)); } catch { return {}; }
 }
@@ -71,53 +71,43 @@ function mapRecord(record) {
 }
 
 function payloadFrom(body) {
-  const meta = {
-    taxExemptAccepted: clean(body.taxExemptAccepted, 3),
-    preferredVendor: clean(body.preferredVendor, 3),
-    approvedVendor: clean(body.approvedVendor, 3),
-    deliveryAvailable: clean(body.deliveryAvailable, 3),
-    leadTimeDays: clean(body.leadTimeDays, 10),
-    emergencyDelivery: clean(body.emergencyDelivery, 3),
-    pickupAvailable: clean(body.pickupAvailable, 3),
-    lastPurchaseDate: clean(body.lastPurchaseDate, 10),
-    ytdPurchases: clean(body.ytdPurchases, 30),
-    pricingRating: clean(body.pricingRating, 1),
-    qualityRating: clean(body.qualityRating, 1),
-    deliveryRating: clean(body.deliveryRating, 1),
-    serviceRating: clean(body.serviceRating, 1),
-    status: clean(body.status, 20),
-    vendorComments: clean(body.vendorComments, 1500)
-  };
+  const keys = [
+    "vendorId", "vendorName", "accountNumber", "vendorCategory", "primaryContact",
+    "contactTitle", "officePhone", "cellPhone", "email", "website",
+    "physicalAddress", "city", "state", "zipCode", "paymentTerms", "creditLimit",
+    "salesRepresentative", "representativePhone", "representativeEmail",
+    "taxExemptAccepted", "preferredVendor", "approvedVendor", "deliveryAvailable",
+    "deliveryFee", "leadTimeDays", "emergencyDelivery", "pickupAvailable",
+    "deliveryNotes", "productCategories", "lastPurchaseDate", "ytdPurchases",
+    "pricingRating", "qualityRating", "deliveryRating", "serviceRating", "status",
+    "pricingInformation", "specialDiscounts", "manufacturerPrograms",
+    "freightPolicies", "returnPolicies", "vendorComments"
+  ];
+  const meta = Object.fromEntries(keys.map(key => [key, clean(body[key], 4000)]));
   const payload = {
-    new_name: clean(body.vendorName, 850),
+    new_name: clean(body.vendorName, 100),
     new_vendorid: clean(body.vendorId, 100),
-    new_vendorname: clean(body.vendorName, 850),
+    new_vendorname: clean(body.vendorName, 100),
     new_accountnumber: clean(body.accountNumber, 100),
     new_vendorcategory: clean(body.vendorCategory, 100),
-    new_primarycontactname: clean(body.primaryContact, 200),
+    new_primarycontactname: clean(body.primaryContact, 100),
     new_contacttitle: clean(body.contactTitle, 100),
     new_officephone: clean(body.officePhone, 50),
     new_cellphone: clean(body.cellPhone, 50),
-    new_emailaddress: clean(body.email, 320),
-    new_website: clean(body.website, 500),
-    new_physicaladdress: clean(body.physicalAddress, 500),
+    new_emailaddress: clean(body.email, 100),
+    new_website: clean(body.website, 100),
+    new_physicaladdress: clean(body.physicalAddress, 100),
     new_city: clean(body.city, 100),
     new_state: clean(body.state, 2),
     new_zipcode: clean(body.zipCode, 20),
     new_paymentterms: clean(body.paymentTerms, 100),
     new_creditlimit: numberOrNull(body.creditLimit),
-    new_salesrepresentative: clean(body.salesRepresentative, 200),
+    new_salesrepresentative: clean(body.salesRepresentative, 100),
     new_representativephone: clean(body.representativePhone, 50),
-    new_representativeemail: clean(body.representativeEmail, 320),
+    new_representativeemail: clean(body.representativeEmail, 100),
     new_deliveryfee: numberOrNull(body.deliveryFee),
-    new_deliverynotes: clean(body.deliveryNotes, 1500),
-    new_productcategories: clean(body.productCategories, 500),
-    new_pricinginformation: clean(body.pricingInformation, 1500),
-    new_specialdiscounts: clean(body.specialDiscounts, 1500),
-    new_manufacturerprograms: clean(body.manufacturerPrograms, 1500),
-    new_freightpolicies: clean(body.freightPolicies, 1500),
-    new_returnpolicies: clean(body.returnPolicies, 1500),
-    new_vendorcomments: META_PREFIX + JSON.stringify(meta)
+    new_productcategories: clean(body.productCategories, 100),
+    new_vendormetadata: META_PREFIX + JSON.stringify(meta)
   };
   for (const [key, value] of Object.entries(payload)) {
     if (value === "") delete payload[key];
