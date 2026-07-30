@@ -1,6 +1,24 @@
 {
   "routes": [
     {
+      "route": "/Executed_Contracts_and_Scheduling_List.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/Executed_Contracts_and_Scheduling_Template.html",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/api/executed-contracts-scheduling*",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
       "route": "/api/executive-tasks/me",
       "allowedRoles": [
         "anonymous"
