@@ -335,6 +335,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     meetingNotes:     { label: 'Wesco Meeting Notes', icon: '📝', desc: 'Company and project meeting notes',      url: '', personAware: false },
     forms:            { label: 'Forms',               icon: '🗂️', desc: 'Company form library',                   url: '', personAware: false },
     masterTaskList:   { label: 'Master Task List',    icon: '📌', desc: 'Company-wide task list across all staff', url: 'Wesco%20Staff%20To%20Do%20Dashboard.html', personAware: false },
+    executedContractsSchedulingList: { label: 'Executed Contracts and Scheduling List', icon: '📑', desc: 'Review the shared executed contracts and scheduling list', url: 'Executed_Contracts_and_Scheduling_List.html', personAware: true },
     messages:         { label: 'Messages',            icon: '💬', desc: 'Message another staff member',           special: 'messages' }
   };
 
@@ -344,6 +345,12 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      same way to give someone else their own extra tabs.
      ------------------------------------------------------------------ */
   var PERSON_EXTRA_TABS = {
+    'Stephanie Atkinson': {
+      executedContractsScheduling: { label: 'Executed Contracts and Scheduling', icon: '📄', desc: 'Add and update executed contract and scheduling records', url: 'Executed_Contracts_and_Scheduling_Template.html', personAware: true }
+    },
+    'Oscar Centeno': {
+      executedContractsScheduling: { label: 'Executed Contracts and Scheduling', icon: '📄', desc: 'Add and update executed contract and scheduling records', url: 'Executed_Contracts_and_Scheduling_Template.html', personAware: true }
+    },
     'Wes Atkinson': {
       approvals:      { label: 'Approvals',              icon: '✅', desc: 'Estimates, Change Orders, Takeoffs & Material Sheets awaiting your approval', url: '', personAware: false },
       approvalRequestLog: { label: 'Approval Request Log', icon: '📋', desc: 'Review Pending, Approved, and Denied approval requests', url: 'Approval-Request-Log-Template.html', personAware: true },
