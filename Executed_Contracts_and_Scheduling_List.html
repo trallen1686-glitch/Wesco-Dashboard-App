@@ -35,7 +35,7 @@ body{
     #090e10;
   font:14.5px/1.45 var(--font);
 }
-.widget{ max-width:1600px; margin:0 auto; }
+.widget{ max-width:920px; margin:0 auto; }
 .card{
   background:var(--panel);
   border:1px solid rgba(255,255,255,.14);
@@ -93,34 +93,6 @@ li.rec-row.selected{ border-color:var(--orange); background:rgba(255,112,18,.12)
 .tag.flag-yes{ background:var(--complete-tint); color:#8fedc4; border-color:rgba(52,211,153,.3); }
 .tag.flag-no{ background:rgba(255,255,255,.08); color:var(--muted); }
 .empty-state{ padding:26px 22px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:5px; margin:10px 22px; }
-
-/* ---------- SharePoint table ---------- */
-.table-wrap{ margin:0 12px 10px; overflow-x:auto; border:1px solid var(--line); border-radius:5px; }
-.records-table{ width:100%; min-width:1450px; border-collapse:collapse; table-layout:auto; }
-.records-table th{
-  position:sticky; top:0; z-index:2; padding:11px 10px; text-align:left;
-  color:#1a1a1a; background:var(--orange); border-right:1px solid rgba(0,0,0,.2);
-  font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.025em; white-space:nowrap;
-}
-.records-table th:last-child{ border-right:0; }
-.records-table td{
-  padding:11px 10px; color:var(--white); border-top:1px solid var(--line);
-  border-right:1px solid rgba(255,255,255,.09); vertical-align:top; min-width:120px;
-}
-.records-table td:last-child{ border-right:0; }
-.records-table tbody tr{ background:rgba(255,255,255,.04); cursor:pointer; }
-.records-table tbody tr:hover{ background:rgba(255,112,18,.08); }
-.records-table tbody tr.selected{ background:rgba(255,112,18,.14); outline:1px solid var(--orange); outline-offset:-1px; }
-.records-table .cell-project-number{ min-width:125px; font-weight:800; color:var(--orange); }
-.records-table .cell-project-name{ min-width:180px; font-weight:700; }
-.records-table .cell-customer{ min-width:160px; }
-.records-table .cell-location{ min-width:210px; }
-.records-table .cell-status{ min-width:145px; }
-.records-table .cell-flag{ min-width:120px; text-align:center; }
-.records-table .cell-scope{ min-width:260px; max-width:360px; white-space:normal; }
-.records-table .cell-pm-name{ min-width:165px; }
-.cell-value-yes{ color:#6ee7b7; font-weight:800; }
-.cell-value-no{ color:var(--muted); }
 
 /* ---------- Edit panel ---------- */
 #editPanel{ padding:4px 22px 20px; }
@@ -399,20 +371,18 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
   }
 
   function rowHtml(o){
-    function yesNoClass(value){ return value === 'Yes' ? 'cell-value-yes' : 'cell-value-no'; }
     return (
-      '<tr class="rec-row' + (o.id === selectedId ? ' selected' : '') + '" data-id="' + escapeHtml(o.id) + '">' +
-        '<td class="cell-project-number">' + escapeHtml(o.projectNumber || '\u2014') + '</td>' +
-        '<td class="cell-project-name">' + escapeHtml(o.projectName || '\u2014') + '</td>' +
-        '<td class="cell-customer">' + escapeHtml(o.customer || '\u2014') + '</td>' +
-        '<td class="cell-location">' + escapeHtml(o.location || '\u2014') + '</td>' +
-        '<td class="cell-status">' + escapeHtml(o.approvalStatus || 'Needs to Contact') + '</td>' +
-        '<td class="cell-flag ' + yesNoClass(o.estimateCreated) + '">' + escapeHtml(o.estimateCreated || 'No') + '</td>' +
-        '<td class="cell-flag ' + yesNoClass(o.siteVisited) + '">' + escapeHtml(o.siteVisited || 'No') + '</td>' +
-        '<td class="cell-scope">' + escapeHtml(o.scope || '\u2014') + '</td>' +
-        '<td class="cell-flag ' + yesNoClass(o.pmAssigned) + '">' + escapeHtml(o.pmAssigned || 'No') + '</td>' +
-        '<td class="cell-pm-name">' + escapeHtml(o.projectManagerName || 'N/A') + '</td>' +
-      '</tr>'
+      '<li class="rec-row' + (o.id === selectedId ? ' selected' : '') + '" data-id="' + o.id + '">' +
+        '<span class="rec-number">' + escapeHtml(o.projectNumber || '\u2014') + '</span>' +
+        '<span class="rec-name">' + escapeHtml(o.projectName) + '</span>' +
+        '<span class="tag ' + statusTagClass(o.approvalStatus) + '">' + escapeHtml(o.approvalStatus || 'Needs to Contact') + '</span>' +
+        '<span class="tag">' + escapeHtml(o.customer) + '</span>' +
+        '<span class="tag ' + flagTagClass(o.estimateCreated) + '">Estimate: ' + escapeHtml(o.estimateCreated || 'No') + '</span>' +
+        '<span class="tag ' + flagTagClass(o.siteVisited) + '">Site Visited: ' + escapeHtml(o.siteVisited || 'No') + '</span>' +
+        '<span class="tag ' + flagTagClass(o.pmAssigned) + '">PM Assigned: ' + escapeHtml(o.pmAssigned || 'No') + '</span>' +
+        (o.projectManagerName && o.projectManagerName !== 'N/A' ? '<span class="tag">PM: ' + escapeHtml(o.projectManagerName) + '</span>' : '') +
+        '<span class="chev">\u203a</span>' +
+      '</li>'
     );
   }
 
@@ -425,12 +395,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     $('countChip').textContent = sorted.length;
 
     root.innerHTML = sorted.length
-      ? '<div class="table-wrap"><table class="records-table" aria-label="Executed Contracts and Scheduling">' +
-          '<thead><tr>' +
-            '<th>Project Number</th><th>Project Name</th><th>Customer</th><th>Location</th>' +
-            '<th>Approval Status</th><th>Estimate Created</th><th>Site Visited</th><th>Scope</th>' +
-            '<th>PM Assigned</th><th>PM Assigned To</th>' +
-          '</tr></thead><tbody>' + sorted.map(rowHtml).join('') + '</tbody></table></div>'
+      ? '<ul class="rec-list">' + sorted.map(rowHtml).join('') + '</ul>'
       : '<div class="empty-state">' + (allRecords.length ? 'No entries match that filter.' : 'No projects saved yet — add one in Executed Contracts and Scheduling.') + '</div>';
 
     Array.prototype.forEach.call(root.querySelectorAll('.rec-row'), function(row){
