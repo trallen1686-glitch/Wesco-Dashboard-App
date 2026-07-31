@@ -103,20 +103,39 @@ const ALIASES = {
   customer: ["Customer", "Customer Name"],
   location: ["Location", "Project Location", "Address"],
   approvalStatus: ["Approval Status", "Contract Status", "Status"],
-  estimateCreated: ["Estimate Created", "Estimate Created?"],
+  estimateCreated: ["Estimate Created", "Estimate Created?", "Estimate Complete", "Estimate Completed", "Estimate Made", "Estimate"],
   siteVisited: ["Site Visited", "Site Visited?"],
   pmAssigned: ["PM Assigned", "Project Manager Assigned"],
-  projectManagerName: ["Project Manager Name", "Project Manager", "PM Name"],
+  projectManagerName: ["PM Assigned To", "Assigned To", "Project Manager Name", "Project Manager", "PM Name"],
   scope: ["Scope", "Scope of Work", "Description"],
 };
 
 function findColumn(columns, key) {
-  return columns.find((candidate) =>
+  const exact = columns.find((candidate) =>
     ALIASES[key].some((alias) =>
       normalized(candidate.displayName) === normalized(alias) ||
       normalized(candidate.name) === normalized(alias)
     )
   );
+  if (exact) return exact;
+
+  // Existing SharePoint lists sometimes preserve older display names or encode
+  // punctuation in internal names. Use a narrow fallback without changing the list.
+  if (key === "estimateCreated") {
+    return columns.find((candidate) => {
+      const name = normalized(candidate.displayName || candidate.name);
+      return name.includes("estimate") &&
+        (name.includes("create") || name.includes("complete") || name === "estimate");
+    });
+  }
+  if (key === "projectManagerName") {
+    return columns.find((candidate) => {
+      const name = normalized(candidate.displayName || candidate.name);
+      return name === "pmassignedto" || name === "assignedto" ||
+        name.includes("projectmanagername");
+    });
+  }
+  return undefined;
 }
 
 async function schema() {
