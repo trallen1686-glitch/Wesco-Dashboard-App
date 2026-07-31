@@ -42,7 +42,7 @@ html,body{
   font-size: 14.5px;
   line-height:1.45;
 }
-.widget{ max-width: 820px; margin: 0 auto; padding: 14px; }
+.widget{ max-width: 780px; margin: 0 auto; padding: 14px; }
 .card{
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -108,6 +108,12 @@ form{ padding: 4px 18px 18px; }
 
 .actions-row{ display:flex; gap:10px; padding-top: 18px; margin-top: 6px; border-top:1px solid var(--border); }
 .actions-row .btn-block{ flex:1; }
+.approval-submit-row{ padding:10px 0 2px; }
+.approval-submit-row .btn{ width:100%; }
+.quickbooks-submit{ margin-top:22px; padding:18px; border:2px solid #2ca01c; border-radius:7px; background:#f1faef; }
+.quickbooks-submit .quickbooks-label{ margin:0 0 10px; color:#1f6f16; font-size:13px; font-weight:700; text-align:center; }
+.quickbooks-submit .btn-quickbooks{ width:100%; padding:15px 22px; background:#2ca01c; color:#fff; font-size:16px; box-shadow:0 2px 5px rgba(44,160,28,.25); }
+.quickbooks-submit .btn-quickbooks:hover{ background:#238b16; }
 
 .toolbar-row{ display:flex; gap:8px; padding: 12px 0 2px; flex-wrap:wrap; }
 .toolbar-row .btn-sm{ padding:8px 14px; font-size:12.5px; }
@@ -125,6 +131,8 @@ form{ padding: 4px 18px 18px; }
 .li-row:last-child{ border-bottom:none; }
 .li-field{ display:flex; flex-direction:column; gap:3px; }
 .li-field label{ font-size:10px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; }
+.li-field.item-number{ flex:0 1 115px; min-width:100px; }
+.li-field.item-name{ flex:0 1 145px; min-width:120px; }
 .li-field.desc{ flex:1 1 220px; min-width:160px; }
 .li-field.qty{ flex:0 0 64px; }
 .li-field.price{ flex:0 0 96px; }
@@ -262,16 +270,21 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
       </div>
 
       <div class="toolbar-row no-print">
-        <button type="button" class="btn btn-ghost btn-sm" id="saveDraftBtn">💾 Save Draft</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="saveDraftBtn">💾 Save Estimate</button>
         <button type="button" class="btn btn-ghost btn-sm" id="printFormBtn">🖨 Print</button>
       </div>
+      <div class="approval-submit-row no-print">
+        <button type="button" class="btn" id="approvalBtn">Submit for Approval</button>
+      </div>
 
-      <div class="section-label">Order Details</div>
+      <div class="section-label">Details</div>
       <div class="field-grid">
         <div class="field" id="f_requestedBy">
-          <label for="requestedBy">Requested By<span class="req">*</span></label>
-          <input type="text" id="requestedBy" placeholder="Your name" maxlength="80" autocomplete="off">
-          <span class="error-msg">Enter your name.</span>
+          <label for="requestedBy">Submitted By<span class="req">*</span></label>
+          <select id="requestedBy">
+            <option value="">Select staff member</option><option value="Wes">Wes</option><option value="Oscar">Oscar</option><option value="Joe">Joe</option><option value="Chris">Chris</option><option value="Theo">Theo</option>
+          </select>
+          <span class="error-msg">Select who submitted this purchase order.</span>
         </div>
         <div class="field" id="f_poDate">
           <label for="poDate">Date<span class="req">*</span></label>
@@ -287,6 +300,14 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           <label for="jobName">Job Name<span class="req">*</span></label>
           <input type="text" id="jobName" placeholder="e.g. Smith Residence" maxlength="120" autocomplete="off">
           <span class="error-msg">Enter the job name.</span>
+        </div>
+        <div class="field" id="f_customerName">
+          <label for="customerName">Customer Name</label>
+          <input type="text" id="customerName" placeholder="Customer name" maxlength="120" autocomplete="off">
+        </div>
+        <div class="field" id="f_estimateInvoiceNumber">
+          <label for="estimateInvoiceNumber">Estimate/Invoice Number</label>
+          <input type="text" id="estimateInvoiceNumber" placeholder="Estimate or invoice number" maxlength="80" autocomplete="off">
         </div>
         <div class="field" id="f_phase">
           <label for="phase">Phase<span class="req">*</span></label>
@@ -304,19 +325,19 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         </div>
       </div>
 
-      <div class="section-label">Vendor</div>
+      <div class="section-label">Subcontractor/Vendor</div>
       <div class="field-grid">
         <div class="field full" id="f_vendor">
-          <label for="vendor">Vendor<span class="req">*</span></label>
-          <input type="text" id="vendor" placeholder="Vendor / supplier name" maxlength="120" autocomplete="off">
-          <span class="error-msg">Enter the vendor name.</span>
+          <label for="vendor">Subcontractor/Supplier Name<span class="req">*</span></label>
+          <input type="text" id="vendor" placeholder="Subcontractor / supplier name" maxlength="120" autocomplete="off">
+          <span class="error-msg">Enter the subcontractor or supplier name.</span>
         </div>
         <div class="field" id="f_vendorPhone">
-          <label for="vendorPhone">Vendor Phone <span class="hint">(optional)</span></label>
+          <label for="vendorPhone">Subcontractor/Vendor Phone <span class="hint">(optional)</span></label>
           <input type="tel" id="vendorPhone" placeholder="(336) 555-0100" maxlength="30" autocomplete="off">
         </div>
         <div class="field" id="f_vendorEmail">
-          <label for="vendorEmail">Vendor Email <span class="hint">(optional)</span></label>
+          <label for="vendorEmail">Subcontractor/Vendor Email <span class="hint">(optional)</span></label>
           <input type="email" id="vendorEmail" placeholder="orders@vendor.com" maxlength="120" autocomplete="off">
         </div>
         <div class="field full" id="f_shipTo">
@@ -354,6 +375,10 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
       <div class="actions-row">
         <button type="button" class="btn btn-ghost" id="clearBtn">Clear Form</button>
         <button type="submit" class="btn btn-block" id="createBtn">Create Purchase Order</button>
+      </div>
+      <div class="quickbooks-submit">
+        <p class="quickbooks-label">QUICKBOOKS</p>
+        <button type="button" class="btn btn-quickbooks" id="quickBooksBtn">Submit Purchase Order to QuickBooks</button>
       </div>
 
     </form>
@@ -473,9 +498,11 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
      shipping cost changes.
      ------------------------------------------------------------------ */
   function lineItemRowHtml(item){
-    item = item || { description:'', qty:'', unitPrice:'' };
+    item = item || { itemNumber:'', itemName:'', description:'', qty:'', unitPrice:'' };
     return (
       '<div class="li-row">' +
+        '<div class="li-field item-number"><label>Item Number</label><input type="text" class="li-item-number" placeholder="Item #" value="' + escapeHtml(item.itemNumber) + '"></div>' +
+        '<div class="li-field item-name"><label>Item Name</label><input type="text" class="li-item-name" placeholder="Item name" value="' + escapeHtml(item.itemName) + '"></div>' +
         '<div class="li-field desc"><label>Description</label>' +
           '<input type="text" class="li-desc" placeholder="Item description" value="' + escapeHtml(item.description) + '"></div>' +
         '<div class="li-field qty"><label>Qty</label>' +
@@ -522,6 +549,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   function readAllRows(){
     return Array.prototype.map.call(document.querySelectorAll('#lineItemsBody .li-row'), function(row){
       return {
+        itemNumber: row.querySelector('.li-item-number').value.trim(),
+        itemName: row.querySelector('.li-item-name').value.trim(),
         description: row.querySelector('.li-desc').value.trim(),
         qty: row.querySelector('.li-qty').value,
         unitPrice: row.querySelector('.li-price').value,
@@ -532,8 +561,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
 
   function collectLineItems(){
     return readAllRows()
-      .filter(function(r){ return r.description || Number(r.qty) > 0 || Number(r.unitPrice) > 0; })
-      .map(function(r){ return { description: r.description, qty: Number(r.qty) || 0, unitPrice: Number(r.unitPrice) || 0 }; });
+      .filter(function(r){ return r.itemNumber || r.itemName || r.description || Number(r.qty) > 0 || Number(r.unitPrice) > 0; })
+      .map(function(r){ return { itemNumber: r.itemNumber, itemName: r.itemName, description: r.description, qty: Number(r.qty) || 0, unitPrice: Number(r.unitPrice) || 0 }; });
   }
 
   function calcTotals(items, taxRate, shipping){
@@ -595,6 +624,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
       neededBy: $('neededBy').value || '',
       jobNumber: $('jobNumber').value.trim(),
       jobName: $('jobName').value.trim(),
+      customerName: $('customerName').value.trim(),
+      estimateInvoiceNumber: $('estimateInvoiceNumber').value.trim(),
       phase: $('phase').value.trim(),
       vendor: $('vendor').value.trim(),
       vendorPhone: $('vendorPhone').value.trim(),
@@ -615,12 +646,14 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     recalcTotals();
   }
 
-  function createPurchaseOrder(){
+  function createPurchaseOrder(submissionStatus){
     if(!validateForm()) return;
+    submissionStatus = submissionStatus || 'created';
     var data = collectFormData();
     var record = Object.assign({
       id: uid(),
       poNumber: nextPoNumber(allOrders),
+      status: submissionStatus,
       createdAt: new Date().toISOString()
     }, data);
 
@@ -629,7 +662,9 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     discardDraftData();
     resetForm();
     renderList();
-    showToast(record.poNumber + ' created for ' + record.vendor + '.');
+    showToast(record.status === 'pending_approval'
+      ? record.poNumber + ' submitted for approval.'
+      : record.poNumber + ' created for ' + record.vendor + '.');
     $('requestedBy').focus();
   }
 
@@ -655,6 +690,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '<span class="tag">' + escapeHtml(o.jobName) + ' (' + escapeHtml(o.jobNumber) + ')</span>' +
           '<span class="tag">' + escapeHtml(o.phase) + '</span>' +
           '<span class="tag">' + escapeHtml(formatDate(o.poDate)) + '</span>' +
+          (o.status === 'pending_approval' ? '<span class="tag">Pending Approval</span>' : '') +
           '<span class="tag total">' + escapeHtml(formatMoney(totals.total)) + '</span>' +
           '<span class="tag">' + o.lineItems.length + (o.lineItems.length === 1 ? ' item' : ' items') + '</span>' +
         '</div>' +
@@ -701,6 +737,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
       var lineTotal = (Number(it.qty)||0) * (Number(it.unitPrice)||0);
       return (
         '<tr>' +
+          '<td>' + escapeHtml(it.itemNumber || '') + '</td>' +
+          '<td>' + escapeHtml(it.itemName || '') + '</td>' +
           '<td>' + escapeHtml(it.description) + '</td>' +
           '<td class="num">' + escapeHtml(it.qty) + '</td>' +
           '<td class="num">' + escapeHtml(formatMoney(it.unitPrice)) + '</td>' +
@@ -724,19 +762,21 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '<div class="p-ponum"><b>' + escapeHtml(poNo) + '</b>Printed ' + escapeHtml(formatDate(todayStr())) + '</div>' +
         '</div>' +
         '<div class="p-grid">' +
-          '<div><b>Requested By</b><span>' + escapeHtml(o.requestedBy || '') + '</span></div>' +
+          '<div><b>Submitted By</b><span>' + escapeHtml(o.requestedBy || '') + '</span></div>' +
           '<div><b>Date</b><span>' + escapeHtml(formatDate(o.poDate)) + '</span></div>' +
           '<div><b>Job Number</b><span>' + escapeHtml(o.jobNumber || '') + '</span></div>' +
           '<div><b>Job Name</b><span>' + escapeHtml(o.jobName || '') + '</span></div>' +
+          '<div><b>Customer Name</b><span>' + escapeHtml(o.customerName || '\u2014') + '</span></div>' +
+          '<div><b>Estimate/Invoice Number</b><span>' + escapeHtml(o.estimateInvoiceNumber || '\u2014') + '</span></div>' +
           '<div><b>Phase</b><span>' + escapeHtml(o.phase || '') + '</span></div>' +
           '<div><b>Needed By</b><span>' + escapeHtml(o.neededBy ? formatDate(o.neededBy) : '\u2014') + '</span></div>' +
-          '<div><b>Vendor</b><span>' + escapeHtml(o.vendor || '') + '</span></div>' +
-          '<div><b>Vendor Contact</b><span>' + escapeHtml([o.vendorPhone, o.vendorEmail].filter(Boolean).join(' · ') || '\u2014') + '</span></div>' +
+          '<div><b>Subcontractor/Supplier Name</b><span>' + escapeHtml(o.vendor || '') + '</span></div>' +
+          '<div><b>Subcontractor/Vendor Contact</b><span>' + escapeHtml([o.vendorPhone, o.vendorEmail].filter(Boolean).join(' · ') || '\u2014') + '</span></div>' +
           '<div style="grid-column:1 / -1;"><b>Ship To</b><span>' + escapeHtml(o.shipTo || '') + '</span></div>' +
         '</div>' +
         '<table class="p-items">' +
-          '<thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit Price</th><th class="num">Total</th></tr></thead>' +
-          '<tbody>' + (rows || '<tr><td colspan="4">No line items.</td></tr>') + '</tbody>' +
+          '<thead><tr><th>Item Number</th><th>Item Name</th><th>Description</th><th class="num">Qty</th><th class="num">Unit Price</th><th class="num">Total</th></tr></thead>' +
+          '<tbody>' + (rows || '<tr><td colspan="6">No line items.</td></tr>') + '</tbody>' +
         '</table>' +
         '<div class="p-totals">' +
           '<div class="p-trow"><span>Subtotal</span><span>' + escapeHtml(formatMoney(totals.subtotal)) + '</span></div>' +
@@ -746,7 +786,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         '</div>' +
         notesBlock +
         '<div class="p-sign-row">' +
-          '<div class="p-sign">Requested By — ' + escapeHtml(o.requestedBy || '') + '</div>' +
+          '<div class="p-sign">Submitted By — ' + escapeHtml(o.requestedBy || '') + '</div>' +
           '<div class="p-sign">Authorized Signature</div>' +
         '</div>' +
       '</div>'
@@ -774,6 +814,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
       $('neededBy').value = draft.neededBy || '';
       $('jobNumber').value = draft.jobNumber || '';
       $('jobName').value = draft.jobName || '';
+      $('customerName').value = draft.customerName || '';
+      $('estimateInvoiceNumber').value = draft.estimateInvoiceNumber || '';
       $('phase').value = draft.phase || '';
       $('vendor').value = draft.vendor || '';
       $('vendorPhone').value = draft.vendorPhone || '';
@@ -805,10 +847,17 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     $('saveDraftBtn').addEventListener('click', function(){
       saveDraftData(collectFormData());
       $('draftBanner').style.display = 'none';
-      showToast('Draft saved on this device.');
+      showToast('Estimate saved on this device.');
+    });
+    $('approvalBtn').addEventListener('click', function(){
+      createPurchaseOrder('pending_approval');
     });
     $('printFormBtn').addEventListener('click', function(){
       printPurchaseOrder(collectFormData(), true);
+    });
+    $('quickBooksBtn').addEventListener('click', function(){
+      if(!validateForm()) return;
+      showToast('QuickBooks submission is ready for automation after approval.');
     });
     $('discardDraftBtn').addEventListener('click', function(){
       discardDraftData();
