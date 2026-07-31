@@ -131,6 +131,18 @@ form{ padding: 4px 18px 18px; }
 
 .actions-row{ display:flex; gap:10px; padding-top: 18px; margin-top: 6px; border-top:1px solid var(--border); }
 .actions-row .btn-block{ flex:1; }
+.quickbooks-submit{
+  margin-top:22px; padding:18px; border:2px solid #2ca01c; border-radius:7px;
+  background:#f1faef;
+}
+.quickbooks-submit .quickbooks-label{
+  margin:0 0 10px; color:#1f6f16; font-size:13px; font-weight:700; text-align:center;
+}
+.quickbooks-submit .btn-quickbooks{
+  width:100%; padding:15px 22px; background:#2ca01c; color:#fff; font-size:16px;
+  box-shadow:0 2px 5px rgba(44,160,28,.25);
+}
+.quickbooks-submit .btn-quickbooks:hover{ background:#238b16; }
 
 .banner{
   margin: 14px 18px 0; padding:10px 14px; border-radius:5px;
@@ -243,6 +255,82 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   .field-grid{ grid-template-columns: 1fr; }
   .actions-row{ flex-direction:column; }
 }
+
+/* ---------- Executed Contracts dark/orange theme ---------- */
+:root{
+  --orange:#ff7012;
+  --white:#fff;
+  --muted:rgba(255,255,255,.65);
+  --panel:rgba(9,14,16,.82);
+  --line:rgba(255,255,255,.18);
+  --focus:rgba(255,112,18,.55);
+  --danger:#ff5858;
+  --success:#34d399;
+  --font:"Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+}
+html,body{min-height:100%;}
+body{
+  padding:24px;
+  color:var(--white);
+  background:radial-gradient(circle at 12% 8%,rgba(255,112,18,.09),transparent 24rem),#090e10;
+}
+.widget{max-width:920px;padding:0;}
+.card{background:var(--panel);border:1px solid rgba(255,255,255,.14);border-radius:5px;box-shadow:0 16px 42px rgba(0,0,0,.28);overflow:hidden;}
+.header{gap:20px;padding:18px 22px 16px;border-bottom:2px solid var(--orange);}
+.header img.logo{height:62px;background:#fff;border-radius:4px;padding:5px 8px;}
+.header h1{font-size:19px;font-weight:800;color:var(--white);}
+.header .subtitle{color:var(--muted);}
+form{padding:4px 22px 18px;}
+.section-label{color:var(--orange);font-weight:800;margin:19px 0 10px;padding:0 0 9px;border-top:0;border-bottom:1px solid var(--orange);}
+.section-label:first-of-type{margin-top:6px;}
+.field label{color:var(--white);}
+.field label .hint{color:var(--muted);}
+.field input[type="text"],.field input[type="date"],.field input[type="number"],.field textarea,.field select{
+  color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3);
+}
+.field select option{color:var(--white);background:#090e10;}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.42);}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--focus);background:rgba(255,112,18,.06);}
+.field.readonly-field input{background:rgba(255,255,255,.035);color:var(--muted);}
+.btn{border:1px solid var(--orange);border-radius:4px;background:var(--orange);color:#1a1a1a;}
+.btn-ghost{background:transparent;color:var(--orange);border-color:var(--orange);}
+.btn-ghost:hover{background:rgba(255,112,18,.08);}
+.section-heading,.list-toggle,details.data-note,.empty-state{color:var(--muted);border-color:var(--line);}
+li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
+.co-jobname,.co-desc{color:var(--white);}
+.co-number{background:var(--orange);color:#1a1a1a;}
+.tag{background:rgba(255,255,255,.1);color:var(--white);}
+
+/* ---------- Line items and totals ---------- */
+.line-items-wrap{grid-column:1/-1;}
+.line-items-head,.line-item{
+  display:grid;grid-template-columns:minmax(180px,1fr) 74px 112px 112px 34px;gap:10px;align-items:center;
+}
+.line-items-head{padding:8px 10px;color:var(--orange);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--orange);}
+.line-item{padding:7px 10px;border-bottom:1px solid var(--line);}
+.line-item input{width:100%;font:13.5px var(--font);padding:9px 10px;color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3);border-radius:4px;}
+.line-item input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--focus);}
+.money-input{position:relative;}
+.money-input span{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);}
+.money-input input{padding-left:22px;text-align:right;}
+.line-amount{text-align:right;font-weight:700;}
+.remove-line{color:var(--muted);font-size:20px;}
+.add-line-row{display:flex;justify-content:flex-end;padding:10px 0;}
+.totals-box{width:min(100%,360px);margin-left:auto;}
+.total-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px dashed var(--line);}
+.total-row label{font-weight:600;}
+.tax-rate-control{display:flex;align-items:center;gap:6px;}
+.tax-rate-control input{width:92px!important;text-align:right;}
+.total-row.grand-total{margin-top:4px;border-bottom:0;border-top:2px solid var(--orange);font-size:17px;font-weight:800;}
+.total-row.grand-total output{color:var(--orange);font-size:19px;}
+@media(max-width:680px){
+  body{padding:14px;}
+  .line-items-head{display:none;}
+  .line-item{grid-template-columns:1fr 1fr;position:relative;padding-right:42px;}
+  .line-item .line-description{grid-column:1/-1;}
+  .line-item .line-amount{grid-column:1/-1;}
+  .remove-line{position:absolute;right:8px;top:8px;}
+}
 </style>
 </head>
 <body>
@@ -295,6 +383,11 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
             <input type="text" id="jobName" placeholder="e.g. Smith Residence" maxlength="120" autocomplete="off">
             <span class="error-msg">Enter the job name.</span>
           </div>
+          <div class="field" id="f_customerName">
+            <label for="customerName">Customer Name<span class="req">*</span></label>
+            <input type="text" id="customerName" placeholder="e.g. John Smith" maxlength="120" autocomplete="off">
+            <span class="error-msg">Enter the customer name.</span>
+          </div>
           <div class="field" id="f_invoiceNumber">
             <label for="invoiceNumber">Invoice Number <span class="hint">(if known)</span></label>
             <input type="text" id="invoiceNumber" placeholder="e.g. INV-3021" maxlength="40" autocomplete="off">
@@ -318,6 +411,28 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
             <textarea id="description" placeholder="Describe the scope, reason, and cost/schedule impact of this change…" maxlength="4000"></textarea>
             <span class="error-msg">Enter a description of the change.</span>
           </div>
+          <div class="line-items-wrap">
+            <div class="section-label">Line Items</div>
+            <div class="line-items-head">
+              <span>Description</span><span>Qty</span><span>Unit Price</span><span style="text-align:right">Amount</span><span></span>
+            </div>
+            <div id="lineItems"></div>
+            <div class="add-line-row">
+              <button type="button" class="btn btn-ghost btn-sm" id="addLineBtn">+ Add Line</button>
+            </div>
+            <div class="totals-box">
+              <div class="total-row"><label>Subtotal</label><output id="subtotalDisplay">$0.00</output></div>
+              <div class="total-row">
+                <label for="taxRate">Tax Rate (%)</label>
+                <div class="tax-rate-control">
+                  <input type="number" id="taxRate" min="0" max="100" step="0.01" value="0" aria-label="Tax percentage">
+                  <span>%</span>
+                </div>
+              </div>
+              <div class="total-row"><label>Tax</label><output id="taxDisplay">$0.00</output></div>
+              <div class="total-row grand-total"><label>Total</label><output id="totalDisplay">$0.00</output></div>
+            </div>
+          </div>
           <div class="field full readonly-field">
             <label for="approvedByDisplay">Approved By</label>
             <input type="text" id="approvedByDisplay" value="Pending — awaiting Wes Atkinson's approval" readonly tabindex="-1">
@@ -327,6 +442,10 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         <div class="actions-row">
           <button type="button" class="btn btn-ghost" id="clearBtn">Clear Form</button>
           <button type="submit" class="btn btn-block" id="submitBtn">Submit for Approval</button>
+        </div>
+        <div class="quickbooks-submit">
+          <p class="quickbooks-label">QUICKBOOKS</p>
+          <button type="button" class="btn btn-quickbooks" id="quickBooksBtn">Submit Change Order to QuickBooks</button>
         </div>
 
       </form>
@@ -461,6 +580,61 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   function nextCoNumber(list){
     return 'CO-' + (1000 + list.length + 1);
   }
+  function money(n){
+    return '$' + (Number(n) || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function newLineItem(item){
+    item = item || {description:'',qty:1,unitPrice:0};
+    var row = document.createElement('div');
+    row.className = 'line-item';
+    row.innerHTML =
+      '<input class="line-description" type="text" placeholder="Description" aria-label="Line item description">' +
+      '<input class="line-qty" type="number" min="0" step="0.01" value="1" aria-label="Quantity">' +
+      '<div class="money-input"><span>$</span><input class="line-price" type="number" min="0" step="0.01" value="0.00" aria-label="Unit price"></div>' +
+      '<output class="line-amount">$0.00</output>' +
+      '<button type="button" class="btn-icon remove-line" aria-label="Remove line item">&times;</button>';
+    row.querySelector('.line-description').value = item.description || '';
+    row.querySelector('.line-qty').value = Number(item.qty == null ? 1 : item.qty);
+    row.querySelector('.line-price').value = Number(item.unitPrice || 0).toFixed(2);
+    Array.prototype.forEach.call(row.querySelectorAll('input'),function(input){
+      input.addEventListener('input',calculateTotals);
+    });
+    row.querySelector('.remove-line').addEventListener('click',function(){
+      row.remove();
+      if(!$('lineItems').children.length) newLineItem();
+      calculateTotals();
+    });
+    $('lineItems').appendChild(row);
+    calculateTotals();
+  }
+  function getLineItems(){
+    return Array.prototype.map.call(document.querySelectorAll('.line-item'),function(row){
+      return {
+        description:row.querySelector('.line-description').value.trim(),
+        qty:Number(row.querySelector('.line-qty').value)||0,
+        unitPrice:Number(row.querySelector('.line-price').value)||0
+      };
+    });
+  }
+  function setLineItems(items){
+    $('lineItems').innerHTML = '';
+    (items && items.length ? items : [{description:'',qty:1,unitPrice:0}]).forEach(newLineItem);
+    calculateTotals();
+  }
+  function calculateTotals(){
+    var subtotal = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('.line-item'),function(row){
+      var amount = (Number(row.querySelector('.line-qty').value)||0) * (Number(row.querySelector('.line-price').value)||0);
+      row.querySelector('.line-amount').textContent = money(amount);
+      subtotal += amount;
+    });
+    var taxRate = Math.max(0,Math.min(100,Number($('taxRate') && $('taxRate').value)||0));
+    var tax = subtotal * taxRate / 100;
+    $('subtotalDisplay').textContent = money(subtotal);
+    $('taxDisplay').textContent = money(tax);
+    $('totalDisplay').textContent = money(subtotal + tax);
+    return {subtotal:subtotal,taxRate:taxRate,tax:tax,total:subtotal+tax};
+  }
 
   /* ------------------------------------------------------------------
      Print — builds a clean, letterhead-style version of a single change
@@ -495,6 +669,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '<div><b>Date</b><span>' + escapeHtml(formatDate(o.coDate)) + '</span></div>' +
           '<div><b>Job Number</b><span>' + escapeHtml(o.jobNumber || '') + '</span></div>' +
           '<div><b>Job Name</b><span>' + escapeHtml(o.jobName || '') + '</span></div>' +
+          '<div><b>Customer Name</b><span>' + escapeHtml(o.customerName || '') + '</span></div>' +
           '<div><b>Invoice Number</b><span>' + escapeHtml(o.invoiceNumber || '\u2014') + '</span></div>' +
           '<div><b>Phase</b><span>' + escapeHtml(o.phase || '') + '</span></div>' +
         '</div>' +
@@ -502,6 +677,10 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '<b>Change Order Description</b>' +
           '<p>' + escapeHtml(o.description || '') + '</p>' +
         '</div>' +
+        '<table style="width:100%;border-collapse:collapse;margin:18px 0"><thead><tr><th style="text-align:left;border-bottom:1px solid #000">Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>' +
+          (o.lineItems || []).map(function(item){ return '<tr><td>' + escapeHtml(item.description || '') + '</td><td style="text-align:center">' + escapeHtml(item.qty) + '</td><td style="text-align:right">' + money(item.unitPrice) + '</td><td style="text-align:right">' + money((Number(item.qty)||0)*(Number(item.unitPrice)||0)) + '</td></tr>'; }).join('') +
+        '</tbody></table>' +
+        '<div style="width:260px;margin-left:auto;text-align:right"><div>Subtotal: <b>' + money(o.subtotal) + '</b></div><div>Tax (' + escapeHtml(o.taxRate || 0) + '%): <b>' + money(o.tax) + '</b></div><div style="font-size:16px;border-top:2px solid #000;margin-top:5px;padding-top:5px">Total: <b>' + money(o.total) + '</b></div></div>' +
         '<div class="p-sign-row">' +
           '<div class="p-sign">Submitted By — ' + escapeHtml(o.submittedBy || '') + '</div>' +
           '<div class="p-sign">Approved By — ' + approvedLine + '</div>' +
@@ -547,7 +726,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   /* ------------------------------------------------------------------
      Validation (submitter form)
      ------------------------------------------------------------------ */
-  var REQUIRED_IDS = ['submittedBy','coDate','jobNumber','jobName','phase','description'];
+  var REQUIRED_IDS = ['submittedBy','coDate','jobNumber','jobName','customerName','phase','description'];
 
   function clearErrors(){
     Array.prototype.forEach.call(document.querySelectorAll('.field.invalid'), function(f){
@@ -572,14 +751,21 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
      Submitter view: create + revise/resubmit
      ------------------------------------------------------------------ */
   function collectFormData(){
+    var totals = calculateTotals();
     return {
       submittedBy: $('submittedBy').value.trim(),
       coDate: $('coDate').value || '',
       jobNumber: $('jobNumber').value.trim(),
       jobName: $('jobName').value.trim(),
+      customerName: $('customerName').value.trim(),
       invoiceNumber: $('invoiceNumber').value.trim(),
       phase: $('phase').value.trim(),
-      description: $('description').value.trim()
+      description: $('description').value.trim(),
+      lineItems: getLineItems(),
+      taxRate: totals.taxRate,
+      subtotal: totals.subtotal,
+      tax: totals.tax,
+      total: totals.total
     };
   }
 
@@ -588,6 +774,8 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     clearErrors();
     $('coDate').value = todayStr();
     $('approvedByDisplay').value = "Pending — awaiting " + APPROVER_NAME + "'s approval";
+    $('taxRate').value = '0';
+    setLineItems();
     editingId = null;
     $('submitBtn').textContent = 'Submit for Approval';
   }
@@ -641,9 +829,12 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     $('coDate').value = o.coDate;
     $('jobNumber').value = o.jobNumber;
     $('jobName').value = o.jobName;
+    $('customerName').value = o.customerName || '';
     $('invoiceNumber').value = o.invoiceNumber;
     $('phase').value = o.phase;
     $('description').value = o.description;
+    $('taxRate').value = Number(o.taxRate || 0);
+    setLineItems(o.lineItems);
     $('approvedByDisplay').value = "Pending — awaiting " + APPROVER_NAME + "'s approval";
     $('submitBtn').textContent = 'Resubmit for Approval';
     clearErrors();
@@ -681,6 +872,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           (o.invoiceNumber ? '<span class="tag">Inv ' + escapeHtml(o.invoiceNumber) + '</span>' : '') +
         '</div>' +
         '<div class="co-desc">' + escapeHtml(o.description) + '</div>' +
+        '<div class="co-meta-row"><span class="tag">Subtotal ' + money(o.subtotal) + '</span><span class="tag">Tax ' + money(o.tax) + '</span><span class="tag status-approved">Total ' + money(o.total) + '</span></div>' +
         approvedNote + sentBack +
         '<div class="co-card-actions">' +
           '<button type="button" class="btn btn-sm btn-ghost print-record-btn" data-id="' + o.id + '">🖨 Print</button>' +
@@ -768,6 +960,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           (o.invoiceNumber ? '<span class="tag">Inv ' + escapeHtml(o.invoiceNumber) + '</span>' : '') +
         '</div>' +
         '<div class="co-desc">' + escapeHtml(o.description) + '</div>' +
+        '<div class="co-meta-row"><span class="tag">Subtotal ' + money(o.subtotal) + '</span><span class="tag">Tax ' + money(o.tax) + '</span><span class="tag status-approved">Total ' + money(o.total) + '</span></div>' +
         '<div class="co-approve-row">' +
           '<button type="button" class="btn btn-approve btn-sm approve-btn" data-id="' + o.id + '">Approve</button>' +
           '<button type="button" class="btn btn-sendback btn-sm sendback-toggle-btn" data-id="' + o.id + '">Send Back</button>' +
@@ -801,6 +994,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           (o.status === 'approved' ? '<span class="tag">Approved ' + escapeHtml(formatDate(o.approvedDate)) + '</span>' : '') +
         '</div>' +
         '<div class="co-desc">' + escapeHtml(o.description) + '</div>' +
+        '<div class="co-meta-row"><span class="tag">Subtotal ' + money(o.subtotal) + '</span><span class="tag">Tax ' + money(o.tax) + '</span><span class="tag status-approved">Total ' + money(o.total) + '</span></div>' +
         noteBlock +
         '<div class="co-card-actions">' +
           '<button type="button" class="btn btn-sm btn-ghost print-record-btn" data-id="' + o.id + '">🖨 Print</button>' +
@@ -877,11 +1071,19 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         $('coDate').value = draft.coDate || todayStr();
         $('jobNumber').value = draft.jobNumber || '';
         $('jobName').value = draft.jobName || '';
+        $('customerName').value = draft.customerName || '';
         $('invoiceNumber').value = draft.invoiceNumber || '';
         $('phase').value = draft.phase || '';
         $('description').value = draft.description || '';
+        $('taxRate').value = Number(draft.taxRate || 0);
+        setLineItems(draft.lineItems);
         $('draftBanner').style.display = 'flex';
+      } else {
+        setLineItems();
       }
+
+      $('addLineBtn').addEventListener('click',function(){ newLineItem(); });
+      $('taxRate').addEventListener('input',calculateTotals);
 
       $('coForm').addEventListener('submit', function(e){
         e.preventDefault();
@@ -902,6 +1104,10 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         var existing = editingId ? allOrders.find(function(x){ return x.id === editingId; }) : null;
         var record = existing ? Object.assign({}, existing, current) : current;
         printChangeOrder(record, !existing);
+      });
+      $('quickBooksBtn').addEventListener('click', function(){
+        if(!validateForm()) return;
+        showToast('QuickBooks submission is ready for automation after approval.');
       });
       $('discardDraftBtn').addEventListener('click', function(){
         discardDraftData();
