@@ -17,6 +17,14 @@
   .hero h1{margin:0 0 8px;font-size:30px}
   .hero p{margin:0;color:#d9e5ec;font-size:13px;max-width:640px}
   main{max-width:1180px;margin:0 auto;padding:30px 24px 60px}
+  .hub-tabs{display:flex;gap:8px;margin-bottom:24px;padding:5px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 3px 10px rgba(24,48,65,.04)}
+  .hub-tab{flex:0 1 230px;padding:12px 18px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:700 13px/1.2 inherit;cursor:pointer}
+  .hub-tab:hover{background:#eef4f8;color:var(--navy)}
+  .hub-tab[aria-selected="true"]{background:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(16,43,61,.2)}
+  .hub-tab:focus-visible{outline:3px solid rgba(23,105,170,.28);outline-offset:2px}
+  .tab-panel[hidden]{display:none}
+  .embedded-tool{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#090e10;box-shadow:0 8px 24px rgba(24,48,65,.1)}
+  .embedded-tool iframe{display:block;width:100%;height:calc(100vh - 230px);min-height:760px;border:0;background:#090e10}
   .group{margin-bottom:34px}
   .group h2{margin:0 0 3px;color:var(--navy);font-size:16px}
   .group p.sub{margin:0 0 14px;color:var(--muted);font-size:11px}
@@ -25,7 +33,7 @@
   .card:hover{box-shadow:0 8px 20px rgba(24,48,65,.1);transform:translateY(-1px)}
   .card b{color:var(--navy);font-size:13px}
   .card span{color:var(--muted);font-size:10.5px;line-height:1.4}
-  @media(max-width:640px){.hero{padding:28px 20px}.hero h1{font-size:24px}main{padding:22px 14px 40px}}
+  @media(max-width:640px){.hero{padding:28px 20px}.hero h1{font-size:24px}main{padding:22px 14px 40px}.hub-tabs{position:sticky;top:0;z-index:5}.hub-tab{flex:1;padding:11px 10px}.embedded-tool iframe{height:calc(100vh - 160px);min-height:640px}}
 </style>
 </head>
 <body>
@@ -35,6 +43,12 @@
   <p>One place for meetings, to-dos, calendars, requests, contracts, trackers, and project tools.</p>
 </header>
 <main>
+  <div class="hub-tabs" role="tablist" aria-label="Wesco Hub sections">
+    <button class="hub-tab" id="hub-tab" type="button" role="tab" aria-selected="true" aria-controls="hub-panel" data-tab="hub">Wesco Hub</button>
+    <button class="hub-tab" id="daily-update-tab" type="button" role="tab" aria-selected="false" aria-controls="daily-update-panel" data-tab="daily-update" tabindex="-1">Daily Update Log</button>
+  </div>
+
+  <div class="tab-panel" id="hub-panel" role="tabpanel" aria-labelledby="hub-tab">
   <section class="group">
     <h2>Daily tools</h2>
     <p class="sub">Meetings, tasks, and daily updates</p>
@@ -43,7 +57,6 @@
       <a class="card" href="Wesco%20To-Do%20List.html"><b>To-Do List</b><span>Unassigned items that still need to be done.</span></a>
       <a class="card" href="Wesco%20Member%20To-Do%20List%20Template.html"><b>Member To-Do</b><span>Personal to-do dashboard by team member.</span></a>
       <a class="card" href="PM-Daily-Update-Template.html"><b>PM Daily Update</b><span>Daily project manager status update.</span></a>
-      <a class="card" href="Staff_Daily_Update_Log_Template.html"><b>Staff Daily Update Log</b><span>Record daily progress, job-site visits, concerns, and photos.</span></a>
       <a class="card" href="Staff_Daily_Update_Log_List.html"><b>Daily Update Log List</b><span>Review every submitted staff daily update by date and staff member.</span></a>
     </div>
   </section>
@@ -149,7 +162,51 @@
       <a class="card" href="https://github.com/trallen1686-glitch/Wesco-Dashboard-App" target="_blank" rel="noopener"><b>GitHub Repository</b><span>Browse every repository file, folder, workflow, configuration file, and revision.</span></a>
     </div>
   </section>
+  </div>
+
+  <section class="tab-panel embedded-tool" id="daily-update-panel" role="tabpanel" aria-labelledby="daily-update-tab" hidden>
+    <iframe src="Staff_Daily_Update_Log_Template.html" title="Staff Daily Update Log"></iframe>
+  </section>
 </main>
+<script>
+(function(){
+  'use strict';
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var panels = {
+    hub: document.getElementById('hub-panel'),
+    'daily-update': document.getElementById('daily-update-panel')
+  };
+
+  function activate(name, updateHash){
+    tabs.forEach(function(tab){
+      var selected = tab.getAttribute('data-tab') === name;
+      tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    Object.keys(panels).forEach(function(key){ panels[key].hidden = key !== name; });
+    if(updateHash){
+      history.replaceState(null, '', name === 'daily-update' ? '#daily-update-log' : window.location.pathname + window.location.search);
+    }
+  }
+
+  tabs.forEach(function(tab, index){
+    tab.addEventListener('click', function(){ activate(tab.getAttribute('data-tab'), true); });
+    tab.addEventListener('keydown', function(event){
+      var next = index;
+      if(event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      else if(event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+      else if(event.key === 'Home') next = 0;
+      else if(event.key === 'End') next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      tabs[next].focus();
+      activate(tabs[next].getAttribute('data-tab'), true);
+    });
+  });
+
+  if(window.location.hash === '#daily-update-log') activate('daily-update', false);
+})();
+</script>
 <script src="staff-portal-back.js"></script>
 <!-- Deployment refresh: separate Invoice tab -->
 </body>
