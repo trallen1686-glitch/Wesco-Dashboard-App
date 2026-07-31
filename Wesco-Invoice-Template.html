@@ -93,11 +93,14 @@ table.line-items thead th.num, table.line-items tbody td.num{ text-align:right; 
 table.line-items thead th.actions-col, table.line-items tbody td.actions-col{ width:36px; text-align:center; }
 table.line-items tbody td{ padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
 table.line-items tbody tr:last-child td{ border-bottom:none; }
-table.line-items input{
+table.line-items input, table.line-items textarea{
   font-family:var(--font); font-size:13px; width:100%; padding:7px 8px;
   color:var(--white); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.25); border-radius:4px;
 }
-table.line-items input:focus{ outline:none; border-color:var(--orange); box-shadow:0 0 0 2px var(--focus); }
+table.line-items input:focus, table.line-items textarea:focus{ outline:none; border-color:var(--orange); box-shadow:0 0 0 2px var(--focus); }
+table.line-items textarea.li-desc{
+  display:block; min-height:38px; overflow:hidden; resize:none; line-height:1.4; white-space:pre-wrap;
+}
 table.line-items input.li-qty, table.line-items input.li-price{ text-align:right; }
 table.line-items td.li-amount{ text-align:right; font-weight:700; white-space:nowrap; }
 .li-remove{ font-size:14px; }
@@ -414,12 +417,14 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
 (function(){
   'use strict';
 
+  function staffPortalUrl(){
+    var params = new URLSearchParams(window.location.search);
+    var person = (params.get('person') || '').trim();
+    return 'Staff-Portal-Starter-Template.html' + (person ? '?person=' + encodeURIComponent(person) : '');
+  }
+
   document.getElementById('backBtn').addEventListener('click', function(){
-    if(window.history.length > 1){
-      window.history.back();
-    } else {
-      window.location.href = 'Staff-Portal-Starter-Template.html';
-    }
+    window.location.href = staffPortalUrl();
   });
 
   /* ------------------------------------------------------------------
@@ -507,7 +512,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       '<tr data-row-id="' + rowId + '">' +
         '<td><input type="text" class="li-item-number" placeholder="Item Number" value="' + escapeHtml(itemNumber) + '"></td>' +
         '<td><input type="text" class="li-item-name" placeholder="Item Name" value="' + escapeHtml(itemName) + '"></td>' +
-        '<td><input type="text" class="li-desc" placeholder="Description" value="' + escapeHtml(desc) + '"></td>' +
+        '<td><textarea class="li-desc" placeholder="Description" rows="1">' + escapeHtml(desc) + '</textarea></td>' +
         '<td><input type="number" class="li-qty" min="0" step="1" value="' + escapeHtml(qty) + '"></td>' +
         '<td><input type="number" class="li-price" min="0" step="0.01" value="' + toNumber(price).toFixed(2) + '"></td>' +
         '<td class="li-amount num">' + formatMoney(toNumber(qty) * toNumber(price)) + '</td>' +
@@ -516,9 +521,16 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     );
   }
 
+  function autoGrowDescription(box){
+    if(!box) return;
+    box.style.height = 'auto';
+    box.style.height = Math.max(38, box.scrollHeight) + 'px';
+  }
+
   function addLineItemRow(item){
     var tbody = $('lineItemsBody');
     tbody.insertAdjacentHTML('beforeend', lineItemRowHtml(item));
+    autoGrowDescription(tbody.lastElementChild.querySelector('.li-desc'));
     recalcTotals();
   }
 
@@ -907,6 +919,9 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       if(btn) removeLineItemRow(btn.closest('tr'));
     });
     $('lineItemsBody').addEventListener('input', function(e){
+      if(e.target.classList.contains('li-desc')){
+        autoGrowDescription(e.target);
+      }
       if(e.target.classList.contains('li-qty') || e.target.classList.contains('li-price')){
         recalcTotals();
       }
