@@ -94,7 +94,10 @@ async function graph(path, options = {}) {
 }
 
 function normalized(value) {
-  return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return String(value || "")
+    .replace(/_x([0-9a-f]{4})_/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 }
 
 const ALIASES = {
@@ -103,39 +106,31 @@ const ALIASES = {
   customer: ["Customer", "Customer Name"],
   location: ["Location", "Project Location", "Address"],
   approvalStatus: ["Approval Status", "Contract Status", "Status"],
-  estimateCreated: ["Estimated Created", "Estimate Created", "Estimate Created?", "Estimate Complete", "Estimate Completed", "Estimate Made", "Estimate"],
+  estimateCreated: [
+    "Estimate Created",
+    "Estimate Created?",
+    "Estimate Complete",
+    "Estimate Completed",
+    "Estimate",
+  ],
   siteVisited: ["Site Visited", "Site Visited?"],
   pmAssigned: ["PM Assigned", "Project Manager Assigned"],
-  projectManagerName: ["PM Assigned To", "Assigned To", "Project Manager Name", "Project Manager", "PM Name"],
+  projectManagerName: [
+    "PM Assigned To",
+    "Project Manager Name",
+    "Project Manager",
+    "PM Name",
+  ],
   scope: ["Scope", "Scope of Work", "Description"],
 };
 
 function findColumn(columns, key) {
-  const exact = columns.find((candidate) =>
+  return columns.find((candidate) =>
     ALIASES[key].some((alias) =>
       normalized(candidate.displayName) === normalized(alias) ||
       normalized(candidate.name) === normalized(alias)
     )
   );
-  if (exact) return exact;
-
-  // Existing SharePoint lists sometimes preserve older display names or encode
-  // punctuation in internal names. Use a narrow fallback without changing the list.
-  if (key === "estimateCreated") {
-    return columns.find((candidate) => {
-      const name = normalized(candidate.displayName || candidate.name);
-      return name.includes("estimate") &&
-        (name.includes("create") || name.includes("complete") || name === "estimate");
-    });
-  }
-  if (key === "projectManagerName") {
-    return columns.find((candidate) => {
-      const name = normalized(candidate.displayName || candidate.name);
-      return name === "pmassignedto" || name === "assignedto" ||
-        name.includes("projectmanagername");
-    });
-  }
-  return undefined;
 }
 
 async function schema() {
@@ -158,27 +153,11 @@ async function schema() {
       };
     }
   }
-  const missing = ["projectNumber", "projectName", "customer", "approvalStatus"].filter((key) => !mapping[key]);
+  const missing = Object.keys(ALIASES).filter((key) => !mapping[key]);
   if (missing.length) throw new Error(`SharePoint list is missing required columns: ${missing.join(", ")}.`);
   const value = { siteId: site.id, listId: list.id, mapping };
   schemaCache = { value, expires: Date.now() + 10 * 60 * 1000 };
   return value;
-}
-
-function plainText(value) {
-  return String(value == null ? "" : value)
-    .replace(/<br\\s*\\/?\\s*>/gi, "\\n")
-    .replace(/<\\/div\\s*>/gi, "\\n")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&#x27;/gi, "'")
-    .replace(/\\r/g, "")
-    .replace(/\\n{3,}/g, "\\n\\n")
-    .trim();
 }
 
 function mapItem(item, mapping) {
@@ -188,7 +167,7 @@ function mapItem(item, mapping) {
     const value = fields[column.name];
     record[key] = column.type === "boolean"
       ? (value === true || value === "true" || value === 1 ? "Yes" : "No")
-      : (key === "scope" ? plainText(value) : (value == null ? "" : String(value)));
+      : (value == null ? "" : String(value));
   }
   return record;
 }
