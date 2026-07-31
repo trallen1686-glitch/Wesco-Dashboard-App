@@ -538,7 +538,77 @@ li.estimate{border-color:var(--line);background:rgba(255,255,255,.025)}
                 <th>Amount</th>
                 <th aria-label="Remove"></th>
               </tr>
-        …784 tokens truncated…loat(v);return Number.isFinite(n)?n:0}
+            </thead>
+            <tbody id="lineItemsBody"></tbody>
+          </table>
+        </div>
+        <div class="line-toolbar">
+          <div>
+            <button type="button" class="btn btn-ghost btn-sm" id="addLineBtn">＋ Add Line Item</button>
+            <p class="line-help">Item # and Item Name are the first two columns before Description.</p>
+          </div>
+          <div class="totals" aria-label="Estimate totals">
+            <div class="total-row"><span>Subtotal</span><output id="subtotal">$0.00</output></div>
+            <div class="total-row">
+              <span>Tax Rate (%)</span>
+              <div class="tax-rate-control">
+                <input type="number" id="taxRate" min="0" max="100" step="0.01" value="0" aria-label="Tax percentage">
+                <span>%</span>
+              </div>
+            </div>
+            <div class="total-row"><span>Tax</span><output id="taxDisplay">$0.00</output></div>
+            <div class="total-row grand"><span>Estimate Total</span><output id="estimateTotal">$0.00</output></div>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button type="button" class="btn btn-ghost" id="clearBtn">Clear Form</button>
+          <button type="submit" class="btn btn-block" id="submitBtn">Submit for Approval</button>
+        </div>
+        <div class="quickbooks-submit">
+          <p class="quickbooks-label">QUICKBOOKS</p>
+          <button type="button" class="btn btn-quickbooks" id="quickBooksBtn">Submit Estimate to QuickBooks</button>
+        </div>
+      </form>
+
+      <div class="section-heading">Estimate Status</div>
+      <div id="submitterListRoot"></div>
+    </div>
+
+    <div id="approverView" style="display:none">
+      <div class="section-heading">Awaiting Your Approval</div>
+      <div id="pendingListRoot"></div>
+      <button type="button" class="list-toggle" id="historyToggle">▶ <span id="historyToggleLabel">Approval History (0)</span></button>
+      <div class="list-wrap" id="historyWrap"><div id="historyListRoot"></div></div>
+    </div>
+
+    <details class="data-note">
+      <summary>ℹ How this estimate review template stores information</summary>
+      <div class="body">
+        <p>This review version saves drafts, submitted estimates, and approval status in this browser only. Shared storage and automated notifications can be connected after the template is approved.</p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var STORAGE_KEY='WESCO_ESTIMATES_V1';
+  var DRAFT_KEY='WESCO_ESTIMATE_DRAFT_V1';
+  var APPROVER_NAME='Wes Atkinson';
+  var params=new URLSearchParams(window.location.search);
+  var IS_APPROVER=(params.get('person')||'').trim().toLowerCase()===APPROVER_NAME.toLowerCase();
+  var records=[];
+  var editingId=null;
+
+  function $(id){return document.getElementById(id)}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+  function todayStr(){return new Date().toISOString().slice(0,10)}
+  function num(v){var n=parseFloat(v);return Number.isFinite(n)?n:0}
   function money(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v))}
   function escapeHtml(v){
     return String(v==null?'':v).replace(/[&<>"']/g,function(ch){
