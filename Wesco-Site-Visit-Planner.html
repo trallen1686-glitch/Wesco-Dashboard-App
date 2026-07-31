@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco Site Visit Planner</title>
+<style>
+:root{
+  --orange:#ff7012;
+  --panel:rgba(9,14,16,.82);
+  --white:#fff;
+  --muted:rgba(255,255,255,.65);
+  --line:rgba(255,255,255,.18);
+  --field:rgba(255,255,255,.05);
+  --focus:rgba(255,112,18,.55);
+  --danger:#ff5858;
+  --success:#34d399;
+  --font:"Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  font-family:var(--font);
+  background-color:#090e10;
+  background-image:radial-gradient(circle at 12% 8%,rgba(255,112,18,.09),transparent 384px);
+  background-attachment:fixed;
+  margin:0;
+  min-height:100vh;
+  color:var(--white);
+  font-size:14.5px;
+}
+.container{max-width:1700px;margin:0 auto;padding:24px}
+.header,.section{
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:5px;
+  box-shadow:0 16px 42px rgba(0,0,0,.28);
+}
+.header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{width:300px;max-width:46vw;height:auto;display:block;background:#fff;border-radius:4px;padding:7px}
+.header-title{text-align:right}
+.header-title h1{margin:0;color:var(--white);font-size:31px;font-weight:800}
+.header-title p{margin:6px 0 0;color:var(--muted);font-weight:600}
+.section{padding:20px;margin-top:18px}
+h2{margin:0 0 14px;color:var(--white);font-size:21px;font-weight:800;padding-left:12px;border-left:4px solid var(--orange)}
+h3{margin:24px 0 12px;color:var(--white);font-size:17px;font-weight:800}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1180px}
+th{background:var(--orange);color:#1a1a1a;padding:11px 9px;text-align:left;font-size:14px;font-weight:800;white-space:nowrap}
+td{padding:8px;border:1px solid var(--line);vertical-align:top;background:rgba(255,255,255,.025);color:var(--white)}
+input,textarea,select{
+  width:100%;min-width:135px;padding:9px;border:1px solid rgba(255,255,255,.3);
+  border-radius:4px;font:inherit;background:var(--field);color:var(--white);color-scheme:dark;
+}
+input:focus,textarea:focus,select:focus,.multi-select-toggle:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--orange)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:72px;resize:vertical;overflow:hidden}
+button{border:1px solid transparent;padding:10px 16px;border-radius:4px;cursor:pointer;font-family:var(--font);font-weight:800;font-size:14px}
+button:hover{filter:brightness(1.08)}
+.primary{background:var(--orange);border-color:var(--orange);color:#1a1a1a}
+.secondary{background:transparent;border-color:var(--orange);color:var(--orange)}
+.success{background:var(--success);border-color:var(--success);color:#07140e}
+.danger{background:var(--danger);border-color:var(--danger);color:#1a1a1a}
+.icon-btn{padding:7px 10px;font-size:18px;line-height:1}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.add-cell{vertical-align:middle;text-align:center;min-width:145px}
+.audit-header th{background:var(--orange);color:#1a1a1a}
+.checkbox-cell{text-align:center;vertical-align:middle}
+.checkbox-cell input{width:22px;height:22px;min-width:0;cursor:pointer;accent-color:var(--orange)}
+.empty-row td{text-align:center;padding:24px;color:var(--muted);font-style:italic}
+.multi-select{position:relative;min-width:210px}
+.multi-select.open{z-index:2147483646}
+.multi-select-toggle{
+  width:100%;background:var(--field);color:var(--white);border:1px solid rgba(255,255,255,.3);
+  text-align:left;font-weight:500;padding:9px 34px 9px 9px;position:relative;
+}
+.multi-select-toggle::after{content:'▾';position:absolute;right:11px;top:8px;color:var(--orange)}
+.multi-select-menu{
+  display:none;position:fixed;z-index:2147483647;top:0;left:0;right:auto;
+  background:#111719;color:var(--white);border:1px solid rgba(255,255,255,.3);border-radius:4px;
+  box-shadow:0 16px 42px rgba(0,0,0,.65);padding:7px;max-height:260px;overflow:auto;
+}
+.multi-select.open .multi-select-menu{display:block}
+.multi-select-menu label{display:flex;align-items:center;gap:8px;padding:6px;border-radius:4px;cursor:pointer;font-weight:700}
+.multi-select-menu label:hover{background:rgba(255,112,18,.14)}
+.multi-select-menu input[type=checkbox]{width:17px;height:17px;min-width:0;accent-color:var(--orange)}
+.other-input{margin-top:7px;display:none}
+.other-input.show{display:block}
+.status{font-size:13px;color:var(--success);margin-left:4px;align-self:center}
+@media(max-width:800px){
+  .container{padding:12px}
+  .header{display:block;text-align:center}
+  .logo{max-width:100%;margin:auto}
+  .header-title{text-align:center;margin-top:12px}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .container{max-width:none;padding:0}
+  .header,.section{box-shadow:none;border:1px solid #aaa;background:#fff;color:#111}
+  .header-title h1,h2,td{color:#111}
+  .no-print{display:none!important}
+  .multi-select-menu{display:none!important}
+  table{min-width:0;font-size:10px}
+  th,td{padding:5px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc. logo">
+    <div class="header-title">
+      <h1>Wesco Site Visit Planner</h1>
+      <p>Schedule, track, and archive estimator site visits</p>
+    </div>
+  </div>
+
+  <div class="section" id="unscheduledSection">
+    <h2>Add Site to Visit — Date Not Yet Scheduled</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th class="no-print">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" id="unscheduledProjectName" aria-label="Unscheduled Project Name"></td>
+            <td><input type="text" id="unscheduledCustomerName" aria-label="Unscheduled Customer Name"></td>
+            <td><input type="text" id="unscheduledAddress" aria-label="Unscheduled Project Address"></td>
+            <td><textarea id="unscheduledScope" aria-label="Unscheduled Scope of Work"></textarea></td>
+            <td class="add-cell no-print"><button class="primary" type="button" onclick="addUnscheduledVisit()">Add Site to Visit</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Sites Awaiting Scheduling</h3>
+    <div class="table-wrap">
+      <table id="unscheduledTable">
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th>Scheduled Visit Date</th>
+            <th>Assigned Site Visit By</th>
+            <th class="no-print">Schedule</th>
+            <th class="no-print">Delete</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="actions no-print">
+      <button class="secondary" type="button" onclick="printAwaitingList()">Print List</button>
+    </div>
+  </div>
+
+  <div class="section" id="scheduleSection">
+    <h2>Schedule New Site Visit</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th>Scheduled Visit Date</th>
+            <th>Assigned Site Visit By</th>
+            <th class="no-print">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" id="projectName" aria-label="Project Name"></td>
+            <td><input type="text" id="customerName" aria-label="Customer Name"></td>
+            <td><input type="text" id="address" aria-label="Project Address"></td>
+            <td><textarea id="scope" aria-label="Scope of Work"></textarea></td>
+            <td><input type="date" id="scheduledDate" aria-label="Scheduled Visit Date"></td>
+            <td>
+              <div id="assignedTeam" class="multi-select" data-placeholder="Select team members"></div>
+            </td>
+            <td class="add-cell no-print"><button class="primary" type="button" onclick="addVisit()">Add Site Visit</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="pendingSection">
+    <h2>Pending Site Visits</h2>
+    <div class="table-wrap">
+      <table id="activeTable">
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th>Scheduled Visit Date</th>
+            <th>Assigned Site Visit By</th>
+            <th>Date Visited</th>
+            <th>Visit By</th>
+            <th>Visited</th>
+            <th class="no-print">Delete</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="actions no-print">
+      <button class="success" type="button" onclick="saveData()">Save</button>
+      <button class="secondary" type="button" onclick="window.print()">Print</button>
+      <button class="primary" type="button" onclick="printPendingList()">Print List</button>
+      <button class="primary" type="button" onclick="printAllSiteVisitLists()">Print All List</button>
+      <span class="status" id="saveStatus"></span>
+    </div>
+  </div>
+
+  <div class="section" id="auditSection">
+    <h2>Past Site Visit Audit Log</h2>
+    <div class="table-wrap">
+      <table id="auditTable">
+        <thead>
+          <tr class="audit-header">
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th>Scheduled Visit Date</th>
+            <th>Assigned Site Visit By</th>
+            <th>Date Visited</th>
+            <th>Visit By</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEAM_MEMBERS = ['Wes','Oscar','Joe','Chris','Theo','Jesse','Other'];
+const STORAGE_KEY = 'wescoEstimatorSiteVisitsV2';
+let state = { unscheduled: [], pending: [], audit: [] };
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+
+function positionMultiSelectMenu(container){
+  const toggle = container.querySelector('.multi-select-toggle');
+  const menu = container.querySelector('.multi-select-menu');
+  if(!toggle || !menu || !container.classList.contains('open')) return;
+  const rect = toggle.getBoundingClientRect();
+  const gap = 4;
+  const edge = 8;
+  const width = Math.min(Math.max(rect.width,210),window.innerWidth - edge * 2);
+  menu.style.width = `${width}px`;
+  menu.style.left = `${Math.max(edge,Math.min(rect.left,window.innerWidth - width - edge))}px`;
+  const menuHeight = Math.min(menu.scrollHeight,260);
+  const roomBelow = window.innerHeight - rect.bottom - edge;
+  const openAbove = roomBelow < menuHeight + gap && rect.top > roomBelow;
+  menu.style.top = `${openAbove ? Math.max(edge,rect.top - menuHeight - gap) : rect.bottom + gap}px`;
+}
+
+function closeMultiSelect(container){
+  container.classList.remove('open');
+  const toggle = container.querySelector('.multi-select-toggle');
+  if(toggle) toggle.setAttribute('aria-expanded','false');
+}
+
+function createMultiSelect(container, selected = [], otherText = ''){
+  container.innerHTML = '';
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'multi-select-toggle';
+  toggle.setAttribute('aria-haspopup','listbox');
+  toggle.setAttribute('aria-expanded','false');
+  const menu = document.createElement('div');
+  menu.className = 'multi-select-menu';
+  menu.setAttribute('role','listbox');
+  menu.setAttribute('aria-multiselectable','true');
+
+  TEAM_MEMBERS.forEach(name => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = name;
+    cb.checked = selected.includes(name);
+    cb.addEventListener('change', () => {
+      otherInput.classList.toggle('show', otherCheckbox.checked);
+      updateMultiSelectLabel(container);
+    });
+    const text = document.createElement('span');
+    text.textContent = name;
+    label.append(cb,text);
+    menu.appendChild(label);
+  });
+
+  const otherCheckbox = [...menu.querySelectorAll('input')].find(input => input.value === 'Other');
+  const otherInput = document.createElement('input');
+  otherInput.type = 'text';
+  otherInput.className = 'other-input' + (otherCheckbox.checked ? ' show' : '');
+  otherInput.placeholder = 'Enter other person name';
+  otherInput.value = otherText;
+  otherInput.addEventListener('input', () => updateMultiSelectLabel(container));
+  menu.appendChild(otherInput);
+
+  toggle.addEventListener('click', event => {
+    event.stopPropagation();
+    document.querySelectorAll('.multi-select.open').forEach(el => { if(el !== container) closeMultiSelect(el); });
+    const willOpen = !container.classList.contains('open');
+    if(willOpen){
+      container.classList.add('open');
+      toggle.setAttribute('aria-expanded','true');
+      positionMultiSelectMenu(container);
+    } else {
+      closeMultiSelect(container);
+    }
+  });
+  menu.addEventListener('click', event => event.stopPropagation());
+  container.append(toggle,menu);
+  updateMultiSelectLabel(container);
+}
+
+function getMultiSelectValue(container){
+  const checked = [...container.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+  const otherInput = container.querySelector('.other-input');
+  const otherText = checked.includes('Other') ? otherInput.value.trim() : '';
+  if(checked.includes('Other') && !otherText){
+    return { valid:false, selected:checked, otherText:'', display:'' };
+  }
+  const displayItems = checked.filter(x => x !== 'Other');
+  if(otherText) displayItems.push(otherText);
+  return { valid:true, selected:checked, otherText, display:displayItems.join(', ') };
+}
+
+function updateMultiSelectLabel(container){
+  const toggle = container.querySelector('.multi-select-toggle');
+  if(!toggle) return;
+  const result = getMultiSelectValue(container);
+  toggle.textContent = result.display || container.dataset.placeholder || 'Select';
+}
+
+document.addEventListener('click', () => document.querySelectorAll('.multi-select.open').forEach(closeMultiSelect));
+window.addEventListener('resize', () => document.querySelectorAll('.multi-select.open').forEach(positionMultiSelectMenu));
+window.addEventListener('scroll', () => document.querySelectorAll('.multi-select.open').forEach(positionMultiSelectMenu),true);
+
+function addUnscheduledVisit(){
+  const project = document.getElementById('unscheduledProjectName').value.trim();
+  const customer = document.getElementById('unscheduledCustomerName').value.trim();
+  const address = document.getElementById('unscheduledAddress').value.trim();
+  const scope = document.getElementById('unscheduledScope').value.trim();
+
+  if(!project){ alert('Please enter a Project Name.'); return; }
+
+  state.unscheduled.push({
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    project, customer, address, scope
+  });
+  clearUnscheduledForm();
+  render();
+  saveData(false);
+}
+
+function clearUnscheduledForm(){
+  ['unscheduledProjectName','unscheduledCustomerName','unscheduledAddress','unscheduledScope']
+    .forEach(id => document.getElementById(id).value = '');
+}
+
+function scheduleUnscheduledVisit(id,dateInput,assignedContainer){
+  const item = state.unscheduled.find(x => x.id === id);
+  const scheduledDate = dateInput.value;
+  const team = getMultiSelectValue(assignedContainer);
+  if(!item) return;
+  if(!scheduledDate){ alert('Please select the Scheduled Visit Date.'); return; }
+  if(team.selected.length === 0){ alert('Please select at least one person in Assigned Site Visit By.'); return; }
+  if(!team.valid){ alert('Please type the name of the other assigned team member.'); return; }
+
+  state.pending.push({
+    ...item,
+    scheduledDate,
+    assignedSelected:team.selected,
+    assignedOther:team.otherText,
+    assignedDisplay:team.display,
+    visitedDate:'', visitedSelected:[], visitedOther:'', visitedDisplay:''
+  });
+  state.unscheduled = state.unscheduled.filter(x => x.id !== id);
+  render();
+  saveData(false);
+}
+
+function deleteUnscheduled(id){
+  if(confirm('Delete this site awaiting scheduling?')){
+    state.unscheduled = state.unscheduled.filter(x => x.id !== id);
+    render();
+    saveData(false);
+  }
+}
+
+function addVisit(){
+  const project = document.getElementById('projectName').value.trim();
+  const customer = document.getElementById('customerName').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const scope = document.getElementById('scope').value.trim();
+  const scheduledDate = document.getElementById('scheduledDate').value;
+  const team = getMultiSelectValue(document.getElementById('assignedTeam'));
+
+  if(!project){ alert('Please enter a Project Name.'); return; }
+  if(!scheduledDate){ alert('Please select the Scheduled Visit Date.'); return; }
+  if(team.selected.length === 0){ alert('Please select at least one person in Assigned Site Visit By.'); return; }
+  if(!team.valid){ alert('Please type the name of the other assigned team member.'); return; }
+
+  state.pending.push({
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    project, customer, address, scope, scheduledDate,
+    assignedSelected:team.selected,
+    assignedOther:team.otherText,
+    assignedDisplay:team.display,
+    visitedDate:'', visitedSelected:[], visitedOther:'', visitedDisplay:''
+  });
+  clearScheduleForm();
+  render();
+  saveData(false);
+}
+
+function clearScheduleForm(){
+  ['projectName','customerName','address','scope','scheduledDate'].forEach(id => document.getElementById(id).value = '');
+  createMultiSelect(document.getElementById('assignedTeam'));
+}
+
+function render(){
+  const unscheduledBody = document.querySelector('#unscheduledTable tbody');
+  unscheduledBody.innerHTML = '';
+  if(state.unscheduled.length === 0){
+    unscheduledBody.innerHTML = '<tr class="empty-row"><td colspan="8">No sites are waiting to be scheduled.</td></tr>';
+  } else {
+    state.unscheduled.forEach(item => {
+      const row = unscheduledBody.insertRow();
+      row.dataset.id = item.id;
+      [item.project,item.customer,item.address,item.scope].forEach(value => {
+        const cell = row.insertCell();
+        cell.textContent = value;
+      });
+
+      const dateCell = row.insertCell();
+      const dateInput = document.createElement('input');
+      dateInput.type = 'date';
+      dateInput.setAttribute('aria-label',`Scheduled Visit Date for ${item.project}`);
+      dateCell.appendChild(dateInput);
+
+      const assignedCell = row.insertCell();
+      const assignedContainer = document.createElement('div');
+      assignedContainer.className = 'multi-select';
+      assignedContainer.dataset.placeholder = 'Select team members';
+      createMultiSelect(assignedContainer);
+      assignedCell.appendChild(assignedContainer);
+
+      const scheduleCell = row.insertCell();
+      scheduleCell.className = 'checkbox-cell no-print';
+      const scheduleButton = document.createElement('button');
+      scheduleButton.type = 'button';
+      scheduleButton.className = 'primary';
+      scheduleButton.textContent = 'Schedule';
+      scheduleButton.addEventListener('click', () => scheduleUnscheduledVisit(item.id,dateInput,assignedContainer));
+      scheduleCell.appendChild(scheduleButton);
+
+      const deleteCell = row.insertCell();
+      deleteCell.className = 'checkbox-cell no-print';
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'danger icon-btn';
+      del.title = 'Delete site';
+      del.setAttribute('aria-label','Delete site awaiting scheduling');
+      del.textContent = '🗑';
+      del.addEventListener('click', () => deleteUnscheduled(item.id));
+      deleteCell.appendChild(del);
+    });
+  }
+
+  const pendingBody = document.querySelector('#activeTable tbody');
+  pendingBody.innerHTML = '';
+  if(state.pending.length === 0){
+    pendingBody.innerHTML = '<tr class="empty-row"><td colspan="10">No pending site visits.</td></tr>';
+  } else {
+    state.pending.forEach(item => {
+      const row = pendingBody.insertRow();
+      row.dataset.id = item.id;
+      [item.project,item.customer,item.address,item.scope,item.scheduledDate,item.assignedDisplay].forEach(value => {
+        const cell = row.insertCell();
+        cell.textContent = value;
+      });
+
+      const dateCell = row.insertCell();
+      const dateInput = document.createElement('input');
+      dateInput.type = 'date';
+      dateInput.value = item.visitedDate || '';
+      dateInput.addEventListener('change', () => { item.visitedDate = dateInput.value; saveData(false); });
+      dateCell.appendChild(dateInput);
+
+      const visitedByCell = row.insertCell();
+      const visitedContainer = document.createElement('div');
+      visitedContainer.className = 'multi-select';
+      visitedContainer.dataset.placeholder = 'Select visitors';
+      createMultiSelect(visitedContainer,item.visitedSelected || [],item.visitedOther || '');
+      visitedContainer.addEventListener('change', () => {
+        const result = getMultiSelectValue(visitedContainer);
+        item.visitedSelected = result.selected;
+        item.visitedOther = result.otherText;
+        item.visitedDisplay = result.display;
+        saveData(false);
+      });
+      visitedByCell.appendChild(visitedContainer);
+
+      const checkedCell = row.insertCell();
+      checkedCell.className = 'checkbox-cell';
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.setAttribute('aria-label','Mark site visit completed');
+      check.addEventListener('change', () => completeVisit(item.id,check,visitedContainer));
+      checkedCell.appendChild(check);
+
+      const deleteCell = row.insertCell();
+      deleteCell.className = 'checkbox-cell no-print';
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'danger icon-btn';
+      del.title = 'Delete site visit';
+      del.setAttribute('aria-label','Delete site visit');
+      del.textContent = '🗑';
+      del.addEventListener('click', () => deletePending(item.id));
+      deleteCell.appendChild(del);
+    });
+  }
+
+  const auditBody = document.querySelector('#auditTable tbody');
+  auditBody.innerHTML = '';
+  if(state.audit.length === 0){
+    auditBody.innerHTML = '<tr class="empty-row"><td colspan="8">No completed site visits in the audit log.</td></tr>';
+  } else {
+    state.audit.forEach(item => {
+      const row = auditBody.insertRow();
+      [item.project,item.customer,item.address,item.scope,item.scheduledDate,item.assignedDisplay,item.visitedDate,item.visitedDisplay].forEach(value => {
+        const cell = row.insertCell();
+        cell.textContent = value;
+      });
+    });
+  }
+}
+
+function completeVisit(id,box,visitedContainer){
+  const item = state.pending.find(x => x.id === id);
+  const visitors = getMultiSelectValue(visitedContainer);
+  if(!item.visitedDate){ alert('Please enter Date Visited.'); box.checked = false; return; }
+  if(visitors.selected.length === 0){ alert('Please select at least one person in Visit By.'); box.checked = false; return; }
+  if(!visitors.valid){ alert('Please type the name of the other visitor.'); box.checked = false; return; }
+  item.visitedSelected = visitors.selected;
+  item.visitedOther = visitors.otherText;
+  item.visitedDisplay = visitors.display;
+  state.audit.unshift(item);
+  state.pending = state.pending.filter(x => x.id !== id);
+  render();
+  saveData(false);
+}
+
+function deletePending(id){
+  if(confirm('Delete this pending site visit?')){
+    state.pending = state.pending.filter(x => x.id !== id);
+    render();
+    saveData(false);
+  }
+}
+
+function saveData(showMessage = true){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  if(showMessage){
+    const status = document.getElementById('saveStatus');
+    status.textContent = 'Saved successfully.';
+    setTimeout(() => status.textContent = '',2200);
+  }
+}
+
+function loadData(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(saved && Array.isArray(saved.pending) && Array.isArray(saved.audit)){
+      state = {
+        unscheduled:Array.isArray(saved.unscheduled) ? saved.unscheduled : [],
+        pending:saved.pending,
+        audit:saved.audit
+      };
+    }
+  }catch(error){ console.warn('Saved site visit data could not be loaded.',error); }
+}
+
+function openPrintListWindow(title,content){
+  const printWindow = window.open('','_blank','width=1200,height=800');
+  if(!printWindow){
+    alert('Please allow pop-ups to print this list.');
+    return;
+  }
+  printWindow.document.write(`<!DOCTYPE html><html><head><title>${escapeHtml(title)}</title>
+  <style>
+    body{font-family:"Segoe UI",Arial,sans-serif;margin:24px;color:#1a1a1a}
+    h1{color:#ff7012;margin:16px 0 18px}h2{margin:28px 0 10px;color:#1a1a1a}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px}
+    th{background:#ff7012;color:#1a1a1a}th,td{border:1px solid #999;padding:7px;text-align:left;vertical-align:top}
+    .logo{width:310px}.empty{text-align:center;font-style:italic;color:#666}
+  </style></head><body><img class="logo" src="${document.querySelector('.logo').src}">
+  <h1>${escapeHtml(title)}</h1>${content}</body></html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => printWindow.print(),300);
+}
+
+function printAwaitingList(){
+  const rows = state.unscheduled.map(item => `
+    <tr>
+      <td>${escapeHtml(item.project)}</td>
+      <td>${escapeHtml(item.customer)}</td>
+      <td>${escapeHtml(item.address)}</td>
+      <td>${escapeHtml(item.scope)}</td>
+    </tr>`).join('');
+  openPrintListWindow('Sites Awaiting Scheduling',`
+    <table><thead><tr><th>Project Name</th><th>Customer Name</th><th>Project Address</th><th>Scope of Work</th></tr></thead>
+    <tbody>${rows || '<tr><td class="empty" colspan="4">No sites are waiting to be scheduled.</td></tr>'}</tbody></table>`);
+}
+
+function printAllSiteVisitLists(){
+  const awaitingRows = state.unscheduled.map(item => `
+    <tr>
+      <td>${escapeHtml(item.project)}</td>
+      <td>${escapeHtml(item.customer)}</td>
+      <td>${escapeHtml(item.address)}</td>
+      <td>${escapeHtml(item.scope)}</td>
+    </tr>`).join('');
+  const pendingRows = state.pending.map(item => `
+    <tr>
+      <td>${escapeHtml(item.project)}</td>
+      <td>${escapeHtml(item.customer)}</td>
+      <td>${escapeHtml(item.address)}</td>
+      <td>${escapeHtml(item.scope)}</td>
+      <td>${escapeHtml(item.scheduledDate)}</td>
+      <td>${escapeHtml(item.assignedDisplay)}</td>
+      <td>${escapeHtml(item.visitedDate || '')}</td>
+      <td>${escapeHtml(item.visitedDisplay || '')}</td>
+    </tr>`).join('');
+
+  openPrintListWindow('Wesco Site Visit Lists',`
+    <h2>Sites Awaiting Scheduling</h2>
+    <table><thead><tr><th>Project Name</th><th>Customer Name</th><th>Project Address</th><th>Scope of Work</th></tr></thead>
+    <tbody>${awaitingRows || '<tr><td class="empty" colspan="4">No sites are waiting to be scheduled.</td></tr>'}</tbody></table>
+    <h2>Pending Site Visits</h2>
+    <table><thead><tr><th>Project Name</th><th>Customer Name</th><th>Project Address</th><th>Scope of Work</th><th>Scheduled Visit Date</th><th>Assigned Site Visit By</th><th>Date Visited</th><th>Visit By</th></tr></thead>
+    <tbody>${pendingRows || '<tr><td class="empty" colspan="8">No pending site visits.</td></tr>'}</tbody></table>`);
+}
+
+function printPendingList(){
+  const rows = state.pending.map(item => `
+    <tr>
+      <td>${escapeHtml(item.project)}</td>
+      <td>${escapeHtml(item.customer)}</td>
+      <td>${escapeHtml(item.address)}</td>
+      <td>${escapeHtml(item.scope)}</td>
+      <td>${escapeHtml(item.scheduledDate)}</td>
+      <td>${escapeHtml(item.assignedDisplay)}</td>
+      <td>${escapeHtml(item.visitedDate || '')}</td>
+      <td>${escapeHtml(item.visitedDisplay || '')}</td>
+    </tr>`).join('');
+
+  const printWindow = window.open('','_blank','width=1200,height=800');
+  printWindow.document.write(`<!DOCTYPE html><html><head><title>Pending Site Visits</title>
+  <style>body{font-family:"Segoe UI",Arial,sans-serif;margin:24px}h1{color:#ff7012}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#ff7012;color:#1a1a1a}th,td{border:1px solid #999;padding:7px;text-align:left;vertical-align:top}.logo{width:310px}</style>
+  </head><body><img class="logo" src="${document.querySelector('.logo').src}"><h1>Pending Site Visits</h1>
+  <table><thead><tr><th>Project Name</th><th>Customer Name</th><th>Project Address</th><th>Scope of Work</th><th>Scheduled Visit Date</th><th>Assigned Site Visit By</th><th>Date Visited</th><th>Visit By</th></tr></thead>
+  <tbody>${rows || '<tr><td colspan="8">No pending site visits.</td></tr>'}</tbody></table></body></html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => printWindow.print(),300);
+}
+
+createMultiSelect(document.getElementById('assignedTeam'));
+loadData();
+render();
+</script>
+</body>
+</html>
+
