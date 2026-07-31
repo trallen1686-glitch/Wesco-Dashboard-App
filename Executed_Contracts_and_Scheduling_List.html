@@ -340,7 +340,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       throw new Error('Sign in with your Wesco account.');
     }
     var body = response.status === 204 ? null : await response.json().catch(function(){ return {}; });
-    if(!response.ok) throw new Error((body && body.error) || 'The shared SharePoint list is unavailable.');
+    if(!response.ok) throw new Error((body && (body.detail || body.error)) || 'The shared SharePoint list is unavailable.');
     return body;
   }
   async function loadRecords(){
