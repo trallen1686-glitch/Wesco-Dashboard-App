@@ -304,12 +304,13 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
 /* ---------- Line items and totals ---------- */
 .line-items-wrap{grid-column:1/-1;}
 .line-items-head,.line-item{
-  display:grid;grid-template-columns:90px 130px minmax(180px,1fr) 64px 96px 96px 34px;gap:10px;align-items:center;
+  display:grid;grid-template-columns:90px 130px minmax(180px,1fr) 64px 96px 96px 34px;gap:10px;align-items:start;
 }
 .line-items-head{padding:8px 10px;color:var(--orange);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--orange);}
 .line-item{padding:7px 10px;border-bottom:1px solid var(--line);}
-.line-item input{width:100%;font:13.5px var(--font);padding:9px 10px;color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3);border-radius:4px;}
-.line-item input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--focus);}
+.line-item input,.line-item textarea{width:100%;font:13.5px var(--font);padding:9px 10px;color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3);border-radius:4px;}
+.line-item textarea.line-description{min-height:42px;resize:none;overflow:hidden;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;}
+.line-item input:focus,.line-item textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--focus);}
 .money-input{position:relative;}
 .money-input span{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);}
 .money-input input{padding-left:22px;text-align:right;}
@@ -584,6 +585,10 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
   function money(n){
     return '$' + (Number(n) || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   }
+  function autoResizeLineDescription(textarea){
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.max(42, textarea.scrollHeight) + 'px';
+  }
   function newLineItem(item){
     item = item || {itemNumber:'',itemName:'',description:'',qty:1,unitPrice:0};
     var row = document.createElement('div');
@@ -591,7 +596,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
     row.innerHTML =
       '<input class="line-item-number" type="text" placeholder="Item #" aria-label="Item number">' +
       '<input class="line-item-name" type="text" placeholder="Item name" aria-label="Item name">' +
-      '<input class="line-description" type="text" placeholder="Description" aria-label="Line item description">' +
+      '<textarea class="line-description" rows="1" placeholder="Description" aria-label="Line item description"></textarea>' +
       '<input class="line-qty" type="number" min="0" step="0.01" value="1" aria-label="Quantity">' +
       '<div class="money-input"><span>$</span><input class="line-price" type="number" min="0" step="0.01" value="0.00" aria-label="Unit price"></div>' +
       '<output class="line-amount">$0.00</output>' +
@@ -599,10 +604,14 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
     row.querySelector('.line-item-number').value = item.itemNumber || '';
     row.querySelector('.line-item-name').value = item.itemName || '';
     row.querySelector('.line-description').value = item.description || '';
+    autoResizeLineDescription(row.querySelector('.line-description'));
     row.querySelector('.line-qty').value = Number(item.qty == null ? 1 : item.qty);
     row.querySelector('.line-price').value = Number(item.unitPrice || 0).toFixed(2);
-    Array.prototype.forEach.call(row.querySelectorAll('input'),function(input){
-      input.addEventListener('input',calculateTotals);
+    Array.prototype.forEach.call(row.querySelectorAll('input, textarea'),function(input){
+      input.addEventListener('input',function(){
+        if(input.classList.contains('line-description')) autoResizeLineDescription(input);
+        calculateTotals();
+      });
     });
     row.querySelector('.remove-line').addEventListener('click',function(){
       row.remove();
@@ -685,7 +694,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
           '<p>' + escapeHtml(o.description || '') + '</p>' +
         '</div>' +
         '<table style="width:100%;border-collapse:collapse;margin:18px 0"><thead><tr><th style="text-align:left;border-bottom:1px solid #000">Item Number</th><th style="text-align:left;border-bottom:1px solid #000">Item Name</th><th style="text-align:left;border-bottom:1px solid #000">Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>' +
-          (o.lineItems || []).map(function(item){ return '<tr><td>' + escapeHtml(item.itemNumber || '') + '</td><td>' + escapeHtml(item.itemName || '') + '</td><td>' + escapeHtml(item.description || '') + '</td><td style="text-align:center">' + escapeHtml(item.qty) + '</td><td style="text-align:right">' + money(item.unitPrice) + '</td><td style="text-align:right">' + money((Number(item.qty)||0)*(Number(item.unitPrice)||0)) + '</td></tr>'; }).join('') +
+          (o.lineItems || []).map(function(item){ return '<tr><td>' + escapeHtml(item.itemNumber || '') + '</td><td>' + escapeHtml(item.itemName || '') + '</td><td style="white-space:pre-wrap;overflow-wrap:anywhere;vertical-align:top">' + escapeHtml(item.description || '') + '</td><td style="text-align:center;vertical-align:top">' + escapeHtml(item.qty) + '</td><td style="text-align:right">' + money(item.unitPrice) + '</td><td style="text-align:right">' + money((Number(item.qty)||0)*(Number(item.unitPrice)||0)) + '</td></tr>'; }).join('') +
         '</tbody></table>' +
         '<div style="width:260px;margin-left:auto;text-align:right"><div>Subtotal: <b>' + money(o.subtotal) + '</b></div><div>Tax (' + escapeHtml(o.taxRate || 0) + '%): <b>' + money(o.tax) + '</b></div><div style="font-size:16px;border-top:2px solid #000;margin-top:5px;padding-top:5px">Total: <b>' + money(o.total) + '</b></div></div>' +
         '<div class="p-sign-row">' +
