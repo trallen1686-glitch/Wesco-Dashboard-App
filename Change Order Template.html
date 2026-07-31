@@ -304,7 +304,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
 /* ---------- Line items and totals ---------- */
 .line-items-wrap{grid-column:1/-1;}
 .line-items-head,.line-item{
-  display:grid;grid-template-columns:minmax(180px,1fr) 74px 112px 112px 34px;gap:10px;align-items:center;
+  display:grid;grid-template-columns:90px 130px minmax(180px,1fr) 64px 96px 96px 34px;gap:10px;align-items:center;
 }
 .line-items-head{padding:8px 10px;color:var(--orange);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--orange);}
 .line-item{padding:7px 10px;border-bottom:1px solid var(--line);}
@@ -327,6 +327,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
   body{padding:14px;}
   .line-items-head{display:none;}
   .line-item{grid-template-columns:1fr 1fr;position:relative;padding-right:42px;}
+  .line-item .line-item-number,.line-item .line-item-name{grid-column:auto;}
   .line-item .line-description{grid-column:1/-1;}
   .line-item .line-amount{grid-column:1/-1;}
   .remove-line{position:absolute;right:8px;top:8px;}
@@ -414,7 +415,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
           <div class="line-items-wrap">
             <div class="section-label">Line Items</div>
             <div class="line-items-head">
-              <span>Description</span><span>Qty</span><span>Unit Price</span><span style="text-align:right">Amount</span><span></span>
+              <span>Item Number</span><span>Item Name</span><span>Description</span><span>Qty</span><span>Unit Price</span><span style="text-align:right">Amount</span><span></span>
             </div>
             <div id="lineItems"></div>
             <div class="add-line-row">
@@ -584,15 +585,19 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
     return '$' + (Number(n) || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   }
   function newLineItem(item){
-    item = item || {description:'',qty:1,unitPrice:0};
+    item = item || {itemNumber:'',itemName:'',description:'',qty:1,unitPrice:0};
     var row = document.createElement('div');
     row.className = 'line-item';
     row.innerHTML =
+      '<input class="line-item-number" type="text" placeholder="Item #" aria-label="Item number">' +
+      '<input class="line-item-name" type="text" placeholder="Item name" aria-label="Item name">' +
       '<input class="line-description" type="text" placeholder="Description" aria-label="Line item description">' +
       '<input class="line-qty" type="number" min="0" step="0.01" value="1" aria-label="Quantity">' +
       '<div class="money-input"><span>$</span><input class="line-price" type="number" min="0" step="0.01" value="0.00" aria-label="Unit price"></div>' +
       '<output class="line-amount">$0.00</output>' +
       '<button type="button" class="btn-icon remove-line" aria-label="Remove line item">&times;</button>';
+    row.querySelector('.line-item-number').value = item.itemNumber || '';
+    row.querySelector('.line-item-name').value = item.itemName || '';
     row.querySelector('.line-description').value = item.description || '';
     row.querySelector('.line-qty').value = Number(item.qty == null ? 1 : item.qty);
     row.querySelector('.line-price').value = Number(item.unitPrice || 0).toFixed(2);
@@ -610,6 +615,8 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
   function getLineItems(){
     return Array.prototype.map.call(document.querySelectorAll('.line-item'),function(row){
       return {
+        itemNumber:row.querySelector('.line-item-number').value.trim(),
+        itemName:row.querySelector('.line-item-name').value.trim(),
         description:row.querySelector('.line-description').value.trim(),
         qty:Number(row.querySelector('.line-qty').value)||0,
         unitPrice:Number(row.querySelector('.line-price').value)||0
@@ -618,7 +625,7 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
   }
   function setLineItems(items){
     $('lineItems').innerHTML = '';
-    (items && items.length ? items : [{description:'',qty:1,unitPrice:0}]).forEach(newLineItem);
+    (items && items.length ? items : [{itemNumber:'',itemName:'',description:'',qty:1,unitPrice:0}]).forEach(newLineItem);
     calculateTotals();
   }
   function calculateTotals(){
@@ -677,8 +684,8 @@ li.co{border-color:var(--line);background:rgba(255,255,255,.025);}
           '<b>Change Order Description</b>' +
           '<p>' + escapeHtml(o.description || '') + '</p>' +
         '</div>' +
-        '<table style="width:100%;border-collapse:collapse;margin:18px 0"><thead><tr><th style="text-align:left;border-bottom:1px solid #000">Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>' +
-          (o.lineItems || []).map(function(item){ return '<tr><td>' + escapeHtml(item.description || '') + '</td><td style="text-align:center">' + escapeHtml(item.qty) + '</td><td style="text-align:right">' + money(item.unitPrice) + '</td><td style="text-align:right">' + money((Number(item.qty)||0)*(Number(item.unitPrice)||0)) + '</td></tr>'; }).join('') +
+        '<table style="width:100%;border-collapse:collapse;margin:18px 0"><thead><tr><th style="text-align:left;border-bottom:1px solid #000">Item Number</th><th style="text-align:left;border-bottom:1px solid #000">Item Name</th><th style="text-align:left;border-bottom:1px solid #000">Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>' +
+          (o.lineItems || []).map(function(item){ return '<tr><td>' + escapeHtml(item.itemNumber || '') + '</td><td>' + escapeHtml(item.itemName || '') + '</td><td>' + escapeHtml(item.description || '') + '</td><td style="text-align:center">' + escapeHtml(item.qty) + '</td><td style="text-align:right">' + money(item.unitPrice) + '</td><td style="text-align:right">' + money((Number(item.qty)||0)*(Number(item.unitPrice)||0)) + '</td></tr>'; }).join('') +
         '</tbody></table>' +
         '<div style="width:260px;margin-left:auto;text-align:right"><div>Subtotal: <b>' + money(o.subtotal) + '</b></div><div>Tax (' + escapeHtml(o.taxRate || 0) + '%): <b>' + money(o.tax) + '</b></div><div style="font-size:16px;border-top:2px solid #000;margin-top:5px;padding-top:5px">Total: <b>' + money(o.total) + '</b></div></div>' +
         '<div class="p-sign-row">' +
