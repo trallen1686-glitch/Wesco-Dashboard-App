@@ -43,6 +43,8 @@ body{
 .header .titles{ flex:1; min-width:0; }
 .header h1{ margin:0; font-size:19px; font-weight:800; letter-spacing:.01em; color:var(--white); }
 .header .subtitle{ margin:5px 0 0; color:var(--muted); font-size:12px; }
+.header-back{ flex:0 0 auto; padding:9px 14px; border:1px solid var(--orange); border-radius:4px; color:var(--white); background:rgba(255,112,18,.12); font:700 12.5px var(--font); cursor:pointer; }
+.header-back:hover,.header-back:focus{ background:var(--orange); outline:none; }
 
 /* ---------- Section label ---------- */
 .section-title{
@@ -175,6 +177,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
         <h1>Staff Daily Update Log List</h1>
         <div class="subtitle">Every daily update from Staff Daily Update Log, listed by date. Click a name to view their update.</div>
       </div>
+      <button type="button" class="header-back no-print" id="backBtn" aria-label="Back to staff portal">← Back</button>
     </div>
 
     <div class="section-title">Updates<span class="count-chip" id="countChip">0</span></div>
@@ -370,12 +373,32 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     );
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
+  function refreshEntries(){
     allEntries = loadEntries();
-    renderList();
+    if(selectedId && !allEntries.some(function(x){ return x.id === selectedId; })) closeEntry();
+    else renderList();
+  }
 
+  function goBackToPortal(){
+    var ref = document.referrer || '';
+    if(ref.indexOf(location.origin) === 0 && ref.indexOf('Staff-Portal-Starter-Template.html') !== -1){
+      location.href = ref;
+      return;
+    }
+    location.href = 'Staff-Portal-Starter-Template.html?person=Wes%20Atkinson';
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    refreshEntries();
+
+    $('backBtn').addEventListener('click', goBackToPortal);
     $('listFilter').addEventListener('input', renderList);
     $('closeReviewBtn').addEventListener('click', closeEntry);
+    window.addEventListener('storage', function(e){
+      if(e.key === STORAGE_KEY) refreshEntries();
+    });
+    window.addEventListener('focus', refreshEntries);
+
     $('printEntryBtn').addEventListener('click', function(){
       if(!selectedId) return;
       var o = allEntries.find(function(x){ return x.id === selectedId; });
