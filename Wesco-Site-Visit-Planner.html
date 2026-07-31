@@ -615,8 +615,7 @@ function openPrintListWindow(title,content){
     th{background:#ff7012;color:#1a1a1a}th,td{border:1px solid #999;padding:7px;text-align:left;vertical-align:top}
     .logo{width:310px}.empty{text-align:center;font-style:italic;color:#666}
   </style></head><body><img class="logo" src="${document.querySelector('.logo').src}">
-  <h1>${escapeHtml(title)}</h1>${content}<script src="staff-portal-back.js"></script>
-</body></html>`);
+  <h1>${escapeHtml(title)}</h1>${content}</body></html>`);
   printWindow.document.close();
   printWindow.focus();
   setTimeout(() => printWindow.print(),300);
@@ -692,6 +691,7 @@ createMultiSelect(document.getElementById('assignedTeam'));
 loadData();
 render();
 </script>
+<script src="staff-portal-back.js"></script>
 </body>
 </html>
 
