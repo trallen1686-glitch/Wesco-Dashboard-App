@@ -8,22 +8,23 @@
     :root{--orange:#ff7012;--ink:#090e10;--white:#fff;--muted:rgba(255,255,255,.66);--panel:rgba(9,14,16,.84);--line:rgba(255,255,255,.18);--good:#42d69b;--font:"Segoe UI","Open Sans",system-ui,sans-serif}
     *{box-sizing:border-box} body{margin:0;min-height:100vh;padding:24px;color:var(--white);background:radial-gradient(circle at 12% 8%,rgba(255,112,18,.1),transparent 26rem),var(--ink);font:14px/1.45 var(--font)}
     button,input,select,textarea{font:inherit}.shell{max-width:1080px;margin:auto}.container{background:var(--panel);border:1px solid rgba(255,255,255,.14);border-radius:6px;box-shadow:0 16px 42px rgba(0,0,0,.28);overflow:hidden}
-    .header{display:flex;align-items:center;gap:20px;padding:20px 22px 17px;border-bottom:2px solid var(--orange)}.logo{width:176px;min-width:176px;background:#fff;border-radius:4px;padding:5px 8px}.logo img{display:block;width:100%}
+    .back-row{margin-bottom:12px}.back-link{display:inline-flex;align-items:center;color:var(--orange);text-decoration:none;font-size:12.5px;font-weight:800;border:1px solid var(--orange);border-radius:4px;padding:8px 13px;background:transparent}.back-link:hover,.back-link:focus-visible{background:var(--orange);color:#1a1a1a;outline:0}.header{display:flex;align-items:center;gap:20px;padding:20px 22px 17px;border-bottom:2px solid var(--orange)}.logo{width:176px;min-width:176px;background:#fff;border-radius:4px;padding:5px 8px}.logo img{display:block;width:100%}
     h1{margin:0;font-size:22px}.subtitle{margin:4px 0 0;color:var(--muted);font-size:12px}.tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--line)}.tab{appearance:none;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);font-weight:800;padding:15px 20px;cursor:pointer}.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
     .view{padding:22px}.view[hidden]{display:none}.section-title{color:var(--orange);font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin:0 0 13px;padding-bottom:9px;border-bottom:1px solid var(--orange)}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 18px}.field{display:flex;flex-direction:column;gap:6px}.full{grid-column:1/-1}label{font-weight:700;font-size:12.5px}.optional{color:var(--muted);font-weight:500}
     input,select,textarea{width:100%;padding:10px 11px;color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3);border-radius:4px;color-scheme:dark}select option{background:var(--ink)}textarea{min-height:94px;resize:vertical}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,112,18,.25)}
     .upload{border:1px dashed rgba(255,112,18,.68);background:rgba(255,112,18,.055);border-radius:5px;padding:16px}.upload-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.file-note{color:var(--muted);font-size:12px}.preview{display:none;max-width:220px;max-height:150px;margin-top:12px;border:1px solid var(--line);border-radius:4px}
     .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--orange)}button,.button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:43px;border:1px solid var(--orange);border-radius:4px;padding:10px 14px;background:var(--orange);color:#191919;font-weight:850;cursor:pointer;text-decoration:none}.secondary{background:transparent;color:var(--orange)}button:hover{filter:brightness(1.08)}button:disabled{opacity:.55;cursor:not-allowed}
-    .status{display:none;margin-top:16px;padding:11px 13px;border-left:4px solid var(--orange);background:rgba(255,112,18,.08)}.status.show{display:block}.tools{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:10px;margin-bottom:16px}.summary{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:12px;color:var(--muted)}.summary strong{color:#fff}
+    .status{display:none;margin-top:16px;padding:11px 13px;border-left:4px solid var(--orange);background:rgba(255,112,18,.08)}.status.show{display:block}.tools{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:16px}.filter-field{display:flex;flex-direction:column;gap:5px}.filter-field label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}.summary{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:12px;color:var(--muted)}.summary strong{color:#fff}
     .list{display:grid;gap:10px}.purchase{width:100%;display:grid;grid-template-columns:1.1fr 1.2fr .8fr .8fr auto;gap:14px;align-items:center;text-align:left;background:rgba(255,255,255,.04);color:#fff;border-color:var(--line)}.purchase:hover{border-color:var(--orange);background:rgba(255,112,18,.08)}.purchase small{display:block;color:var(--muted);font-weight:500}.amount{color:var(--good);font-size:16px}.badge{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:99px;background:rgba(255,112,18,.16);color:var(--orange);font-size:10px;text-transform:uppercase}.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line)}
     dialog{width:min(720px,calc(100% - 28px));color:#fff;background:#101719;border:1px solid var(--orange);border-radius:6px;padding:0;box-shadow:0 24px 80px #000}dialog::backdrop{background:rgba(0,0,0,.7)}.dialog-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}.dialog-body{padding:18px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}.detail{border-bottom:1px solid var(--line);padding-bottom:8px}.detail strong{display:block;color:var(--orange);font-size:10px;text-transform:uppercase}.close{min-height:34px;padding:5px 11px}
     @media(max-width:760px){body{padding:12px}.header{align-items:flex-start;flex-direction:column}.grid,.detail-grid,.tools{grid-template-columns:1fr}.full{grid-column:1}.actions{grid-template-columns:1fr 1fr}.purchase{grid-template-columns:1fr}.tabs{overflow:auto}.tab{white-space:nowrap}}
-    @media print{body{padding:0;background:#fff;color:#111}.container{background:#fff;border:0;box-shadow:none}.header{border-bottom-color:#111}.tabs,.actions,.tools,.no-print{display:none!important}.view{padding:10px}.view[hidden]{display:none}.list-view{display:block!important}.purchase{color:#111;border:0;border-bottom:1px solid #bbb;background:#fff;page-break-inside:avoid}.purchase small,.summary{color:#555}.amount{color:#111}.badge{color:#111;background:#eee}.empty{color:#555}h1{color:#111}}
+    @media print{body{padding:0;background:#fff;color:#111}.back-row,.tabs,.actions,.tools,.no-print{display:none!important}.container{background:#fff;border:0;box-shadow:none}.header{border-bottom-color:#111}.view{padding:10px}.print-form #listView,.print-list #formView{display:none!important}.print-form #formView,.print-list #listView{display:block!important}.print-form input,.print-form select,.print-form textarea{color:#111;background:#fff;border-color:#aaa}.print-form .upload{border-color:#aaa;background:#fff}.print-form .preview{display:block!important;max-width:320px;max-height:420px}.purchase{color:#111;border:0;border-bottom:1px solid #bbb;background:#fff;page-break-inside:avoid}.purchase small,.summary{color:#555}.amount{color:#111}.badge{color:#111;background:#eee}.empty{color:#555}h1{color:#111}}
   </style>
 </head>
 <body>
 <main class="shell">
+  <div class="back-row"><a id="backToPortal" class="back-link" href="Staff-Portal-Starter-Template.html">&#8592; Back to Staff Portal</a></div>
   <section class="container">
     <header class="header">
       <div class="logo"><img src="upload/Wesco Logo 2(2).png" alt="Wesco Exteriors, Inc."></div>
@@ -38,7 +39,7 @@
       <form id="receiptForm">
         <div class="section-title">Purchase Information</div>
         <div class="grid">
-          <div class="field"><label for="staffName">Staff Member Name</label><select id="staffName" required><option value="">Select staff member</option><option>Wes Atkinson</option><option>Stephanie Atkinson</option><option>Rebecca Kirkman</option><option>Oscar Centeno</option><option>Joe</option><option>Chris</option><option>Theo Allen</option><option>Jesse</option></select></div>
+          <div class="field"><label for="staffName">Staff Member Name</label><select id="staffName" required><option value="">Select staff member</option><option>Wes</option><option>Stephanie</option><option>Rebecca</option><option>Oscar</option><option>Joe</option><option>Chris</option><option>Theo</option><option>Jess</option></select></div>
           <div class="field"><label for="cardNumber">Card Number <span class="optional">(last 4 digits)</span></label><input id="cardNumber" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="0000" required></div>
           <div class="field"><label for="purchaseDate">Purchase Date</label><input id="purchaseDate" type="date" required></div>
           <div class="field"><label for="amount">Amount</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="$0.00" required></div>
@@ -48,13 +49,13 @@
         </div>
         <div class="section-title" style="margin-top:20px">Receipt Photo</div>
         <div class="upload">
-          <div class="upload-row"><label class="button secondary" for="receiptPhoto">Upload Receipt Photo</label><input id="receiptPhoto" type="file" accept="image/*,.pdf" hidden><span id="fileName" class="file-note">No receipt selected</span></div>
+          <div class="upload-row"><label class="button secondary" for="receiptPhoto">Upload Receipt Photo</label><input id="receiptPhoto" type="file" accept="image/*" capture="environment" hidden><span id="fileName" class="file-note">No receipt selected</span></div>
           <img id="preview" class="preview" alt="Receipt preview">
         </div>
         <div id="formStatus" class="status" role="status"></div>
         <div class="actions">
           <button id="addButton" type="submit">Add Item to List</button>
-          <button id="saveButton" class="secondary" type="button">Save Draft</button>
+          <button id="saveButton" class="secondary" type="button">Save</button>
           <button id="printButton" class="secondary" type="button">Print Receipt</button>
           <button id="quickBooksButton" type="button">Submit to QuickBooks</button>
         </div>
@@ -64,9 +65,9 @@
     <section id="listView" class="view list-view" hidden>
       <div class="section-title">Credit Purchase List</div>
       <div class="tools no-print">
-        <input id="search" type="search" placeholder="Search staff, vendor, job, or description">
-        <input id="dateFrom" type="date" aria-label="From date">
-        <input id="dateTo" type="date" aria-label="To date">
+        <div class="filter-field"><label for="search">Search Purchases</label><input id="search" type="search" placeholder="Staff, purchased from, job, or description"></div>
+        <div class="filter-field"><label for="dateFrom">From Date</label><input id="dateFrom" type="date"></div>
+        <div class="filter-field"><label for="dateTo">To Date</label><input id="dateTo" type="date"></div>
         <button id="printList" type="button">Print List</button>
       </div>
       <div class="summary"><span><strong id="visibleCount">0</strong> purchases shown</span><span>Total: <strong id="visibleTotal">$0.00</strong></span></div>
@@ -83,22 +84,24 @@
   const ids=["staffName","cardNumber","purchaseDate","amount","purchasedFrom","jobName","description"];
   const $=id=>document.getElementById(id), money=n=>Number(n||0).toLocaleString("en-US",{style:"currency",currency:"USD"});
   const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  let records=JSON.parse(localStorage.getItem(STORE)||"[]"), photoData="";
+  let records=[];try{records=JSON.parse(localStorage.getItem(STORE)||"[]")}catch(_){records=[]}let photoData="";
   const values=()=>Object.fromEntries(ids.map(id=>[id,$(id).value.trim()]));
   const tell=m=>{$("formStatus").textContent=m;$("formStatus").classList.add("show")};
   function showView(id){document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!==id);document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===id));if(id==="listView")render()}
   document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
+  const params=new URLSearchParams(location.search),person=params.get("person");if(person)$("backToPortal").href=`Staff-Portal-Starter-Template.html?person=${encodeURIComponent(person)}`;
   $("purchaseDate").value=new Date().toISOString().slice(0,10);
-  $("receiptPhoto").addEventListener("change",e=>{const f=e.target.files[0];$("fileName").textContent=f?f.name:"No receipt selected";photoData="";$("preview").style.display="none";if(f&&f.type.startsWith("image/")){const r=new FileReader();r.onload=()=>{photoData=r.result;$("preview").src=photoData;$("preview").style.display="block"};r.readAsDataURL(f)}});
-  $("saveButton").addEventListener("click",()=>{localStorage.setItem(DRAFT,JSON.stringify(values()));tell("Draft saved on this device.")});
+  $("receiptPhoto").addEventListener("change",e=>{const f=e.target.files[0];$("fileName").textContent=f?f.name:"No receipt selected";photoData="";$("preview").style.display="none";if(!f)return;if(!f.type.startsWith("image/")){tell("Please upload a receipt photo in JPG, PNG, HEIC, or another image format.");e.target.value="";$("fileName").textContent="No receipt selected";return}if(f.size>5*1024*1024){tell("Please choose a receipt photo smaller than 5 MB.");e.target.value="";$("fileName").textContent="No receipt selected";return}const r=new FileReader();r.onload=()=>{photoData=r.result;$("preview").src=photoData;$("preview").style.display="block"};r.readAsDataURL(f)});
+  $("saveButton").addEventListener("click",()=>{try{localStorage.setItem(DRAFT,JSON.stringify(values()));tell("Saved on this device. You can return and finish this receipt later.")}catch(_){tell("This browser could not save the receipt. Please keep this page open and try again.")}});
   const draft=JSON.parse(localStorage.getItem(DRAFT)||"null");if(draft)ids.forEach(id=>{$(id).value=draft[id]||$(id).value});
-  $("printButton").addEventListener("click",()=>window.print());
-  $("receiptForm").addEventListener("submit",e=>{e.preventDefault();const v=values();records.unshift({...v,id:"cc-"+Date.now(),amount:Number(v.amount),receiptName:$("receiptPhoto").files[0]?.name||"",photoData,quickBooksStatus:"Not submitted",createdAt:new Date().toISOString()});localStorage.setItem(STORE,JSON.stringify(records));localStorage.removeItem(DRAFT);$("receiptForm").reset();$("purchaseDate").value=new Date().toISOString().slice(0,10);$("fileName").textContent="No receipt selected";$("preview").style.display="none";photoData="";updateCount();tell("Purchase added to the Credit Purchase List.");});
-  $("quickBooksButton").addEventListener("click",()=>{if(!$("receiptForm").reportValidity())return;tell("The receipt is ready. QuickBooks connection must be authorized before it can be submitted.");});
+  function printMode(mode){document.body.classList.remove("print-form","print-list");document.body.classList.add(mode);window.print();setTimeout(()=>document.body.classList.remove(mode),250)}
+  $("printButton").addEventListener("click",()=>{if(!$("receiptForm").reportValidity())return;printMode("print-form")});
+  $("receiptForm").addEventListener("submit",e=>{e.preventDefault();const v=values(),record={...v,id:"cc-"+Date.now(),amount:Number(v.amount),receiptName:$("receiptPhoto").files[0]?.name||"",photoData,quickBooksStatus:"Not submitted",createdAt:new Date().toISOString()};records.unshift(record);try{localStorage.setItem(STORE,JSON.stringify(records))}catch(_){records.shift();tell("This receipt photo is too large for this browser to save. Choose a smaller photo and try again.");return}localStorage.removeItem(DRAFT);$("receiptForm").reset();$("purchaseDate").value=new Date().toISOString().slice(0,10);$("fileName").textContent="No receipt selected";$("preview").style.display="none";photoData="";updateCount();tell("Purchase added to the Credit Purchase List.");});
+  $("quickBooksButton").addEventListener("click",()=>{if(!$("receiptForm").reportValidity())return;tell("The receipt is complete. QuickBooks authorization is still required before this button can transfer the purchase.");});
   function filtered(){const q=$("search").value.toLowerCase(),from=$("dateFrom").value,to=$("dateTo").value;return records.filter(r=>(!q||[r.staffName,r.purchasedFrom,r.jobName,r.description,r.cardNumber].join(" ").toLowerCase().includes(q))&&(!from||r.purchaseDate>=from)&&(!to||r.purchaseDate<=to))}
   function updateCount(){$("countBadge").textContent=records.length?`(${records.length})`:""} updateCount();
   function render(){const rows=filtered();$("visibleCount").textContent=rows.length;$("visibleTotal").textContent=money(rows.reduce((s,r)=>s+Number(r.amount||0),0));$("purchaseList").innerHTML=rows.length?rows.map(r=>`<button class="purchase" type="button" data-id="${safe(r.id)}"><span><strong>${safe(r.purchasedFrom)}</strong><small>${safe(r.description)}</small></span><span>${safe(r.staffName)}<small>Card ending ${safe(r.cardNumber)}</small></span><span>${safe(r.purchaseDate)}<small>${safe(r.jobName||"No job assigned")}</small></span><strong class="amount">${money(r.amount)}</strong><span>View ›<small class="badge">${safe(r.quickBooksStatus)}</small></span></button>`).join(""):`<div class="empty">No credit purchases match this date range or search.</div>`}
-  ["search","dateFrom","dateTo"].forEach(id=>$(id).addEventListener("input",render));$("printList").addEventListener("click",()=>window.print());
+  ["search","dateFrom","dateTo"].forEach(id=>$(id).addEventListener("input",()=>{if($("dateFrom").value&&$("dateTo").value&&$("dateFrom").value>$("dateTo").value){$("dateTo").setCustomValidity("The To Date must be on or after the From Date.")}else{$("dateTo").setCustomValidity("")}render()}));$("printList").addEventListener("click",()=>{if(!$("dateTo").reportValidity())return;printMode("print-list")});
   $("purchaseList").addEventListener("click",e=>{const r=records.find(x=>x.id===e.target.closest(".purchase")?.dataset.id);if(!r)return;const fields=[["Staff Member",r.staffName],["Card Number","Ending "+r.cardNumber],["Purchase Date",r.purchaseDate],["Amount",money(r.amount)],["Purchased From",r.purchasedFrom],["Job Name",r.jobName||"Not assigned"],["Purchase Description",r.description],["QuickBooks Status",r.quickBooksStatus],["Receipt",r.receiptName||"No file uploaded"]];$("dialogBody").innerHTML=`<div class="detail-grid">${fields.map(([a,b])=>`<div class="detail"><strong>${a}</strong>${safe(b)}</div>`).join("")}</div>${r.photoData?`<img src="${r.photoData}" alt="Uploaded receipt" style="max-width:100%;margin-top:18px;border-radius:4px">`:""}`;$("detailsDialog").showModal()});
   $("closeDialog").addEventListener("click",()=>$("detailsDialog").close());
 })();
