@@ -101,14 +101,18 @@ table.line-items input:focus, table.line-items textarea:focus{ outline:none; bor
 table.line-items textarea.li-desc{
   display:block;
   width:100%;
-  min-height:112px;
-  height:auto;
+  min-width:0;
+  max-width:100%;
+  min-height:44px;
+  height:44px;
   max-height:none;
+  overflow-x:hidden;
   overflow-y:hidden;
-  resize:vertical;
+  resize:none;
   line-height:1.5;
   white-space:pre-wrap;
-  field-sizing:content;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 table.line-items input.li-qty, table.line-items input.li-price{ text-align:right; }
 table.line-items td.li-amount{ text-align:right; font-weight:700; white-space:nowrap; }
@@ -521,7 +525,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       '<tr data-row-id="' + rowId + '">' +
         '<td><input type="text" class="li-item-number" placeholder="Item Number" value="' + escapeHtml(itemNumber) + '"></td>' +
         '<td><input type="text" class="li-item-name" placeholder="Item Name" value="' + escapeHtml(itemName) + '"></td>' +
-        '<td style="vertical-align:top;"><textarea class="li-desc" placeholder="Description" rows="5" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';">' + escapeHtml(desc) + '</textarea></td>' +
+        '<td style="vertical-align:top;"><textarea class="li-desc" placeholder="Description" rows="1" wrap="soft" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';">' + escapeHtml(desc) + '</textarea></td>' +
         '<td><input type="number" class="li-qty" min="0" step="1" value="' + escapeHtml(qty) + '"></td>' +
         '<td><input type="number" class="li-price" min="0" step="0.01" value="' + toNumber(price).toFixed(2) + '"></td>' +
         '<td class="li-amount num">' + formatMoney(toNumber(qty) * toNumber(price)) + '</td>' +
@@ -534,7 +538,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     if(!box) return;
     window.requestAnimationFrame(function(){
       box.style.height = 'auto';
-      box.style.height = Math.max(112, box.scrollHeight) + 'px';
+      box.style.height = Math.max(44, box.scrollHeight) + 'px';
     });
   }
 
