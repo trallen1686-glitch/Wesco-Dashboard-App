@@ -37,6 +37,21 @@ html,body{
 }
 button,input,select,textarea{font:inherit}
 .widget{max-width:1120px;margin:0 auto;padding:14px}
+.back-nav{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin:0 0 12px;
+  padding:9px 14px;
+  border:1px solid var(--orange,#ff7012);
+  border-radius:4px;
+  background:transparent;
+  color:var(--orange,#ff7012);
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.back-nav:hover{background:rgba(255,112,18,.1)}
 .card{
   background:var(--card-bg);
   border:1px solid var(--border);
@@ -450,6 +465,7 @@ li.estimate{border-color:var(--line);background:rgba(255,255,255,.025)}
 </head>
 <body>
 <div class="widget">
+  <button type="button" class="back-nav no-print" id="backToStaffPortalBtn" aria-label="Back to staff portal">← Back to Staff Portal</button>
   <div class="card">
     <div class="header">
       <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors logo">
@@ -601,6 +617,15 @@ li.estimate{border-color:var(--line);background:rgba(255,255,255,.025)}
   var DRAFT_KEY='WESCO_ESTIMATE_DRAFT_V1';
   var APPROVER_NAME='Wes Atkinson';
   var params=new URLSearchParams(window.location.search);
+  var staffPerson=(params.get('person')||'').trim();
+  if(!staffPerson&&document.referrer){
+    try{staffPerson=(new URL(document.referrer)).searchParams.get('person')||''}catch(e){}
+  }
+  function returnToStaffPortal(){
+    var target='Staff-Portal-Starter-Template.html';
+    if(staffPerson)target+='?person='+encodeURIComponent(staffPerson);
+    window.location.href=target;
+  }
   var IS_APPROVER=(params.get('person')||'').trim().toLowerCase()===APPROVER_NAME.toLowerCase();
   var records=[];
   var editingId=null;
@@ -960,6 +985,7 @@ li.estimate{border-color:var(--line);background:rgba(255,255,255,.025)}
   }
 
   document.addEventListener('DOMContentLoaded',function(){
+    $('backToStaffPortalBtn').addEventListener('click',returnToStaffPortal);
     records=loadRecords();
     if(IS_APPROVER){
       $('submitterView').style.display='none';
