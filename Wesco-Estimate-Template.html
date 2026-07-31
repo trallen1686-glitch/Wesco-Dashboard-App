@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco – Estimate</title>
+<style>
+:root{
+  --blue:#106EBE;
+  --blue-bright:#0078D4;
+  --urgent:#A80000;
+  --urgent-tint:#FBEAEA;
+  --success:#2EC45A;
+  --success-tint:#E8F8ED;
+  --neutral:#A19F9D;
+  --page-bg:#F5F5F5;
+  --card-bg:#FFFFFF;
+  --border:#E1DFDD;
+  --ink:#201F1E;
+  --ink-soft:#605E5C;
+  --maroon:#5C2B37;
+  --maroon-tint:#F3E7EC;
+  --amber:#8A5A00;
+  --amber-tint:#FDF2E3;
+  --font:'Open Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --radius:6px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--page-bg);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:14.5px;
+  line-height:1.45;
+}
+button,input,select,textarea{font:inherit}
+.widget{max-width:1120px;margin:0 auto;padding:14px}
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 18px;
+  border-bottom:3px solid var(--maroon);
+}
+.header img.logo{height:34px;display:block;flex-shrink:0}
+.header .titles{flex:1;min-width:0}
+.header h1{margin:0;font-size:16.5px;font-weight:700;color:var(--ink)}
+.header .subtitle{margin:1px 0 0;font-size:12px;color:var(--ink-soft)}
+.header .counts{display:flex;gap:8px;flex-wrap:wrap}
+.count-chip{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:12px;
+  background:#EFF6FC;
+  color:var(--blue);
+  white-space:nowrap;
+}
+.count-chip.pending{background:var(--amber-tint);color:var(--amber)}
+form{padding:4px 18px 18px}
+.section-label{
+  font-size:11.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--blue);
+  padding:18px 0 8px;
+  border-top:1px solid var(--border);
+  margin-top:6px;
+}
+.section-label:first-of-type{border-top:none;margin-top:0}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:12.5px;font-weight:700;color:var(--ink)}
+.req{color:var(--urgent);font-weight:700;margin-left:2px}
+.hint{font-weight:400;color:var(--ink-soft);font-size:11.5px;margin-left:4px}
+.field input,.field textarea,.field select{
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:9px 10px;
+  background:#fff;
+  color:var(--ink);
+  width:100%;
+}
+.field textarea{resize:vertical;min-height:88px;line-height:1.5}
+input::placeholder,textarea::placeholder{color:#A19F9D}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--blue-bright)!important;
+  box-shadow:0 0 0 3px rgba(0,120,212,.15);
+}
+.field.invalid input,.field.invalid select,.field.invalid textarea{
+  border-color:var(--urgent);
+  background:var(--urgent-tint);
+}
+.error-msg{display:none;font-size:11.5px;color:var(--urgent);font-weight:600}
+.field.invalid .error-msg{display:block}
+.readonly-field input{background:#FAFAF9;color:var(--ink-soft)}
+.toolbar-row{display:flex;gap:8px;padding:12px 0 2px;flex-wrap:wrap}
+.btn{
+  border:none;
+  border-radius:5px;
+  padding:12px 22px;
+  cursor:pointer;
+  background:var(--blue-bright);
+  color:#fff;
+  font-weight:700;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn-block{width:100%;padding:13px 22px;font-size:14.5px}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);font-weight:600}
+.btn-ghost:hover{background:#F3F2F1}
+.btn-approve{background:var(--success)}
+.btn-sendback{background:transparent;color:var(--urgent);border:1px solid var(--urgent)}
+.btn-sendback:hover{background:var(--urgent-tint)}
+.quickbooks-submit{
+  margin-top:22px;
+  padding:18px;
+  border:2px solid #2ca01c;
+  border-radius:7px;
+  background:#f1faef;
+}
+.quickbooks-submit .quickbooks-label{
+  margin:0 0 10px;
+  color:#1f6f16;
+  font-size:13px;
+  font-weight:700;
+  text-align:center;
+}
+.quickbooks-submit .btn-quickbooks{
+  width:100%;
+  padding:15px 22px;
+  background:#2ca01c;
+  border-color:#2ca01c;
+  color:#fff;
+  font-size:16px;
+  box-shadow:0 2px 5px rgba(44,160,28,.25);
+}
+.quickbooks-submit .btn-quickbooks:hover{background:#238b16}
+.btn-sm{padding:8px 14px;font-size:12.5px}
+.btn-icon{
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  color:var(--ink-soft);
+  padding:4px 6px;
+  line-height:1;
+}
+.btn-icon.delete:hover{color:var(--urgent)}
+.actions-row{display:flex;gap:10px;padding-top:18px;margin-top:10px;border-top:1px solid var(--border)}
+.actions-row .btn-block{flex:1}
+.banner{
+  margin:14px 18px 0;
+  padding:10px 14px;
+  border-radius:5px;
+  background:var(--amber-tint);
+  color:var(--amber);
+  font-size:12.5px;
+  font-weight:600;
+  display:none;
+  align-items:center;
+  gap:8px;
+}
+.line-items-wrap{
+  border:1px solid var(--border);
+  border-radius:5px;
+  overflow-x:auto;
+  background:#fff;
+}
+.line-items{
+  width:100%;
+  min-width:980px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.line-items th{
+  padding:9px 8px;
+  background:#F3F2F1;
+  border-bottom:1px solid var(--border);
+  color:var(--ink-soft);
+  font-size:10.5px;
+  text-align:left;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.line-items th:nth-child(1){width:92px}
+.line-items th:nth-child(2){width:160px}
+.line-items th:nth-child(3){width:auto}
+.line-items th:nth-child(4){width:76px}
+.line-items th:nth-child(5){width:118px}
+.line-items th:nth-child(6){width:118px;text-align:right}
+.line-items th:nth-child(7){width:42px}
+.line-items td{padding:8px;border-bottom:1px solid #EDEBE9;vertical-align:top}
+.line-items tr:last-child td{border-bottom:none}
+.line-items input,.line-items textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px;
+  color:var(--ink);
+  background:#fff;
+}
+.line-items textarea{min-height:40px;resize:vertical;line-height:1.35}
+.line-items .money{text-align:right}
+.line-items .amount{
+  min-height:37px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:8px 2px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.line-items .invalid-cell{border-color:var(--urgent);background:var(--urgent-tint)}
+.line-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-top:10px}
+.line-help{margin:7px 0 0;color:var(--ink-soft);font-size:11.5px}
+.totals{
+  width:min(330px,100%);
+  margin-left:auto;
+  border:1px solid var(--border);
+  border-radius:5px;
+  overflow:hidden;
+}
+.total-row{display:grid;grid-template-columns:1fr 130px;align-items:center;border-bottom:1px solid var(--border)}
+.total-row:last-child{border-bottom:0}
+.total-row span{padding:9px 12px;color:var(--ink-soft);font-size:12.5px}
+.total-row output{padding:9px 12px;text-align:right;font-weight:700}
+.total-row input{
+  width:100%;
+  border:0;
+  border-left:1px solid var(--border);
+  padding:9px 12px;
+  text-align:right;
+}
+.tax-rate-control{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding-right:12px}
+.tax-rate-control input{width:92px;border:1px solid var(--border);border-radius:4px;padding:7px 8px;text-align:right}
+.total-row.grand{background:var(--maroon-tint)}
+.total-row.grand span,.total-row.grand output{color:var(--maroon);font-size:14px;font-weight:700}
+.section-heading{
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  padding:16px 18px 8px;
+}
+ul.estimate-list{list-style:none;margin:0;padding:0 10px 10px}
+li.estimate{
+  border:1px solid var(--border);
+  border-radius:5px;
+  margin:6px 0;
+  padding:12px 14px;
+}
+li.estimate.is-pending{border-color:#f0dcae;background:#FFFDF7}
+.estimate-title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.estimate-number{
+  font-size:11.5px;
+  font-weight:700;
+  color:#fff;
+  background:var(--maroon);
+  padding:2px 8px;
+  border-radius:10px;
+}
+.estimate-jobname{font-size:14px;font-weight:700}
+.estimate-meta-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.tag{
+  font-size:10.5px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:10px;
+  background:#EDEBE9;
+  color:var(--ink-soft);
+}
+.tag.status-pending{background:var(--amber-tint);color:var(--amber)}
+.tag.status-approved{background:var(--success-tint);color:#1B7A3D}
+.tag.status-sentback{background:var(--urgent-tint);color:var(--urgent)}
+.estimate-desc{margin-top:8px;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.estimate-summary{margin-top:8px;font-size:12px;color:var(--ink-soft)}
+.estimate-summary b{color:var(--maroon);font-size:13px}
+.estimate-actions,.estimate-approve-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.sentback-reason{
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:4px;
+  background:var(--urgent-tint);
+  color:#7A1414;
+  font-size:12.5px;
+}
+.sentback-reason b{display:block;font-size:10.5px;text-transform:uppercase;margin-bottom:2px}
+.sendback-box{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.sendback-box.open{display:block}
+.sendback-box textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px 10px;
+  min-height:64px;
+  resize:vertical;
+}
+.sendback-actions{display:flex;gap:8px;margin-top:8px}
+.empty-state{padding:26px 18px;text-align:center;color:var(--ink-soft);font-size:13px}
+.list-toggle{
+  width:100%;
+  text-align:left;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:14px 18px;
+  border-top:1px solid var(--border);
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--ink-soft);
+}
+.list-wrap{display:none}
+.list-wrap.open{display:block}
+details.data-note{font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--border)}
+details.data-note summary{cursor:pointer;padding:10px 18px;font-weight:600}
+details.data-note .body{padding:0 18px 14px;line-height:1.6}
+.toast{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#201F1E;
+  color:#fff;
+  font-size:13px;
+  padding:9px 16px;
+  border-radius:5px;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:99;
+  max-width:90vw;
+}
+.toast.show{opacity:1}
+.toast.err{background:var(--urgent)}
+#printArea{display:none}
+.print-doc{font-family:var(--font);color:#000}
+.p-header{display:flex;align-items:center;gap:14px;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:18px}
+.p-header img{height:46px}
+.p-heading{flex:1}
+.p-header h2{margin:0;font-size:20px;letter-spacing:.03em}
+.p-sub{font-size:12px;color:#333;margin-top:2px}
+.p-estnum{text-align:right;font-size:13px}
+.p-estnum b{display:block;font-size:16px}
+.p-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px;margin-bottom:18px}
+.p-grid div b,.p-desc>b{display:block;font-size:10.5px;text-transform:uppercase;color:#555;margin-bottom:2px}
+.p-desc{margin-bottom:18px}
+.p-desc p{font-size:13px;white-space:pre-wrap;margin:0}
+.p-table{width:100%;border-collapse:collapse;margin-top:10px}
+.p-table th,.p-table td{border:1px solid #999;padding:6px;font-size:10px;text-align:left;vertical-align:top}
+.p-table th{background:#eee}
+.p-table .num{text-align:right;white-space:nowrap}
+.p-totals{width:280px;margin:12px 0 0 auto}
+.p-totals div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #bbb}
+.p-totals .grand{font-weight:700;font-size:14px;border-bottom:2px solid #000}
+.p-sign-row{display:flex;gap:50px;margin-top:60px}
+.p-sign{flex:1;border-top:1px solid #000;padding-top:6px;font-size:11px;color:#333}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{display:block;position:absolute;left:0;top:0;width:100%;padding:20px 30px}
+  .no-print{display:none!important}
+}
+@media(max-width:760px){
+  .field-grid{grid-template-columns:1fr}
+  .actions-row{flex-direction:column}
+  .header{align-items:flex-start;flex-wrap:wrap}
+  .line-toolbar{flex-direction:column}
+  .totals{margin-left:0;width:100%}
+}
+
+/* Match the current Change Order template dark/orange presentation. */
+:root{
+  --orange:#ff7012;
+  --white:#fff;
+  --muted:rgba(255,255,255,.65);
+  --panel:rgba(9,14,16,.82);
+  --line:rgba(255,255,255,.18);
+  --focus:rgba(255,112,18,.55);
+  --danger:#ff5858;
+  --success:#34d399;
+  --font:"Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+}
+html,body{min-height:100%}
+body{
+  padding:24px;
+  color:var(--white);
+  background:radial-gradient(circle at 12% 8%,rgba(255,112,18,.09),transparent 24rem),#090e10;
+}
+.widget{max-width:1120px;padding:0}
+.card{background:var(--panel);border:1px solid rgba(255,255,255,.14);border-radius:5px;box-shadow:0 16px 42px rgba(0,0,0,.28);overflow:hidden}
+.header{gap:20px;padding:18px 22px 16px;border-bottom:2px solid var(--orange)}
+.header img.logo{height:62px;background:#fff;border-radius:4px;padding:5px 8px}
+.header h1{font-size:19px;font-weight:800;color:var(--white)}
+.header .subtitle{color:var(--muted)}
+form{padding:4px 22px 18px}
+.section-label{color:var(--orange);font-weight:800;margin:19px 0 10px;padding:0 0 9px;border-top:0;border-bottom:1px solid var(--orange)}
+.section-label:first-of-type{margin-top:6px}
+.field label{color:var(--white)}
+.field label .hint{color:var(--muted)}
+.field input,.field textarea,.field select{
+  color:var(--white);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.3);
+}
+.field select option{color:var(--white);background:#090e10}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.42)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange)!important;box-shadow:0 0 0 3px var(--focus);background:rgba(255,112,18,.06)}
+.readonly-field input{background:rgba(255,255,255,.035);color:var(--muted)}
+.btn{border:1px solid var(--orange);border-radius:4px;background:var(--orange);color:#1a1a1a}
+.btn-ghost{background:transparent;color:var(--orange);border-color:var(--orange)}
+.btn-ghost:hover{background:rgba(255,112,18,.08)}
+.quickbooks-submit .btn-quickbooks{background:#2ca01c;border-color:#2ca01c;color:#fff}
+.quickbooks-submit .btn-quickbooks:hover{background:#238b16}
+.section-heading,.list-toggle,details.data-note,.empty-state{color:var(--muted);border-color:var(--line)}
+.line-items-wrap{border-color:var(--line);background:transparent}
+.line-items th{background:transparent;color:var(--orange);border-color:var(--orange)}
+.line-items td{border-color:var(--line)}
+.line-items input,.line-items textarea,.tax-rate-control input{
+  color:var(--white);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.3);
+}
+.line-items input:focus,.line-items textarea:focus,.tax-rate-control input:focus{border-color:var(--orange)!important;box-shadow:0 0 0 3px var(--focus)}
+.line-items .amount,.line-help,.total-row span{color:var(--white)}
+.totals{border-color:var(--line);background:rgba(255,255,255,.025)}
+.total-row{border-color:var(--line)}
+.total-row.grand{background:transparent;border-top:2px solid var(--orange)}
+.total-row.grand span,.total-row.grand output{color:var(--orange)}
+li.estimate{border-color:var(--line);background:rgba(255,255,255,.025)}
+.estimate-jobname,.estimate-desc{color:var(--white)}
+.estimate-number{background:var(--orange);color:#1a1a1a}
+.tag{background:rgba(255,255,255,.1);color:var(--white)}
+.estimate-summary{color:var(--muted)}
+@media(max-width:760px){body{padding:14px}}
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="card">
+    <div class="header">
+      <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors logo">
+      <div class="titles">
+        <h1 id="viewTitle">Estimate</h1>
+        <p class="subtitle" id="viewSubtitle">Create and submit an estimate for approval</p>
+      </div>
+      <div class="counts" id="viewCounts"></div>
+    </div>
+
+    <div class="banner" id="draftBanner">A saved estimate draft was restored from this device.</div>
+
+    <div id="submitterView">
+      <form id="estimateForm" novalidate>
+        <div class="toolbar-row no-print">
+          <button type="button" class="btn btn-ghost btn-sm" id="saveDraftBtn">💾 Save Draft</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="printFormBtn">🖨 Print</button>
+        </div>
+
+        <div class="section-label">Estimate Details</div>
+        <div class="field-grid">
+          <div class="field" id="f_submittedBy">
+            <label for="submittedBy">Submitted By<span class="req">*</span></label>
+            <input type="text" id="submittedBy" placeholder="Your name" maxlength="80" autocomplete="off">
+            <span class="error-msg">Enter your name.</span>
+          </div>
+          <div class="field" id="f_estimateDate">
+            <label for="estimateDate">Date<span class="req">*</span></label>
+            <input type="date" id="estimateDate">
+            <span class="error-msg">Enter a date.</span>
+          </div>
+          <div class="field" id="f_jobNumber">
+            <label for="jobNumber">Job Number<span class="req">*</span></label>
+            <input type="text" id="jobNumber" placeholder="e.g. 24-1058" maxlength="40" autocomplete="off">
+            <span class="error-msg">Enter the job number.</span>
+          </div>
+          <div class="field" id="f_jobName">
+            <label for="jobName">Job Name<span class="req">*</span></label>
+            <input type="text" id="jobName" placeholder="e.g. Smith Residence" maxlength="120" autocomplete="off">
+            <span class="error-msg">Enter the job name.</span>
+          </div>
+          <div class="field" id="f_customerName">
+            <label for="customerName">Customer Name<span class="req">*</span></label>
+            <input type="text" id="customerName" placeholder="e.g. John Smith" maxlength="120" autocomplete="off">
+            <span class="error-msg">Enter the customer name.</span>
+          </div>
+          <div class="field" id="f_invoiceNumber">
+            <label for="invoiceNumber">Invoice Number <span class="hint">(if known)</span></label>
+            <input type="text" id="invoiceNumber" placeholder="e.g. INV-3021" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field" id="f_phase">
+            <label for="phase">Phase<span class="req">*</span></label>
+            <input type="text" id="phase" list="phaseOptions" placeholder="e.g. Roofing" maxlength="60" autocomplete="off">
+            <datalist id="phaseOptions">
+              <option value="Roofing">
+              <option value="Siding">
+              <option value="Windows">
+              <option value="Gutters">
+              <option value="Trim / Fascia">
+              <option value="Paint">
+              <option value="Punch List">
+            </datalist>
+            <span class="error-msg">Enter the phase.</span>
+          </div>
+          <div class="field full" id="f_description">
+            <label for="description">Estimate Description<span class="req">*</span></label>
+            <textarea id="description" placeholder="Describe the overall scope, assumptions, and schedule for this estimate…" maxlength="4000"></textarea>
+            <span class="error-msg">Enter an estimate description.</span>
+          </div>
+          <div class="field full readonly-field">
+            <label for="approvedByDisplay">Approved By</label>
+            <input type="text" id="approvedByDisplay" value="Pending — awaiting Wes Atkinson's approval" readonly tabindex="-1">
+          </div>
+        </div>
+
+        <div class="section-label">Line Items</div>
+        <div class="line-items-wrap">
+          <table class="line-items">
+            <thead>
+              <tr>
+                <th>Item #</th>
+                <th>Item Name</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Amount</th>
+                <th aria-label="Remove"></th>
+              </tr>
+        …784 tokens truncated…loat(v);return Number.isFinite(n)?n:0}
+  function money(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v))}
+  function escapeHtml(v){
+    return String(v==null?'':v).replace(/[&<>"']/g,function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+  function formatDate(v){
+    if(!v)return '';
+    var d=new Date(v+'T12:00:00');
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
+  function defaultLine(){
+    return {id:uid(),itemNumber:'',itemName:'',description:'',quantity:1,unitPrice:0};
+  }
+  function lineAmount(line){return num(line.quantity)*num(line.unitPrice)}
+  function subtotal(lines){return (lines||[]).reduce(function(sum,line){return sum+lineAmount(line)},0)}
+  function boundedTaxRate(value){return Math.max(0,Math.min(100,num(value)))}
+  function recordTax(record){return subtotal(record.lineItems)*boundedTaxRate(record.taxRate)/100}
+  function recordTotal(record){return subtotal(record.lineItems)+recordTax(record)}
+  function nextEstimateNumber(){
+    var max=records.reduce(function(current,record){
+      var match=String(record.estimateNumber||'').match(/(\d+)$/);
+      return Math.max(current,match?parseInt(match[1],10):0);
+    },0);
+    return 'EST-'+String(max+1).padStart(4,'0');
+  }
+  function loadRecords(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return []}
+  }
+  function saveRecords(){localStorage.setItem(STORAGE_KEY,JSON.stringify(records))}
+  function showToast(message,isError){
+    var toast=$('toast');
+    toast.textContent=message;
+    toast.className='toast show'+(isError?' err':'');
+    clearTimeout(showToast.timer);
+    showToast.timer=setTimeout(function(){toast.className='toast'},3200);
+  }
+  function getLinesFromForm(){
+    return Array.prototype.map.call(document.querySelectorAll('#lineItemsBody tr'),function(row){
+      return {
+        id:row.getAttribute('data-id'),
+        itemNumber:row.querySelector('[data-field="itemNumber"]').value.trim(),
+        itemName:row.querySelector('[data-field="itemName"]').value.trim(),
+        description:row.querySelector('[data-field="description"]').value.trim(),
+        quantity:num(row.querySelector('[data-field="quantity"]').value),
+        unitPrice:num(row.querySelector('[data-field="unitPrice"]').value)
+      };
+    });
+  }
+  function renderLines(lines){
+    var body=$('lineItemsBody');
+    body.innerHTML=(lines&&lines.length?lines:[defaultLine()]).map(function(line){
+      return '<tr data-id="'+escapeHtml(line.id||uid())+'">'+
+        '<td><input type="text" data-field="itemNumber" aria-label="Item number" placeholder="1" value="'+escapeHtml(line.itemNumber)+'"></td>'+
+        '<td><input type="text" data-field="itemName" aria-label="Item name" placeholder="Item name" value="'+escapeHtml(line.itemName)+'"></td>'+
+        '<td><textarea data-field="description" aria-label="Line item description" placeholder="Describe labor, materials, or scope">'+escapeHtml(line.description)+'</textarea></td>'+
+        '<td><input type="number" data-field="quantity" aria-label="Quantity" min="0" step="0.01" value="'+num(line.quantity)+'"></td>'+
+        '<td><input type="number" data-field="unitPrice" class="money" aria-label="Unit price" min="0" step="0.01" value="'+num(line.unitPrice).toFixed(2)+'"></td>'+
+        '<td><div class="amount">'+money(lineAmount(line))+'</div></td>'+
+        '<td><button type="button" class="btn-icon delete remove-line" aria-label="Remove line item">×</button></td>'+
+      '</tr>';
+    }).join('');
+    wireLineRows();
+    calculateTotals();
+  }
+  function wireLineRows(){
+    Array.prototype.forEach.call(document.querySelectorAll('#lineItemsBody input,#lineItemsBody textarea'),function(input){
+      input.addEventListener('input',function(){
+        input.classList.remove('invalid-cell');
+        calculateTotals();
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.remove-line'),function(button){
+      button.addEventListener('click',function(){
+        var rows=document.querySelectorAll('#lineItemsBody tr');
+        if(rows.length===1){
+          renderLines([defaultLine()]);
+          return;
+        }
+        button.closest('tr').remove();
+        calculateTotals();
+      });
+    });
+  }
+  function calculateTotals(){
+    var lines=getLinesFromForm();
+    Array.prototype.forEach.call(document.querySelectorAll('#lineItemsBody tr'),function(row,index){
+      row.querySelector('.amount').textContent=money(lineAmount(lines[index]));
+    });
+    var sub=subtotal(lines);
+    var taxRate=boundedTaxRate($('taxRate').value);
+    var tax=sub*taxRate/100;
+    $('subtotal').textContent=money(sub);
+    $('taxDisplay').textContent=money(tax);
+    $('estimateTotal').textContent=money(sub+tax);
+  }
+  function collectForm(){
+    return {
+      submittedBy:$('submittedBy').value.trim(),
+      estimateDate:$('estimateDate').value,
+      jobNumber:$('jobNumber').value.trim(),
+      jobName:$('jobName').value.trim(),
+      customerName:$('customerName').value.trim(),
+      invoiceNumber:$('invoiceNumber').value.trim(),
+      phase:$('phase').value.trim(),
+      description:$('description').value.trim(),
+      lineItems:getLinesFromForm(),
+      taxRate:boundedTaxRate($('taxRate').value)
+    };
+  }
+  function fillForm(record){
+    $('submittedBy').value=record.submittedBy||'';
+    $('estimateDate').value=record.estimateDate||todayStr();
+    $('jobNumber').value=record.jobNumber||'';
+    $('jobName').value=record.jobName||'';
+    $('customerName').value=record.customerName||'';
+    $('invoiceNumber').value=record.invoiceNumber||'';
+    $('phase').value=record.phase||'';
+    $('description').value=record.description||'';
+    $('taxRate').value=boundedTaxRate(record.taxRate);
+    renderLines(record.lineItems||[defaultLine()]);
+  }
+  function clearErrors(){
+    Array.prototype.forEach.call(document.querySelectorAll('.field.invalid'),function(field){field.classList.remove('invalid')});
+    Array.prototype.forEach.call(document.querySelectorAll('.invalid-cell'),function(cell){cell.classList.remove('invalid-cell')});
+  }
+  function validateForm(){
+    clearErrors();
+    var required=['submittedBy','estimateDate','jobNumber','jobName','customerName','phase','description'];
+    var first=null;
+    required.forEach(function(id){
+      var input=$(id);
+      if(!input.value.trim()){
+        $('f_'+id).classList.add('invalid');
+        if(!first)first=input;
+      }
+    });
+    var lines=getLinesFromForm();
+    document.querySelectorAll('#lineItemsBody tr').forEach(function(row,index){
+      ['itemNumber','itemName','description'].forEach(function(field){
+        var input=row.querySelector('[data-field="'+field+'"]');
+        if(!lines[index][field]){
+          input.classList.add('invalid-cell');
+          if(!first)first=input;
+        }
+      });
+    });
+    if(!lines.length){
+      showToast('Add at least one line item.',true);
+      return false;
+    }
+    if(first){
+      first.focus();
+      showToast('Complete the highlighted required fields.',true);
+      return false;
+    }
+    return true;
+  }
+  function resetForm(){
+    $('estimateForm').reset();
+    $('estimateDate').value=todayStr();
+    $('taxRate').value='0';
+    $('approvedByDisplay').value="Pending — awaiting "+APPROVER_NAME+"'s approval";
+    renderLines([defaultLine()]);
+    clearErrors();
+    editingId=null;
+    $('submitBtn').textContent='Submit for Approval';
+  }
+  function submitEstimate(){
+    if(!validateForm())return;
+    var data=collectForm();
+    if(editingId){
+      var existing=records.find(function(record){return record.id===editingId});
+      if(existing){
+        Object.assign(existing,data,{status:'pending',approvedBy:'',approvedDate:'',sentBackReason:'',updatedAt:new Date().toISOString()});
+        saveRecords();
+        localStorage.removeItem(DRAFT_KEY);
+        resetForm();
+        renderAll();
+        showToast(existing.estimateNumber+' resubmitted for approval.');
+        return;
+      }
+    }
+    var record=Object.assign({
+      id:uid(),
+      estimateNumber:nextEstimateNumber(),
+      status:'pending',
+      approvedBy:'',
+      approvedDate:'',
+      sentBackReason:'',
+      createdAt:new Date().toISOString(),
+      updatedAt:new Date().toISOString()
+    },data);
+    records.push(record);
+    saveRecords();
+    localStorage.removeItem(DRAFT_KEY);
+    resetForm();
+    renderAll();
+    showToast(record.estimateNumber+' submitted to '+APPROVER_NAME+' for approval.');
+  }
+  function statusTag(record){
+    if(record.status==='approved')return '<span class="tag status-approved">Approved</span>';
+    if(record.status==='sent_back')return '<span class="tag status-sentback">Sent Back</span>';
+    return '<span class="tag status-pending">Pending Approval</span>';
+  }
+  function cardHtml(record,approver){
+    var note=record.status==='sent_back'&&record.sentBackReason
+      ? '<div class="sentback-reason"><b>'+(approver?'Your note':escapeHtml(APPROVER_NAME)+'’s note')+'</b>'+escapeHtml(record.sentBackReason)+'</div>'
+      : '';
+    var controls='';
+    if(approver&&record.status==='pending'){
+      controls='<div class="estimate-approve-row">'+
+        '<button type="button" class="btn btn-approve btn-sm approve-btn" data-id="'+record.id+'">Approve</button>'+
+        '<button type="button" class="btn btn-sendback btn-sm sendback-toggle-btn" data-id="'+record.id+'">Send Back</button>'+
+        '<button type="button" class="btn btn-ghost btn-sm print-record-btn" data-id="'+record.id+'">🖨 Print</button>'+
+      '</div>'+
+      '<div class="sendback-box" data-id="'+record.id+'">'+
+        '<label><b>What needs to change?</b></label>'+
+        '<textarea placeholder="Explain what needs to be revised…"></textarea>'+
+        '<div class="sendback-actions">'+
+          '<button type="button" class="btn btn-sendback btn-sm confirm-sendback-btn" data-id="'+record.id+'">Confirm Send Back</button>'+
+          '<button type="button" class="btn btn-ghost btn-sm cancel-sendback-btn" data-id="'+record.id+'">Cancel</button>'+
+        '</div>'+
+      '</div>';
+    }else{
+      controls='<div class="estimate-actions">'+
+        '<button type="button" class="btn btn-ghost btn-sm print-record-btn" data-id="'+record.id+'">🖨 Print</button>'+
+        (record.status==='sent_back'&&!approver?'<button type="button" class="btn btn-ghost btn-sm revise-btn" data-id="'+record.id+'">Revise &amp; Resubmit</button>':'')+
+      '</div>';
+    }
+    return '<li class="estimate '+(record.status==='pending'&&approver?'is-pending':'')+'">'+
+      '<div class="estimate-title-row"><span class="estimate-number">'+escapeHtml(record.estimateNumber)+'</span>'+
+      '<span class="estimate-jobname">'+escapeHtml(record.jobName)+' ('+escapeHtml(record.jobNumber)+')</span></div>'+
+      '<div class="estimate-meta-row">'+statusTag(record)+
+      '<span class="tag">'+escapeHtml(record.phase)+'</span>'+
+      '<span class="tag">'+escapeHtml(formatDate(record.estimateDate))+'</span>'+
+      '<span class="tag">Customer '+escapeHtml(record.customerName)+'</span>'+
+      (approver?'<span class="tag">Submitted by '+escapeHtml(record.submittedBy)+'</span>':'')+
+      (record.invoiceNumber?'<span class="tag">Inv '+escapeHtml(record.invoiceNumber)+'</span>':'')+
+      '</div>'+
+      '<div class="estimate-desc">'+escapeHtml(record.description)+'</div>'+
+      '<div class="estimate-summary">'+record.lineItems.length+' line item'+(record.lineItems.length===1?'':'s')+' · <b>'+money(recordTotal(record))+'</b></div>'+
+      note+controls+
+    '</li>';
+  }
+  function wireCards(root){
+    root.querySelectorAll('.print-record-btn').forEach(function(button){
+      button.addEventListener('click',function(){
+        var record=records.find(function(item){return item.id===button.dataset.id});
+        if(record)printEstimate(record,false);
+      });
+    });
+    root.querySelectorAll('.revise-btn').forEach(function(button){
+      button.addEventListener('click',function(){
+        var record=records.find(function(item){return item.id===button.dataset.id});
+        if(!record)return;
+        editingId=record.id;
+        fillForm(record);
+        $('submitBtn').textContent='Resubmit for Approval';
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+    });
+    root.querySelectorAll('.approve-btn').forEach(function(button){
+      button.addEventListener('click',function(){
+        var record=records.find(function(item){return item.id===button.dataset.id});
+        if(!record)return;
+        record.status='approved';
+        record.approvedBy=APPROVER_NAME;
+        record.approvedDate=todayStr();
+        record.updatedAt=new Date().toISOString();
+        saveRecords();
+        renderAll();
+        showToast(record.estimateNumber+' approved.');
+      });
+    });
+    root.querySelectorAll('.sendback-toggle-btn,.cancel-sendback-btn').forEach(function(button){
+      button.addEventListener('click',function(){
+        var box=root.querySelector('.sendback-box[data-id="'+button.dataset.id+'"]');
+        if(box)box.classList.toggle('open');
+      });
+    });
+    root.querySelectorAll('.confirm-sendback-btn').forEach(function(button){
+      button.addEventListener('click',function(){
+        var box=root.querySelector('.sendback-box[data-id="'+button.dataset.id+'"]');
+        var reason=box.querySelector('textarea').value.trim();
+        if(!reason){showToast('Add a note explaining what needs to change.',true);return}
+        var record=records.find(function(item){return item.id===button.dataset.id});
+        record.status='sent_back';
+        record.sentBackReason=reason;
+        record.approvedBy='';
+        record.approvedDate='';
+        record.updatedAt=new Date().toISOString();
+        saveRecords();
+        renderAll();
+        showToast(record.estimateNumber+' sent back for revision.');
+      });
+    });
+  }
+  function renderHeader(){
+    if(IS_APPROVER){
+      $('viewTitle').textContent='Estimate Approvals';
+      $('viewSubtitle').textContent='Reviewing on behalf of '+APPROVER_NAME;
+      var pending=records.filter(function(record){return record.status==='pending'}).length;
+      $('viewCounts').innerHTML='<span class="count-chip pending">'+pending+' awaiting approval</span>';
+    }else{
+      $('viewTitle').textContent='Estimate';
+      $('viewSubtitle').textContent='Create and submit an estimate for approval';
+      $('viewCounts').innerHTML='';
+    }
+  }
+  function renderAll(){
+    renderHeader();
+    if(IS_APPROVER){
+      var pending=records.filter(function(record){return record.status==='pending'}).sort(function(a,b){return a.createdAt.localeCompare(b.createdAt)});
+      var history=records.filter(function(record){return record.status!=='pending'}).sort(function(a,b){return b.updatedAt.localeCompare(a.updatedAt)});
+      $('pendingListRoot').innerHTML=pending.length?'<ul class="estimate-list">'+pending.map(function(record){return cardHtml(record,true)}).join('')+'</ul>':'<div class="empty-state">Nothing waiting on your approval right now.</div>';
+      $('historyListRoot').innerHTML=history.length?'<ul class="estimate-list">'+history.map(function(record){return cardHtml(record,true)}).join('')+'</ul>':'<div class="empty-state">No approval history yet.</div>';
+      $('historyToggleLabel').textContent='Approval History ('+history.length+')';
+      wireCards($('pendingListRoot'));
+      wireCards($('historyListRoot'));
+    }else{
+      var sorted=records.slice().sort(function(a,b){return b.updatedAt.localeCompare(a.updatedAt)});
+      $('submitterListRoot').innerHTML=sorted.length?'<ul class="estimate-list">'+sorted.map(function(record){return cardHtml(record,false)}).join('')+'</ul>':'<div class="empty-state">No estimates submitted yet.</div>';
+      wireCards($('submitterListRoot'));
+    }
+  }
+  function printEstimate(record,isDraft){
+    var lines=record.lineItems||[];
+    var rows=lines.map(function(line){
+      return '<tr><td>'+escapeHtml(line.itemNumber)+'</td><td>'+escapeHtml(line.itemName)+'</td><td>'+escapeHtml(line.description)+'</td><td class="num">'+escapeHtml(line.quantity)+'</td><td class="num">'+money(line.unitPrice)+'</td><td class="num">'+money(lineAmount(line))+'</td></tr>';
+    }).join('');
+    $('printArea').innerHTML='<div class="print-doc">'+
+      '<div class="p-header"><img src="Wesco Logo 2.png" alt=""><div class="p-heading"><h2>ESTIMATE</h2><div class="p-sub">'+(isDraft?'Draft':'Wesco Exteriors, Inc.')+'</div></div><div class="p-estnum"><span>Estimate Number</span><b>'+escapeHtml(record.estimateNumber||'DRAFT')+'</b></div></div>'+
+      '<div class="p-grid">'+
+        '<div><b>Submitted By</b><span>'+escapeHtml(record.submittedBy)+'</span></div>'+
+        '<div><b>Date</b><span>'+escapeHtml(formatDate(record.estimateDate))+'</span></div>'+
+        '<div><b>Job Number</b><span>'+escapeHtml(record.jobNumber)+'</span></div>'+
+        '<div><b>Job Name</b><span>'+escapeHtml(record.jobName)+'</span></div>'+
+        '<div><b>Customer Name</b><span>'+escapeHtml(record.customerName)+'</span></div>'+
+        '<div><b>Invoice Number</b><span>'+escapeHtml(record.invoiceNumber||'—')+'</span></div>'+
+        '<div><b>Phase</b><span>'+escapeHtml(record.phase)+'</span></div>'+
+      '</div>'+
+      '<div class="p-desc"><b>Estimate Description</b><p>'+escapeHtml(record.description)+'</p></div>'+
+      '<table class="p-table"><thead><tr><th>Item #</th><th>Item Name</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<div class="p-totals"><div><span>Subtotal</span><span>'+money(subtotal(lines))+'</span></div><div><span>Tax ('+boundedTaxRate(record.taxRate)+'%)</span><span>'+money(recordTax(record))+'</span></div><div class="grand"><span>Estimate Total</span><span>'+money(recordTotal(record))+'</span></div></div>'+
+      '<div class="p-sign-row"><div class="p-sign">Submitted By — '+escapeHtml(record.submittedBy)+'</div><div class="p-sign">Approved By — '+escapeHtml(record.approvedBy||'Pending')+'</div></div>'+
+    '</div>';
+    window.print();
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    records=loadRecords();
+    if(IS_APPROVER){
+      $('submitterView').style.display='none';
+      $('approverView').style.display='';
+    }else{
+      $('estimateDate').value=todayStr();
+      renderLines([defaultLine()]);
+      var draft;
+      try{draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null')}catch(e){draft=null}
+      if(draft){
+        fillForm(draft);
+        $('draftBanner').style.display='flex';
+      }
+      $('estimateForm').addEventListener('submit',function(event){event.preventDefault();submitEstimate()});
+      $('addLineBtn').addEventListener('click',function(){renderLines(getLinesFromForm().concat([defaultLine()]))});
+      $('taxRate').addEventListener('input',calculateTotals);
+      $('saveDraftBtn').addEventListener('click',function(){
+        localStorage.setItem(DRAFT_KEY,JSON.stringify(collectForm()));
+        $('draftBanner').style.display='none';
+        showToast('Estimate draft saved on this device.');
+      });
+      $('printFormBtn').addEventListener('click',function(){
+        var draftRecord=Object.assign({estimateNumber:'DRAFT',approvedBy:''},collectForm());
+        printEstimate(draftRecord,true);
+      });
+      $('quickBooksBtn').addEventListener('click',function(){
+        if(!validateForm())return;
+        showToast('QuickBooks submission is ready for automation after approval.');
+      });
+      $('clearBtn').addEventListener('click',function(){
+        localStorage.removeItem(DRAFT_KEY);
+        resetForm();
+      });
+    }
+    $('historyToggle').addEventListener('click',function(){
+      $('historyWrap').classList.toggle('open');
+      $('historyToggle').firstChild.textContent=$('historyWrap').classList.contains('open')?'▼ ':'▶ ';
+    });
+    renderAll();
+  });
+})();
+</script>
+</body>
+</html>
