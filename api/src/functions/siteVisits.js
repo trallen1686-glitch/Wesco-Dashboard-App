@@ -22,46 +22,55 @@ function missing(error) {
   return error && (error.status === 400 || error.status === 404);
 }
 
+async function atStage(name, operation) {
+  try {
+    return await operation();
+  } catch (error) {
+    error.siteVisitStage = error.siteVisitStage || name;
+    throw error;
+  }
+}
+
 async function ensureTable() {
   try {
-    await graphFetch(`/${tableSegment()}`);
+    await atStage("open-table", () => graphFetch(`/${tableSegment()}`));
     return;
   } catch (error) {
     if (!missing(error)) throw error;
   }
 
   try {
-    await graphFetch("/worksheets/add", {
+    await atStage("add-sheet", () => graphFetch("/worksheets/add", {
       method: "POST",
       body: JSON.stringify({ name: SHEET_NAME }),
-    });
+    }));
   } catch (error) {
     if (!(error.status === 400 || error.status === 409)) throw error;
   }
 
-  await graphFetch(`/${worksheetSegment()}/range(address='A1:O1')`, {
+  await atStage("write-headers", () => graphFetch(`/${worksheetSegment()}/range(address='A1:O1')`, {
     method: "PATCH",
     body: JSON.stringify({ values: HEADERS }),
-  });
+  }));
 
   try {
-    await graphFetch(`/${worksheetSegment()}/tables/add`, {
+    await atStage("add-table", () => graphFetch(`/${worksheetSegment()}/tables/add`, {
       method: "POST",
       body: JSON.stringify({ address: "A1:O1", hasHeaders: true }),
-    });
+    }));
   } catch (error) {
     if (!(error.status === 400 || error.status === 409)) throw error;
   }
 
-  const tables = await graphFetch(`/${worksheetSegment()}/tables`);
+  const tables = await atStage("list-tables", () => graphFetch(`/${worksheetSegment()}/tables`));
   const current = (tables.value || []).find((table) => table.name === TABLE_NAME) ||
     (tables.value || []).find((table) => table.showHeaders);
   if (!current) throw new Error("Could not create the Site Visits table.");
   if (current.name !== TABLE_NAME) {
-    await graphFetch(`/${worksheetSegment()}/tables('${encodeURIComponent(current.name)}')`, {
+    await atStage("rename-table", () => graphFetch(`/${worksheetSegment()}/tables('${encodeURIComponent(current.name)}')`, {
       method: "PATCH",
       body: JSON.stringify({ name: TABLE_NAME }),
-    });
+    }));
   }
 }
 
@@ -131,7 +140,7 @@ function rowFromItem(item) {
 }
 
 async function findRow(id) {
-  const rows = await graphFetch(`/${tableSegment()}/rows`);
+  const rows = await atStage("find-record", () => graphFetch(`/${tableSegment()}/rows`));
   const values = rows.value || [];
   const index = values.findIndex((row) => text(row.values?.[0]?.[0], 100) === id);
   return { index, rows: values };
@@ -177,7 +186,7 @@ app.http("siteVisits", {
     try {
       await ensureTable();
       if (request.method === "GET") {
-        const rows = await graphFetch(`/${tableSegment()}/rows`);
+        const rows = await atStage("read-records", () => graphFetch(`/${tableSegment()}/rows`));
         return {
           headers: { "Cache-Control": "no-store" },
           jsonBody: { state: stateFromRows(rows.value || []) },
@@ -194,7 +203,10 @@ app.http("siteVisits", {
       context.error(error);
       return {
         status: 500,
-        jsonBody: { error: "The shared Site Visit Planner is temporarily unavailable." },
+        jsonBody: {
+          error: "The shared Site Visit Planner is temporarily unavailable.",
+          code: `SITE_VISITS_${String(error.siteVisitStage || "unknown").toUpperCase().replace(/-/g, "_")}`,
+        },
       };
     }
   },
@@ -226,7 +238,10 @@ app.http("siteVisitRecord", {
       context.error(error);
       return {
         status: error.status === 409 ? 409 : 500,
-        jsonBody: { error: error.status === 409 ? error.message : "The shared Site Visit Planner is temporarily unavailable." },
+        jsonBody: {
+          error: error.status === 409 ? error.message : "The shared Site Visit Planner is temporarily unavailable.",
+          code: `SITE_VISITS_${String(error.siteVisitStage || "record").toUpperCase().replace(/-/g, "_")}`,
+        },
       };
     }
   },
