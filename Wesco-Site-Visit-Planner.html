@@ -29,6 +29,13 @@ body{
   font-size:14.5px;
 }
 .container{max-width:1700px;margin:0 auto;padding:24px}
+.portal-back-row{display:flex;justify-content:flex-start;margin-bottom:14px}
+.portal-back{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 16px;
+  border:1px solid var(--orange);border-radius:4px;background:var(--orange);color:#1a1a1a;
+  font-weight:800;text-decoration:none;box-shadow:0 10px 28px rgba(0,0,0,.32)
+}
+.portal-back:hover,.portal-back:focus{filter:brightness(1.08);outline:3px solid var(--focus);outline-offset:2px}
 .header,.section{
   background:var(--panel);
   border:1px solid rgba(255,255,255,.14);
@@ -97,6 +104,7 @@ button:hover{filter:brightness(1.08)}
   .container{max-width:none;padding:0}
   .header,.section{box-shadow:none;border:1px solid #aaa;background:#fff;color:#111}
   .header-title h1,h2,td{color:#111}
+  .portal-back-row{display:none!important}
   .no-print{display:none!important}
   .multi-select-menu{display:none!important}
   table{min-width:0;font-size:10px}
@@ -106,6 +114,9 @@ button:hover{filter:brightness(1.08)}
 </head>
 <body>
 <div class="container">
+  <div class="portal-back-row no-print">
+    <a class="portal-back" id="staffPortalBack" href="Staff-Portal-Starter-Template.html" aria-label="Back to Staff Portal">← Back to Staff Portal</a>
+  </div>
   <div class="header">
     <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc. logo">
     <div class="header-title">
@@ -690,8 +701,23 @@ function printPendingList(){
 createMultiSelect(document.getElementById('assignedTeam'));
 loadData();
 render();
+
+(function configureStaffPortalBackButton(){
+  const backButton = document.getElementById('staffPortalBack');
+  const person = new URL(window.location.href).searchParams.get('person');
+  const portalUrl = new URL('Staff-Portal-Starter-Template.html', window.location.href);
+  if(person) portalUrl.searchParams.set('person', person);
+  backButton.href = portalUrl.toString();
+
+  backButton.addEventListener('click', function(event){
+    if(window.opener && !window.opener.closed){
+      event.preventDefault();
+      window.opener.focus();
+      window.close();
+    }
+  });
+})();
 </script>
-<script src="staff-portal-back.js"></script>
 </body>
 </html>
 
