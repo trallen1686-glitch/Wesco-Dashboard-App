@@ -97,23 +97,6 @@ function normalized(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function authorized(request) {
-  const encoded = request.headers.get("x-ms-client-principal");
-  if (!encoded) return false;
-  try {
-    const principal = JSON.parse(Buffer.from(encoded, "base64").toString("utf8"));
-    const roles = (principal.userRoles || []).map((role) => String(role).toLowerCase());
-    const email = String(principal.userDetails || "").trim().toLowerCase();
-    return roles.includes("authenticated") && email.endsWith("@wesconc.com");
-  } catch {
-    return false;
-  }
-}
-
-function unauthorized() {
-  return { status: 401, jsonBody: { error: "Sign in with your Wesco account." } };
-}
-
 const ALIASES = {
   projectNumber: ["Project Number", "Project #", "Job Number"],
   projectName: ["Project Name", "Title", "Job Name"],
@@ -125,63 +108,6 @@ const ALIASES = {
   pmAssigned: ["PM Assigned", "Project Manager Assigned"],
   projectManagerName: ["Project Manager Name", "Project Manager", "PM Name"],
   scope: ["Scope", "Scope of Work", "Description"],
-};
-
-const COLUMN_DEFINITIONS = {
-  projectNumber: {
-    name: "ProjectNumber",
-    displayName: "Project Number",
-    text: { allowMultipleLines: false, maxLength: 255 },
-  },
-  projectName: {
-    name: "Title",
-    displayName: "Project Name",
-    text: { allowMultipleLines: false, maxLength: 255 },
-  },
-  customer: {
-    name: "Customer",
-    displayName: "Customer",
-    text: { allowMultipleLines: false, maxLength: 255 },
-  },
-  location: {
-    name: "Location",
-    displayName: "Location",
-    text: { allowMultipleLines: false, maxLength: 255 },
-  },
-  approvalStatus: {
-    name: "ApprovalStatus",
-    displayName: "Approval Status",
-    choice: {
-      allowTextEntry: false,
-      choices: ["Needs to Contact", "Pending", "Contract Executed"],
-      displayAs: "dropDownMenu",
-    },
-  },
-  estimateCreated: {
-    name: "EstimateCreated",
-    displayName: "Estimate Created",
-    boolean: {},
-  },
-  siteVisited: {
-    name: "SiteVisited",
-    displayName: "Site Visited",
-    boolean: {},
-  },
-  pmAssigned: {
-    name: "PMAssigned",
-    displayName: "PM Assigned",
-    boolean: {},
-  },
-  projectManagerName: {
-    name: "ProjectManagerName",
-    displayName: "Project Manager Name",
-    text: { allowMultipleLines: false, maxLength: 255 },
-  },
-  scope: {
-    name: "Scope",
-    displayName: "Scope",
-    text: { allowMultipleLines: true, appendChangesToExistingText: false },
-  },
 };
 
 function findColumn(columns, key) {
@@ -199,20 +125,9 @@ async function schema() {
   const lists = await graph(`sites/${site.id}/lists?$select=id,displayName`);
   const list = (lists.value || []).find((item) => normalized(item.displayName) === normalized(LIST_NAME));
   if (!list) throw new Error(`SharePoint list "${LIST_NAME}" was not found.`);
-  let columns = (await graph(
+  const columns = (await graph(
     `sites/${site.id}/lists/${list.id}/columns?$select=name,displayName,hidden,readOnly,boolean,choice,text`
   )).value || [];
-
-  // The Scheduling pages and SharePoint must share a complete schema. Create
-  // only fields that are absent; existing customer columns are always reused.
-  for (const key of Object.keys(COLUMN_DEFINITIONS)) {
-    if (findColumn(columns, key)) continue;
-    const created = await graph(`sites/${site.id}/lists/${list.id}/columns`, {
-      method: "POST",
-      body: JSON.stringify(COLUMN_DEFINITIONS[key]),
-    });
-    columns.push(created);
-  }
 
   const mapping = {};
   for (const key of Object.keys(ALIASES)) {
@@ -268,7 +183,6 @@ app.http("executedContractsScheduling", {
   authLevel: "anonymous",
   route: "executed-contracts-scheduling",
   handler: async (request, context) => {
-    if (!authorized(request)) return unauthorized();
     try {
       const current = await schema();
       if (request.method === "GET") {
@@ -297,7 +211,6 @@ app.http("executedContractsSchedulingRecord", {
   authLevel: "anonymous",
   route: "executed-contracts-scheduling/{id}",
   handler: async (request, context) => {
-    if (!authorized(request)) return unauthorized();
     const id = String(request.params.id || "");
     if (!/^\d+$/.test(id)) return { status: 400, jsonBody: { error: "Invalid SharePoint item ID." } };
     try {
