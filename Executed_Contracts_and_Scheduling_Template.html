@@ -347,7 +347,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       throw new Error('Sign in with your Wesco account.');
     }
     var body = response.status === 204 ? null : await response.json().catch(function(){ return {}; });
-    if(!response.ok) throw new Error((body && body.error) || 'The shared SharePoint list is unavailable.');
+    if(!response.ok) throw new Error((body && (body.detail || body.error)) || 'The shared SharePoint list is unavailable.');
     return body;
   }
   async function loadRecords(){
@@ -438,8 +438,11 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       resetForm();
       renderList();
       if(wasNew){
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        $('projectNumber').focus();
+        var listUrl = new URL('Executed_Contracts_and_Scheduling_List.html', window.location.href);
+        var person = new URL(window.location.href).searchParams.get('person');
+        if(person) listUrl.searchParams.set('person', person);
+        window.location.href = listUrl.toString();
+        return;
       }
     }catch(error){ showToast(error.message, true); }
     finally{ submit.disabled = false; }
