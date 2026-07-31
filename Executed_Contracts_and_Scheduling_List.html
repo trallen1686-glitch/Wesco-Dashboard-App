@@ -335,10 +335,6 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     var response = await fetch(API + (path || ''), Object.assign({
       headers: { 'Content-Type': 'application/json' }
     }, options || {}));
-    if(response.status === 401){
-      location.href = '/.auth/login/aad?post_login_redirect_uri=' + encodeURIComponent(location.pathname);
-      throw new Error('Sign in with your Wesco account.');
-    }
     var body = response.status === 204 ? null : await response.json().catch(function(){ return {}; });
     if(!response.ok) throw new Error((body && (body.detail || body.error)) || 'The shared SharePoint list is unavailable.');
     return body;
