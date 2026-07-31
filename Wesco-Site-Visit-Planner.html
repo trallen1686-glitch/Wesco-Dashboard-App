@@ -260,9 +260,7 @@ button:hover{filter:brightness(1.08)}
 <script>
 const TEAM_MEMBERS = ['Wes','Oscar','Joe','Chris','Theo','Jesse','Other'];
 const STORAGE_KEY = 'wescoEstimatorSiteVisitsV2';
-const API_URL = '/api/site-visits';
 let state = { unscheduled: [], pending: [], audit: [] };
-let saveQueue = Promise.resolve();
 
 function escapeHtml(value){
   return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -592,86 +590,26 @@ function deletePending(id){
   }
 }
 
-function validState(saved){
-  return saved && Array.isArray(saved.pending) && Array.isArray(saved.audit);
-}
-
-function cacheState(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-}
-
-async function api(path = '',options = {}){
-  const response = await fetch(API_URL + path,{
-    cache:'no-store',
-    headers:{'Content-Type':'application/json',...(options.headers || {})},
-    ...options
-  });
-  const body = await response.json().catch(() => ({}));
-  if(!response.ok) throw new Error(body.error || 'The shared Site Visit Planner could not be updated.');
-  return body;
-}
-
 function saveData(showMessage = true){
-  cacheState();
-  const snapshot = JSON.parse(JSON.stringify(state));
-  saveQueue = saveQueue.catch(() => {}).then(() => api('',{
-    method:'PUT',
-    body:JSON.stringify({state:snapshot})
-  })).then(() => {
-    if(showMessage){
-      const status = document.getElementById('saveStatus');
-      status.textContent = 'Saved to shared list.';
-      setTimeout(() => status.textContent = '',2200);
-    }
-  }).catch(error => {
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  if(showMessage){
     const status = document.getElementById('saveStatus');
-    status.textContent = error.message + ' Saved on this device as a backup.';
-  });
-  return saveQueue;
+    status.textContent = 'Saved successfully.';
+    setTimeout(() => status.textContent = '',2200);
+  }
 }
 
-function localState(){
+function loadData(){
   try{
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(validState(saved)){
-      return {
+    if(saved && Array.isArray(saved.pending) && Array.isArray(saved.audit)){
+      state = {
         unscheduled:Array.isArray(saved.unscheduled) ? saved.unscheduled : [],
         pending:saved.pending,
         audit:saved.audit
       };
     }
   }catch(error){ console.warn('Saved site visit data could not be loaded.',error); }
-  return { unscheduled:[], pending:[], audit:[] };
-}
-
-function hasRecords(value){
-  return value.unscheduled.length || value.pending.length || value.audit.length;
-}
-
-async function loadData(){
-  const backup = localState();
-  try{
-    const result = await api();
-    const shared = result.state;
-    if(validState(shared)){
-      state = {
-        unscheduled:Array.isArray(shared.unscheduled) ? shared.unscheduled : [],
-        pending:shared.pending,
-        audit:shared.audit
-      };
-      if(!hasRecords(state) && hasRecords(backup)){
-        state = backup;
-        await saveData(false);
-      } else {
-        cacheState();
-      }
-    }
-  }catch(error){
-    state = backup;
-    const status = document.getElementById('saveStatus');
-    status.textContent = error.message + ' Showing the device backup.';
-  }
-  render();
 }
 
 function openPrintListWindow(title,content){
@@ -762,6 +700,7 @@ function printPendingList(){
 
 createMultiSelect(document.getElementById('assignedTeam'));
 loadData();
+render();
 
 (function configureStaffPortalBackButton(){
   const backButton = document.getElementById('staffPortalBack');
@@ -781,3 +720,4 @@ loadData();
 </script>
 </body>
 </html>
+
