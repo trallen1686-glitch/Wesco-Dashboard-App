@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesco Site Visit List</title>
+<style>
+:root{
+  --orange:#ff7012;
+  --panel:rgba(9,14,16,.82);
+  --white:#fff;
+  --muted:rgba(255,255,255,.65);
+  --line:rgba(255,255,255,.18);
+  --success:#34d399;
+  --font:"Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:var(--font);
+  font-size:14.5px;
+  color:var(--white);
+  background-color:#090e10;
+  background-image:radial-gradient(circle at 12% 8%,rgba(255,112,18,.09),transparent 384px);
+  background-attachment:fixed;
+}
+.container{max-width:1700px;margin:0 auto;padding:24px}
+.header,.section{
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:5px;
+  box-shadow:0 16px 42px rgba(0,0,0,.28);
+}
+.header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 22px}
+.logo{width:300px;max-width:46vw;height:auto;display:block;background:#fff;border-radius:4px;padding:7px}
+.header-title{text-align:right}
+.header-title h1{margin:0;font-size:31px;font-weight:800}
+.header-title p{margin:6px 0 0;color:var(--muted);font-weight:600}
+.section{padding:20px;margin-top:18px}
+h2{margin:0 0 14px;padding-left:12px;border-left:4px solid var(--orange);font-size:21px;font-weight:800}
+.table-wrap{overflow-x:auto}
+table{width:100%;min-width:900px;border-collapse:collapse}
+th{padding:11px 9px;background:var(--orange);color:#1a1a1a;text-align:left;font-size:14px;font-weight:800;white-space:nowrap}
+td{padding:9px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--white);vertical-align:top}
+.empty-row td{text-align:center;padding:24px;color:var(--muted);font-style:italic}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px}
+button{
+  padding:10px 16px;border:1px solid transparent;border-radius:4px;cursor:pointer;
+  font-family:var(--font);font-size:14px;font-weight:800;
+}
+button:hover{filter:brightness(1.08)}
+.save{background:var(--success);border-color:var(--success);color:#07140e}
+.print{background:var(--orange);border-color:var(--orange);color:#1a1a1a}
+.status{color:var(--success);font-size:13px}
+.portal-back{
+  position:fixed;left:18px;bottom:18px;z-index:2147483647;display:inline-flex;align-items:center;
+  min-height:42px;padding:10px 15px;border:1px solid var(--orange);border-radius:9px;
+  background:var(--orange);color:#1a1a1a!important;font-weight:800;text-decoration:none;
+  box-shadow:0 10px 28px rgba(0,0,0,.42);
+}
+.portal-back:hover,.portal-back:focus{filter:brightness(1.08);outline:3px solid rgba(255,112,18,.28);outline-offset:2px}
+.summary{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.summary-card{min-width:190px;padding:12px 14px;border:1px solid var(--line);border-radius:4px;background:rgba(255,255,255,.04)}
+.summary-card strong{display:block;color:var(--orange);font-size:24px}
+.summary-card span{color:var(--muted);font-size:12px;font-weight:700}
+@media(max-width:800px){
+  .container{padding:12px}
+  .header{display:block;text-align:center}
+  .logo{max-width:100%;margin:auto}
+  .header-title{text-align:center;margin-top:12px}
+}
+@media print{
+  body{background:#fff;color:#111;font-size:11px}
+  .container{max-width:none;padding:0}
+  .header,.section{background:#fff;color:#111;box-shadow:none;border:1px solid #aaa}
+  .header-title p,.summary-card span{color:#555}
+  h2,td{color:#111}
+  .actions{display:none!important}
+  .portal-back{display:none!important}
+  .table-wrap{overflow:visible}
+  table{min-width:0}
+  th,td{padding:6px}
+  .section{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <img class="logo" src="Wesco Logo 2.png" alt="Wesco Exteriors, Inc. logo">
+    <div class="header-title">
+      <h1>Wesco Site Visit List</h1>
+      <p>Sites awaiting scheduling and pending site visits</p>
+    </div>
+  </header>
+
+  <div class="summary" aria-label="Site visit totals">
+    <div class="summary-card"><strong id="awaitingCount">0</strong><span>Awaiting Scheduling</span></div>
+    <div class="summary-card"><strong id="pendingCount">0</strong><span>Pending Site Visits</span></div>
+  </div>
+
+  <section class="section">
+    <h2>Sites Awaiting Scheduling</h2>
+    <div class="table-wrap">
+      <table id="awaitingTable">
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Pending Site Visits</h2>
+    <div class="table-wrap">
+      <table id="pendingTable">
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Customer Name</th>
+            <th>Project Address</th>
+            <th>Scope of Work</th>
+            <th>Scheduled Visit Date</th>
+            <th>Assigned Site Visit By</th>
+            <th>Date Visited</th>
+            <th>Visit By</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <button class="save" type="button" onclick="saveList()">Save</button>
+      <button class="print" type="button" onclick="window.print()">Print</button>
+      <span class="status" id="saveStatus" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+</div>
+<a id="backToStaffPortal" class="portal-back" href="https://wonderful-field-08b34ac0f.7.azurestaticapps.net/Staff-Portal-Starter-Template.html" aria-label="Back to Staff Portal">← Back to Staff Portal</a>
+
+<script>
+const STORAGE_KEY = 'wescoEstimatorSiteVisitsV2';
+let state = { unscheduled:[], pending:[], audit:[] };
+
+function loadList(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(saved && Array.isArray(saved.pending) && Array.isArray(saved.audit)){
+      state = {
+        unscheduled:Array.isArray(saved.unscheduled) ? saved.unscheduled : [],
+        pending:saved.pending,
+        audit:saved.audit
+      };
+    }
+  }catch(error){
+    console.warn('Saved site visit data could not be loaded.',error);
+  }
+  renderList();
+}
+
+function addTextCells(row,values){
+  values.forEach(value => {
+    const cell = row.insertCell();
+    cell.textContent = value || '';
+  });
+}
+
+function renderList(){
+  const awaitingBody = document.querySelector('#awaitingTable tbody');
+  awaitingBody.innerHTML = '';
+  if(state.unscheduled.length === 0){
+    awaitingBody.innerHTML = '<tr class="empty-row"><td colspan="4">No sites are waiting to be scheduled.</td></tr>';
+  } else {
+    state.unscheduled.forEach(item => {
+      const row = awaitingBody.insertRow();
+      addTextCells(row,[item.project,item.customer,item.address,item.scope]);
+    });
+  }
+
+  const pendingBody = document.querySelector('#pendingTable tbody');
+  pendingBody.innerHTML = '';
+  if(state.pending.length === 0){
+    pendingBody.innerHTML = '<tr class="empty-row"><td colspan="8">No pending site visits.</td></tr>';
+  } else {
+    state.pending.forEach(item => {
+      const row = pendingBody.insertRow();
+      addTextCells(row,[
+        item.project,item.customer,item.address,item.scope,item.scheduledDate,
+        item.assignedDisplay,item.visitedDate,item.visitedDisplay
+      ]);
+    });
+  }
+
+  document.getElementById('awaitingCount').textContent = state.unscheduled.length;
+  document.getElementById('pendingCount').textContent = state.pending.length;
+}
+
+function saveList(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  const status = document.getElementById('saveStatus');
+  status.textContent = 'Saved successfully.';
+  setTimeout(() => status.textContent = '',2200);
+}
+
+window.addEventListener('storage',event => {
+  if(event.key === STORAGE_KEY) loadList();
+});
+
+const portalPerson = new URL(window.location.href).searchParams.get('person');
+if(portalPerson){
+  const portalLink = document.getElementById('backToStaffPortal');
+  const portalUrl = new URL(portalLink.href);
+  portalUrl.searchParams.set('person',portalPerson);
+  portalLink.href = portalUrl.toString();
+}
+
+loadList();
+</script>
+</body>
+</html>
+
