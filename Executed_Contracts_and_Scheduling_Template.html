@@ -193,9 +193,14 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
     padding-left:16px; padding-right:16px;
   }
 }
+.executive-page-back{position:fixed;top:18px;left:18px;z-index:2147483647;display:inline-flex;align-items:center;min-height:42px;padding:10px 15px;border:1px solid var(--orange);border-radius:6px;background:var(--orange);color:#1a1a1a!important;font:800 13.5px/1.2 var(--font);text-decoration:none!important;box-shadow:0 8px 24px rgba(0,0,0,.38)}
+.executive-page-back:hover,.executive-page-back:focus{filter:brightness(1.08);outline:3px solid var(--focus);outline-offset:2px}
+@media(max-width:760px){.executive-page-back{position:static;margin:0 0 12px}}
+@media print{.executive-page-back{display:none!important}}
 </style>
 </head>
 <body>
+<a id="executiveBackButton" class="executive-page-back" href="Staff-Portal-Starter-Template.html" aria-label="Back to Staff Portal">&#8592; Back to Staff Portal</a>
 <div class="widget">
   <div class="card">
 
@@ -608,6 +613,12 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
 
 })();
 </script>
-<script src="staff-portal-back.js"></script>
+<script>
+(function(){
+  var backButton=document.getElementById('executiveBackButton');
+  var person=new URL(window.location.href).searchParams.get('person');
+  if(person){var portalUrl=new URL('Staff-Portal-Starter-Template.html',window.location.href);portalUrl.searchParams.set('person',person);backButton.href=portalUrl.toString();}
+})();
+</script>
 </body>
 </html>
