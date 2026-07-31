@@ -107,6 +107,7 @@ const ALIASES = {
   location: ["Location", "Project Location", "Address"],
   approvalStatus: ["Approval Status", "Contract Status", "Status"],
   estimateCreated: [
+    "Estimated Created",
     "Estimate Created",
     "Estimate Created?",
     "Estimate Complete",
@@ -167,9 +168,25 @@ function mapItem(item, mapping) {
     const value = fields[column.name];
     record[key] = column.type === "boolean"
       ? (value === true || value === "true" || value === 1 ? "Yes" : "No")
-      : (value == null ? "" : String(value));
+      : (key === "scope" ? plainText(value) : (value == null ? "" : String(value)));
   }
   return record;
+}
+
+function plainText(value) {
+  return String(value == null ? "" : value)
+    .replace(/<br[^>]*>/gi, "\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;|&#x27;/gi, "'")
+    .replace(/\r/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function clean(value, maximum = 1500) {
