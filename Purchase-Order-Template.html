@@ -249,6 +249,57 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
   .actions-row{ flex-direction:column; }
   .totals-box{ max-width:none; }
 }
+
+/* Estimate Template dark/orange theme — keep synchronized with Wesco-Estimate-Template.html */
+:root{
+  --orange:#ff7012;--white:#fff;--muted:rgba(255,255,255,.65);
+  --panel:rgba(9,14,16,.82);--line:rgba(255,255,255,.18);
+  --focus:rgba(255,112,18,.55);--danger:#ff5858;--success:#34d399;
+  --font:"Segoe UI","Open Sans",system-ui,-apple-system,Arial,sans-serif;
+}
+html,body{min-height:100%}
+body{padding:24px;color:var(--white);background:radial-gradient(circle at 12% 8%,rgba(255,112,18,.09),transparent 24rem),#090e10}
+.widget{max-width:1120px;padding:0}
+.card{background:var(--panel);border:1px solid rgba(255,255,255,.14);border-radius:5px;box-shadow:0 16px 42px rgba(0,0,0,.28);overflow:hidden}
+.header{gap:20px;padding:18px 22px 16px;border-bottom:2px solid var(--orange)}
+.header img.logo{height:62px;background:#fff;border-radius:4px;padding:5px 8px}
+.header h1{font-size:19px;font-weight:800;color:var(--white)}
+.header .subtitle{color:var(--muted)}
+form{padding:4px 22px 18px}
+.section-label{color:var(--orange);font-weight:800;margin:19px 0 10px;padding:0 0 9px;border-top:0;border-bottom:1px solid var(--orange)}
+.section-label:first-of-type{margin-top:6px}
+.field label{color:var(--white)}
+.field label .hint{color:var(--muted)}
+.field input[type="text"],.field input[type="date"],.field input[type="email"],.field input[type="tel"],.field input[type="number"],.field textarea,.field select{color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3)}
+.field select option{color:var(--white);background:#090e10}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.42)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--focus);background:rgba(255,112,18,.06)}
+.btn{border:1px solid var(--orange);border-radius:4px;background:var(--orange);color:#1a1a1a}
+.btn-ghost{background:transparent;color:var(--orange);border-color:var(--orange)}
+.btn-ghost:hover{background:rgba(255,112,18,.08)}
+.actions-row{border-color:var(--line)}
+.quickbooks-submit .btn-quickbooks{background:#2ca01c;border-color:#2ca01c;color:#fff}
+.quickbooks-submit .btn-quickbooks:hover{background:#238b16}
+.banner{background:rgba(138,90,0,.2);color:#f2c46d}
+.banner .btn-icon{color:#f2c46d}
+.li-wrap{border-color:var(--line);background:transparent}
+.li-row{border-color:var(--line)}
+.li-field label{color:var(--orange)}
+.li-field input,.li-field textarea,.totals-row input[type="number"]{color:var(--white);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.3)}
+.li-field input::placeholder,.li-field textarea::placeholder{color:rgba(255,255,255,.42)}
+.li-field input:focus,.li-field textarea:focus,.totals-row input[type="number"]:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--focus)}
+.li-total,.totals-row.grand-total{color:var(--white)}
+.li-empty,.totals-row .t-label{color:var(--muted)}
+.totals-row.grand-total{border-color:var(--orange)}
+.section-heading,.list-toggle,details.data-note,.empty-state{color:var(--muted);border-color:var(--line)}
+li.po{border-color:var(--line);background:rgba(255,255,255,.025)}
+.po-number{background:var(--orange);color:#1a1a1a}
+.po-vendor{color:var(--white)}
+.tag{background:rgba(255,255,255,.1);color:var(--white)}
+.tag.total{background:rgba(255,112,18,.14);color:var(--orange)}
+details.data-note code{background:rgba(255,255,255,.1);color:var(--white)}
+@media(max-width:760px){body{padding:14px}}
+/* End Estimate Template theme */
 </style>
 </head>
 <body>
