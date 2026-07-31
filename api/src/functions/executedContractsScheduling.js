@@ -103,7 +103,7 @@ const ALIASES = {
   customer: ["Customer", "Customer Name"],
   location: ["Location", "Project Location", "Address"],
   approvalStatus: ["Approval Status", "Contract Status", "Status"],
-  estimateCreated: ["Estimate Created", "Estimate Created?", "Estimate Complete", "Estimate Completed", "Estimate Made", "Estimate"],
+  estimateCreated: ["Estimated Created", "Estimate Created", "Estimate Created?", "Estimate Complete", "Estimate Completed", "Estimate Made", "Estimate"],
   siteVisited: ["Site Visited", "Site Visited?"],
   pmAssigned: ["PM Assigned", "Project Manager Assigned"],
   projectManagerName: ["PM Assigned To", "Assigned To", "Project Manager Name", "Project Manager", "PM Name"],
