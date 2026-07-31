@@ -707,6 +707,10 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
      ------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', async function(){
     var params = new URLSearchParams(window.location.search);
+    var appReturnParam = (params.get('returnToInternalStaff') || '').trim();
+    if(appReturnParam){
+      try { sessionStorage.setItem('wescoReturnToInternalStaff', appReturnParam); } catch(e) {}
+    }
     var personParam = (params.get('person') || '').trim().toLowerCase();
     var match = PEOPLE.find(function(p){ return p.name.toLowerCase() === personParam; });
 
@@ -723,6 +727,18 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
     }
 
     $('backLink').addEventListener('click', function(){
+      var appReturn = appReturnParam;
+      if(!appReturn){
+        try { appReturn = sessionStorage.getItem('wescoReturnToInternalStaff') || ''; } catch(e) {}
+      }
+      if(appReturn){
+        if(/^https?:\/\//i.test(appReturn)){
+          window.location.href = appReturn;
+        } else {
+          window.location.href = 'https://apps.powerapps.com/play/e/5f5a03f6-cf02-e670-8e40-ca4c4c83200e/a/98171625-320b-4a58-b82c-d1d9c50505fb?returnToInternalStaff=true';
+        }
+        return;
+      }
       var url = new URL(window.location.href);
       url.searchParams.delete('person');
       window.location.href = url.toString();
