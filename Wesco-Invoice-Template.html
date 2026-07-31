@@ -99,7 +99,16 @@ table.line-items input, table.line-items textarea{
 }
 table.line-items input:focus, table.line-items textarea:focus{ outline:none; border-color:var(--orange); box-shadow:0 0 0 2px var(--focus); }
 table.line-items textarea.li-desc{
-  display:block; min-height:38px; overflow:hidden; resize:none; line-height:1.4; white-space:pre-wrap;
+  display:block;
+  width:100%;
+  min-height:112px;
+  height:auto;
+  max-height:none;
+  overflow-y:hidden;
+  resize:vertical;
+  line-height:1.5;
+  white-space:pre-wrap;
+  field-sizing:content;
 }
 table.line-items input.li-qty, table.line-items input.li-price{ text-align:right; }
 table.line-items td.li-amount{ text-align:right; font-weight:700; white-space:nowrap; }
@@ -512,7 +521,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       '<tr data-row-id="' + rowId + '">' +
         '<td><input type="text" class="li-item-number" placeholder="Item Number" value="' + escapeHtml(itemNumber) + '"></td>' +
         '<td><input type="text" class="li-item-name" placeholder="Item Name" value="' + escapeHtml(itemName) + '"></td>' +
-        '<td><textarea class="li-desc" placeholder="Description" rows="1">' + escapeHtml(desc) + '</textarea></td>' +
+        '<td style="vertical-align:top;"><textarea class="li-desc" placeholder="Description" rows="5" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';">' + escapeHtml(desc) + '</textarea></td>' +
         '<td><input type="number" class="li-qty" min="0" step="1" value="' + escapeHtml(qty) + '"></td>' +
         '<td><input type="number" class="li-price" min="0" step="0.01" value="' + toNumber(price).toFixed(2) + '"></td>' +
         '<td class="li-amount num">' + formatMoney(toNumber(qty) * toNumber(price)) + '</td>' +
@@ -523,8 +532,14 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
 
   function autoGrowDescription(box){
     if(!box) return;
-    box.style.height = 'auto';
-    box.style.height = Math.max(38, box.scrollHeight) + 'px';
+    window.requestAnimationFrame(function(){
+      box.style.height = 'auto';
+      box.style.height = Math.max(112, box.scrollHeight) + 'px';
+    });
+  }
+
+  function resizeAllDescriptions(){
+    Array.prototype.forEach.call(document.querySelectorAll('textarea.li-desc'), autoGrowDescription);
   }
 
   function addLineItemRow(item){
@@ -628,6 +643,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:var(--white); pa
       addLineItemRow();
     }
     recalcTotals();
+    resizeAllDescriptions();
   }
 
   function resetForm(){
