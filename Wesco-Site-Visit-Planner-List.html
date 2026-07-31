@@ -147,13 +147,18 @@ button:hover{filter:brightness(1.08)}
 
 <script>
 const STORAGE_KEY = 'wescoEstimatorSiteVisitsV2';
+const API_URL = '/api/site-visits';
 let state = { unscheduled:[], pending:[], audit:[] };
 
-function loadList(){
+function validState(saved){
+  return saved && Array.isArray(saved.pending) && Array.isArray(saved.audit);
+}
+
+function loadBackup(){
   try{
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(saved && Array.isArray(saved.pending) && Array.isArray(saved.audit)){
-      state = {
+    if(validState(saved)){
+      return {
         unscheduled:Array.isArray(saved.unscheduled) ? saved.unscheduled : [],
         pending:saved.pending,
         audit:saved.audit
@@ -161,6 +166,27 @@ function loadList(){
     }
   }catch(error){
     console.warn('Saved site visit data could not be loaded.',error);
+  }
+  return { unscheduled:[], pending:[], audit:[] };
+}
+
+async function loadList(){
+  try{
+    const response = await fetch(API_URL,{cache:'no-store'});
+    const body = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(body.error || 'The shared Site Visit Planner could not be loaded.');
+    if(validState(body.state)){
+      state = {
+        unscheduled:Array.isArray(body.state.unscheduled) ? body.state.unscheduled : [],
+        pending:body.state.pending,
+        audit:body.state.audit
+      };
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    }
+  }catch(error){
+    state = loadBackup();
+    const status = document.getElementById('saveStatus');
+    status.textContent = error.message + ' Showing the device backup.';
   }
   renderList();
 }
@@ -202,10 +228,11 @@ function renderList(){
   document.getElementById('pendingCount').textContent = state.pending.length;
 }
 
-function saveList(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+async function saveList(){
   const status = document.getElementById('saveStatus');
-  status.textContent = 'Saved successfully.';
+  status.textContent = 'Refreshing shared list…';
+  await loadList();
+  status.textContent = 'Shared list refreshed.';
   setTimeout(() => status.textContent = '',2200);
 }
 
@@ -222,6 +249,8 @@ if(portalPerson){
 }
 
 loadList();
+setInterval(loadList,15000);
+window.addEventListener('focus',loadList);
 </script>
 </body>
 </html>
