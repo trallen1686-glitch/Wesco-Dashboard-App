@@ -165,6 +165,22 @@ async function schema() {
   return value;
 }
 
+function plainText(value) {
+  return String(value == null ? "" : value)
+    .replace(/<br\\s*\\/?\\s*>/gi, "\\n")
+    .replace(/<\\/div\\s*>/gi, "\\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&#x27;/gi, "'")
+    .replace(/\\r/g, "")
+    .replace(/\\n{3,}/g, "\\n\\n")
+    .trim();
+}
+
 function mapItem(item, mapping) {
   const fields = item.fields || {};
   const record = { id: String(item.id), createdAt: item.createdDateTime || "", updatedAt: item.lastModifiedDateTime || "" };
@@ -172,7 +188,7 @@ function mapItem(item, mapping) {
     const value = fields[column.name];
     record[key] = column.type === "boolean"
       ? (value === true || value === "true" || value === 1 ? "Yes" : "No")
-      : (value == null ? "" : String(value));
+      : (key === "scope" ? plainText(value) : (value == null ? "" : String(value)));
   }
   return record;
 }
