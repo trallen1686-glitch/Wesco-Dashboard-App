@@ -1,57 +1,16 @@
 const { app } = require("@azure/functions");
-const { ConfidentialClientApplication } = require("@azure/msal-node");
+const { graphFetch } = require("../graphClient");
 
 const HOSTNAME = "wesconc.sharepoint.com";
 const SITE_PATH = "/sites/Wesco";
 const LIST_NAME = "Executed Contracts and Scheduling";
 const GRAPH = "https://graph.microsoft.com/v1.0";
 
-let tokenCache = null;
 let schemaCache = null;
 
-function credentials() {
-  const candidates = [
-    [process.env.GRAPH_CLIENT_ID, process.env.GRAPH_TENANT_ID, process.env.GRAPH_CLIENT_SECRET],
-    [process.env.EQUIPMENT_GRAPH_CLIENT_ID, process.env.EQUIPMENT_GRAPH_TENANT_ID, process.env.EQUIPMENT_GRAPH_CLIENT_SECRET],
-    [process.env.DATAVERSE_CLIENT_ID, process.env.DATAVERSE_TENANT_ID, process.env.DATAVERSE_CLIENT_SECRET],
-  ];
-  return candidates.find((value) => value.every(Boolean));
-}
-
-async function token() {
-  if (tokenCache && tokenCache.expires > Date.now() + 60000) return tokenCache.value;
-  const credential = credentials();
-  if (!credential) throw new Error("Microsoft Graph credentials are not configured.");
-  const client = new ConfidentialClientApplication({
-    auth: {
-      clientId: credential[0],
-      authority: `https://login.microsoftonline.com/${credential[1]}`,
-      clientSecret: credential[2],
-    },
-  });
-  const result = await client.acquireTokenByClientCredential({
-    scopes: ["https://graph.microsoft.com/.default"],
-  });
-  tokenCache = { value: result.accessToken, expires: new Date(result.expiresOn).getTime() };
-  return tokenCache.value;
-}
-
-async function graph(path, options = {}) {
-  const response = await fetch(path.startsWith("http") ? path : `${GRAPH}/${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${await token()}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`SharePoint request failed (${response.status}): ${detail.slice(0, 400)}`);
-  }
-  if (response.status === 204) return null;
-  return response.json();
+function graph(path, options = {}) {
+  const url = path.startsWith("http") ? path : `${GRAPH}/${path}`;
+  return graphFetch(url, options);
 }
 
 function normalized(value) {
