@@ -362,7 +362,7 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
 
   var QUICK_TOOLS = [
     { label: 'New Project',    icon: '📁', url: '' },
-    { label: 'Change Order',   icon: '📝', url: '' },
+    { label: 'Change Order',   icon: '📝', url: 'Change%20Order%20Template.html', personAware: true },
     { label: 'Purchase Order', icon: '🧾', url: '' },
     { label: 'Daily Update',   icon: '📋', url: '' },
     { label: 'Punch List',     icon: '☑️', url: '' },
@@ -542,7 +542,11 @@ details.data-note code{ background:rgba(255,255,255,.08); color:#FF9A4D; padding
       showToast('“' + tool.label + '” isn\u2019t set up yet \u2014 add its URL to QUICK_TOOLS at the top of the script.', true);
       return;
     }
-    window.open(tool.url, '_blank');
+    var finalUrl = tool.url;
+    if(tool.personAware && currentPersonObj){
+      finalUrl += (finalUrl.indexOf('?') === -1 ? '?' : '&') + 'person=' + encodeURIComponent(currentPersonObj.name);
+    }
+    window.open(finalUrl, '_blank');
   }
 
   function renderStarterView(p){
