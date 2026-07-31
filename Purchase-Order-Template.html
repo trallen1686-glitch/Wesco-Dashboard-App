@@ -7,8 +7,8 @@
 <style>
 /* ==========================================================================
    WESCO EXTERIORS, INC. — Purchase Order Template
-   Colors and font match the Wesco Dashboard Power Apps file / To-Do widget /
-   New Project Template / Change Order Template (Open Sans; #0078D4 /
+   Colors, background, layout, and font match the Wesco Estimate Template
+   (Open Sans; #0078D4 /
    #106EBE blue, #A80000 urgent red, #2EC45A complete green, #A19F9D
    neutral, #F5F5F5 page background, #5C2B37 brand maroon) so this drops
    into the existing WE App screens without looking foreign.
@@ -42,7 +42,7 @@ html,body{
   font-size: 14.5px;
   line-height:1.45;
 }
-.widget{ max-width: 780px; margin: 0 auto; padding: 14px; }
+.widget{ max-width: 1120px; margin: 0 auto; padding: 14px; }
 .card{
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -136,11 +136,12 @@ form{ padding: 4px 18px 18px; }
 .li-field.desc{ flex:1 1 220px; min-width:160px; }
 .li-field.qty{ flex:0 0 64px; }
 .li-field.price{ flex:0 0 96px; }
-.li-field input{
+.li-field input, .li-field textarea{
   font-family:var(--font); font-size:13.5px; border:1px solid var(--border); border-radius:4px;
   padding:8px 9px; background:#fff; color:var(--ink); width:100%;
 }
-.li-field input:focus{ outline:none; border-color:var(--blue-bright); box-shadow:0 0 0 3px rgba(0,120,212,.15); }
+.li-field textarea{ min-height:40px; resize:none; overflow:hidden; line-height:1.35; white-space:pre-wrap; overflow-wrap:anywhere; }
+.li-field input:focus, .li-field textarea:focus{ outline:none; border-color:var(--blue-bright); box-shadow:0 0 0 3px rgba(0,120,212,.15); }
 .li-total{ flex:0 0 92px; text-align:right; font-size:13.5px; font-weight:700; padding-bottom:9px; color:var(--ink); }
 .li-remove{ flex:0 0 auto; }
 .li-empty{ padding:14px 4px; text-align:center; color:var(--ink-soft); font-size:12.5px; }
@@ -318,10 +319,6 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
             <option value="Punch List">
           </datalist>
           <span class="error-msg">Enter the phase.</span>
-        </div>
-        <div class="field" id="f_neededBy">
-          <label for="neededBy">Needed By <span class="hint">(delivery date)</span></label>
-          <input type="date" id="neededBy">
         </div>
       </div>
 
@@ -504,7 +501,7 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
         '<div class="li-field item-number"><label>Item Number</label><input type="text" class="li-item-number" placeholder="Item #" value="' + escapeHtml(item.itemNumber) + '"></div>' +
         '<div class="li-field item-name"><label>Item Name</label><input type="text" class="li-item-name" placeholder="Item name" value="' + escapeHtml(item.itemName) + '"></div>' +
         '<div class="li-field desc"><label>Description</label>' +
-          '<input type="text" class="li-desc" placeholder="Item description" value="' + escapeHtml(item.description) + '"></div>' +
+          '<textarea class="li-desc" rows="1" placeholder="Item description">' + escapeHtml(item.description) + '</textarea></div>' +
         '<div class="li-field qty"><label>Qty</label>' +
           '<input type="number" class="li-qty" min="0" step="1" value="' + escapeHtml(item.qty) + '"></div>' +
         '<div class="li-field price"><label>Unit Price</label>' +
@@ -525,7 +522,15 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     if(focusNew) row.querySelector('.li-desc').focus();
   }
 
+  function autoGrowDescription(textarea){
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.max(40, textarea.scrollHeight) + 'px';
+  }
+
   function wireLineItemRow(row){
+    var description = row.querySelector('.li-desc');
+    autoGrowDescription(description);
+    description.addEventListener('input', function(){ autoGrowDescription(description); });
     row.querySelector('.li-qty').addEventListener('input', recalcTotals);
     row.querySelector('.li-price').addEventListener('input', recalcTotals);
     row.querySelector('.li-remove').addEventListener('click', function(){
@@ -621,7 +626,6 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     return {
       requestedBy: $('requestedBy').value.trim(),
       poDate: $('poDate').value || '',
-      neededBy: $('neededBy').value || '',
       jobNumber: $('jobNumber').value.trim(),
       jobName: $('jobName').value.trim(),
       customerName: $('customerName').value.trim(),
@@ -769,7 +773,6 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
           '<div><b>Customer Name</b><span>' + escapeHtml(o.customerName || '\u2014') + '</span></div>' +
           '<div><b>Estimate/Invoice Number</b><span>' + escapeHtml(o.estimateInvoiceNumber || '\u2014') + '</span></div>' +
           '<div><b>Phase</b><span>' + escapeHtml(o.phase || '') + '</span></div>' +
-          '<div><b>Needed By</b><span>' + escapeHtml(o.neededBy ? formatDate(o.neededBy) : '\u2014') + '</span></div>' +
           '<div><b>Subcontractor/Supplier Name</b><span>' + escapeHtml(o.vendor || '') + '</span></div>' +
           '<div><b>Subcontractor/Vendor Contact</b><span>' + escapeHtml([o.vendorPhone, o.vendorEmail].filter(Boolean).join(' · ') || '\u2014') + '</span></div>' +
           '<div style="grid-column:1 / -1;"><b>Ship To</b><span>' + escapeHtml(o.shipTo || '') + '</span></div>' +
@@ -811,7 +814,6 @@ details.data-note code{ background:#F3F2F1; padding:1px 5px; border-radius:3px; 
     if(draft){
       $('requestedBy').value = draft.requestedBy || '';
       $('poDate').value = draft.poDate || todayStr();
-      $('neededBy').value = draft.neededBy || '';
       $('jobNumber').value = draft.jobNumber || '';
       $('jobName').value = draft.jobName || '';
       $('customerName').value = draft.customerName || '';
